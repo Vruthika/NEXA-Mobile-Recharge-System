@@ -19,7 +19,6 @@ function highlightActiveLink() {
     const href = link.getAttribute("href");
 
     if (currentPath.endsWith(href.replace("../", ""))) {
-      // Active link: purple base, dark purple on hover
       link.classList.add(
         "bg-purple-600",
         "text-white",
@@ -27,7 +26,6 @@ function highlightActiveLink() {
         "hover:bg-purple-700"
       );
     } else {
-      // Inactive links: plain style, no hover background
       link.classList.remove(
         "bg-purple-600",
         "text-white",
@@ -39,84 +37,47 @@ function highlightActiveLink() {
   });
 }
 
-/// Mock Data
-let inactiveCustomers = [
-  { name: "Ravi Kumar", phone: "9876543210", days: 15 },
-  { name: "Priya Sharma", phone: "9123456780", days: 30 },
-  { name: "Arjun Mehta", phone: "9988776655", days: 10 },
-];
+// Customer Data Fetch
+const url = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Customers";
 
-let activeCustomers = [
-  { name: "John Doe", phone: "9090909090", type: "Prepaid", plan: "1.5GB/day" },
-  {
-    name: "Jane Smith",
-    phone: "9123456789",
-    type: "Postpaid",
-    plan: "Family Pack",
-  },
-  {
-    name: "Alice Johnson",
-    phone: "9876501234",
-    type: "Prepaid",
-    plan: "2GB/day",
-  },
-  {
-    name: "Bob Brown",
-    phone: "9988771122",
-    type: "Postpaid",
-    plan: "Unlimited 5G",
-  },
-];
+let inactiveCustomers = [];
+let activeCustomers = [];
+let filteredActive = [];
 
-let filteredActive = [...activeCustomers];
+let inactiveCurrentPage = 1;
+let activeCurrentPage = 1;
+const inactiveRowsPerPage = 5;
+const activeRowsPerPage = 10;
 
-// Render Inactive Customers
-function renderInactive() {
-  let tbody = document.getElementById("inactiveTable");
-  tbody.innerHTML = "";
-  inactiveCustomers.forEach((c, index) => {
-    tbody.innerHTML += `
-            <tr class="text-center border">
-              <td class="p-3 border">${index + 1}</td>
-              <td class="p-3 border">${c.name}</td>
-              <td class="p-3 border">${c.phone}</td>
-              <td class="p-3 border">${c.days}</td>
-              <td class="p-3 border">
-                <button class="px-3 py-1 bg-blue-500 text-white rounded-md mr-2" onclick="viewInactive('${
-                  c.name
-                }')">View</button>
-                <button class="px-3 py-1 bg-red-500 text-white rounded-md" onclick="deactivateInactive(${index})">Deactivate</button>
-              </td>
-            </tr>`;
-  });
+async function fetchCustomers() {
+  try {
+    const res = await fetch(url);
+    const cust = await res.json();
+
+    inactiveCustomers = cust.filter((s) => s.status === "Inactive");
+    activeCustomers = cust.filter((s) => s.status === "Active");
+    filteredActive = [...activeCustomers];
+
+    // Render tables after data fetch
+    renderInactive();
+    renderActive();
+  } catch (e) {
+    console.error("Error fetching customers:", e);
+  }
 }
+fetchCustomers();
 
-// Render Active Customers
-function renderActive() {
-  let tbody = document.getElementById("activeTable");
-  tbody.innerHTML = "";
-  filteredActive.forEach((c, index) => {
-    tbody.innerHTML += `
-            <tr class="text-center border">
-              <td class="p-3 border">${index + 1}</td>
-              <td class="p-3 border">${c.name}</td>
-              <td class="p-3 border">${c.phone}</td>
-              <td class="p-3 border">${c.type}</td>
-              <td class="p-3 border">${c.plan}</td>
-            </tr>`;
-  });
-}
-
-// Deactivate inactive customer (remove from table)
+// Deactivate Inactive Customers
 function deactivateInactive(index) {
   let removed = inactiveCustomers.splice(index, 1);
+  if (
+    inactiveCurrentPage >
+    Math.ceil(inactiveCustomers.length / inactiveRowsPerPage)
+  ) {
+    inactiveCurrentPage = Math.max(1, inactiveCurrentPage - 1);
+  }
   renderInactive();
   showToast(`${removed[0].name} (${removed[0].phone}) has been deactivated`);
-}
-
-// View Inactive customer details
-function viewInactive(name) {
-  showToast(`ℹ️ Viewing details for ${name}`);
 }
 
 // Filter Active Customers
@@ -127,32 +88,222 @@ document.getElementById("filterType").addEventListener("change", (e) => {
   } else {
     filteredActive = activeCustomers.filter((c) => c.type === type);
   }
+  activeCurrentPage = 1;
   renderActive();
 });
 
-// Toast
+// Toast Notifications
 function showToast(message) {
   const container = document.getElementById("toast-container");
 
   const toast = document.createElement("div");
   toast.className =
-    "toast flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg bg-white shadow-xl border-red-500 text-black border-t-4";
+    "toast flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg bg-white border-red-500 text-black border-t-4";
   toast.innerHTML = `❌ <span>${message}</span>`;
 
   container.appendChild(toast);
 
-  // Auto-hide after 3s
   setTimeout(() => {
     toast.classList.add("hide");
     setTimeout(() => toast.remove(), 400);
   }, 3000);
 }
 
-// Initial Render
-renderInactive();
-renderActive();
+// Inactive Customers + Pagination
+function renderInactive() {
+  let tbody = document.getElementById("inactiveTable");
+  tbody.innerHTML = "";
+
+  let start = (inactiveCurrentPage - 1) * inactiveRowsPerPage;
+  let end = start + inactiveRowsPerPage;
+  let paginated = inactiveCustomers.slice(start, end);
+
+  paginated.forEach((c, index) => {
+    tbody.innerHTML += `
+      <tr class="text-center border">
+        <td class="p-3 border">${start + index + 1}</td>
+        <td class="p-3 border">${c.name}</td>
+        <td class="p-3 border">${c.phone}</td>
+        <td class="p-3 border">${c.days}</td>
+        <td class="p-3 border">
+          <button class="px-3 py-1 bg-red-500 text-white rounded-md"
+            onclick="deactivateInactive(${start + index})">Deactivate</button>
+        </td>
+      </tr>`;
+  });
+
+  updateCards();
+  renderInactivePagination();
+}
+
+function renderInactivePagination() {
+  let pagination = document.getElementById("inactivePagination");
+  pagination.innerHTML = "";
+
+  let totalPages = Math.ceil(inactiveCustomers.length / inactiveRowsPerPage);
+  if (totalPages === 0) return;
+
+  // Prev Button
+  let prevBtn = document.createElement("button");
+  prevBtn.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
+         stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" 
+        d="M21 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061A1.125 1.125 0 0 1 21 8.689v8.122ZM11.25 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061a1.125 1.125 0 0 1 1.683.977v8.122Z" />
+    </svg>`;
+  prevBtn.className =
+    "px-2 py-1 rounded-md flex items-center justify-center " +
+    (inactiveCurrentPage === 1
+      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+      : "bg-gray-200 text-gray-700 hover:bg-gray-300");
+
+  prevBtn.disabled = inactiveCurrentPage === 1;
+  prevBtn.addEventListener("click", () => {
+    if (inactiveCurrentPage > 1) {
+      inactiveCurrentPage--;
+      renderInactive();
+    }
+  });
+  pagination.appendChild(prevBtn);
+
+  // Page Numbers
+  for (let i = 1; i <= totalPages; i++) {
+    let button = document.createElement("button");
+    button.innerText = i;
+    button.className =
+      "px-3 py-1 rounded-md " +
+      (i === inactiveCurrentPage
+        ? "bg-purple-600 text-white"
+        : "bg-gray-200 text-gray-700 hover:bg-gray-300");
+
+    button.addEventListener("click", () => {
+      inactiveCurrentPage = i;
+      renderInactive();
+    });
+    pagination.appendChild(button);
+  }
+
+  // Next Button
+  let nextBtn = document.createElement("button");
+  nextBtn.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
+         stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" 
+        d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z" />
+    </svg>`;
+  nextBtn.className =
+    "px-2 py-1 rounded-md flex items-center justify-center " +
+    (inactiveCurrentPage === totalPages
+      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+      : "bg-gray-200 text-gray-700 hover:bg-gray-300");
+
+  nextBtn.disabled = inactiveCurrentPage === totalPages;
+  nextBtn.addEventListener("click", () => {
+    if (inactiveCurrentPage < totalPages) {
+      inactiveCurrentPage++;
+      renderInactive();
+    }
+  });
+  pagination.appendChild(nextBtn);
+}
+
+// Active Customers + Pagination
+function renderActive() {
+  let tbody = document.getElementById("activeTable");
+  tbody.innerHTML = "";
+
+  let start = (activeCurrentPage - 1) * activeRowsPerPage;
+  let end = start + activeRowsPerPage;
+  let paginated = filteredActive.slice(start, end);
+
+  paginated.forEach((c, index) => {
+    tbody.innerHTML += `
+      <tr class="text-center border">
+        <td class="p-3 border">${start + index + 1}</td>
+        <td class="p-3 border">${c.name}</td>
+        <td class="p-3 border">${c.phone}</td>
+        <td class="p-3 border">${c.type}</td>
+        <td class="p-3 border">${c.plan}</td>
+      </tr>`;
+  });
+
+  renderActivePagination();
+  updateCards();
+}
+
+function renderActivePagination() {
+  let pagination = document.getElementById("activePagination");
+  pagination.innerHTML = "";
+
+  let totalPages = Math.ceil(filteredActive.length / activeRowsPerPage);
+  if (totalPages === 0) return;
+
+  // Prev Button
+  let prevBtn = document.createElement("button");
+  prevBtn.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
+         stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" 
+        d="M21 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061A1.125 1.125 0 0 1 21 8.689v8.122ZM11.25 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061a1.125 1.125 0 0 1 1.683.977v8.122Z" />
+    </svg>`;
+  prevBtn.className =
+    "px-2 py-1 rounded-md flex items-center justify-center " +
+    (activeCurrentPage === 1
+      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+      : "bg-gray-200 text-gray-700 hover:bg-gray-300");
+
+  prevBtn.disabled = activeCurrentPage === 1;
+  prevBtn.addEventListener("click", () => {
+    if (activeCurrentPage > 1) {
+      activeCurrentPage--;
+      renderActive();
+    }
+  });
+  pagination.appendChild(prevBtn);
+
+  // Page Numbers
+  for (let i = 1; i <= totalPages; i++) {
+    let button = document.createElement("button");
+    button.innerText = i;
+    button.className =
+      "px-3 py-1 rounded-md " +
+      (i === activeCurrentPage
+        ? "bg-purple-600 text-white"
+        : "bg-gray-200 text-gray-700 hover:bg-gray-300");
+
+    button.addEventListener("click", () => {
+      activeCurrentPage = i;
+      renderActive();
+    });
+    pagination.appendChild(button);
+  }
+
+  // Next Button
+  let nextBtn = document.createElement("button");
+  nextBtn.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
+         stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" 
+        d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z" />
+    </svg>`;
+  nextBtn.className =
+    "px-2 py-1 rounded-md flex items-center justify-center " +
+    (activeCurrentPage === totalPages
+      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+      : "bg-gray-200 text-gray-700 hover:bg-gray-300");
+
+  nextBtn.disabled = activeCurrentPage === totalPages;
+  nextBtn.addEventListener("click", () => {
+    if (activeCurrentPage < totalPages) {
+      activeCurrentPage++;
+      renderActive();
+    }
+  });
+  pagination.appendChild(nextBtn);
+}
 
 // Update Summary Cards
+
 function updateCards() {
   document.getElementById("totalCustomers").innerText =
     activeCustomers.length + inactiveCustomers.length;
@@ -161,43 +312,4 @@ function updateCards() {
 
   document.getElementById("inactiveCustomers").innerText =
     inactiveCustomers.length;
-}
-
-// Modify renderInactive
-function renderInactive() {
-  let tbody = document.getElementById("inactiveTable");
-  tbody.innerHTML = "";
-  inactiveCustomers.forEach((c, index) => {
-    tbody.innerHTML += `
-      <tr class="text-center border">
-        <td class="p-3 border">${index + 1}</td>
-        <td class="p-3 border">${c.name}</td>
-        <td class="p-3 border">${c.phone}</td>
-        <td class="p-3 border">${c.days}</td>
-        <td class="p-3 border">
-          <button class="px-3 py-1 bg-blue-500 text-white rounded-md mr-2" onclick="viewInactive('${
-            c.name
-          }')">View</button>
-          <button class="px-3 py-1 bg-red-500 text-white rounded-md" onclick="deactivateInactive(${index})">Deactivate</button>
-        </td>
-      </tr>`;
-  });
-  updateCards();
-}
-
-// Modify renderActive
-function renderActive() {
-  let tbody = document.getElementById("activeTable");
-  tbody.innerHTML = "";
-  filteredActive.forEach((c, index) => {
-    tbody.innerHTML += `
-      <tr class="text-center border">
-        <td class="p-3 border">${index + 1}</td>
-        <td class="p-3 border">${c.name}</td>
-        <td class="p-3 border">${c.phone}</td>
-        <td class="p-3 border">${c.type}</td>
-        <td class="p-3 border">${c.plan}</td>
-      </tr>`;
-  });
-  updateCards();
 }

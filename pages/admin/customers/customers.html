@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Customer Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script
-      src="https://kit.fontawesome.com/a076d05399.js"
-      crossorigin="anonymous"
-    ></script>
     <style>
       @keyframes slideIn {
         from {
@@ -39,124 +35,345 @@
       .toast.hide {
         animation: slideOut 0.4s ease-in forwards;
       }
+
+      /* Mobile sidebar animation */
+      @keyframes sidebarSlideIn {
+        from {
+          transform: translateX(-100%);
+        }
+        to {
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes sidebarSlideOut {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-100%);
+        }
+      }
+
+      .sidebar-enter {
+        animation: sidebarSlideIn 0.3s ease-out forwards;
+      }
+
+      .sidebar-exit {
+        animation: sidebarSlideOut 0.3s ease-in forwards;
+      }
     </style>
   </head>
+
   <body class="bg-gray-100">
-    <!-- Navbar (fixed top) -->
-    <div id="navbar" class="fixed top-0 left-0 right-0 z-50"></div>
-    <!-- Sidebar (fixed left, below navbar) -->
+    <!-- Mobile Menu Button -->
+    <button
+      id="mobile-menu-btn"
+      class="lg:hidden fixed top-4 right-4 z-50 bg-white p-2 rounded-lg shadow-md hover:bg-gray-50 transition-colors"
+      aria-label="Toggle sidebar"
+    >
+      <svg
+        class="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16"
+        ></path>
+      </svg>
+    </button>
+
+    <!-- Mobile Overlay -->
     <div
-      id="sidebar"
-      class="fixed top-20 left-0 h-[calc(100%-4rem)] w-64 z-40"
+      id="mobile-overlay"
+      class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 hidden"
     ></div>
 
-    
+    <!-- Sidebar -->
+    <div
+      id="sidebar"
+      class="fixed left-0 w-64 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300"
+    ></div>
 
-        <!-- Main Content -->
-        <main class="pt-28 ml-64 p-6 space-y-10">
-          <!-- Summary Cards -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-  <!-- Total Customers -->
-  <div class="bg-white p-6 rounded-lg shadow flex items-center space-x-4">
-    <div class="bg-blue-100 p-4 rounded-full text-blue-500">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-              </svg>
-    </div>
-    <div>
-      <h3 class="text-gray-600">Total Customers</h3>
-      <p id="totalCustomers" class="text-2xl font-bold">0</p>
-    </div>
-  </div>
-
-  <!-- Active Customers -->
-  <div class="bg-white p-6 rounded-lg shadow flex items-center space-x-4">
-    <div class="bg-green-100 p-4 rounded-full text-green-500">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-</svg>
-
-    </div>
-    <div>
-      <h3 class="text-gray-600">Active Customers</h3>
-      <p id="activeCustomers" class="text-2xl font-bold">0</p>
-    </div>
-  </div>
-
-  <!-- Inactive Customers -->
-  <div class="bg-white p-6 rounded-lg shadow flex items-center space-x-4">
-    <div class="bg-red-100 p-4 rounded-full text-red-500">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.25-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z" />
-</svg>
-
-    </div>
-    <div>
-      <h3 class="text-gray-600">Inactive Customers</h3>
-      <p id="inactiveCustomers" class="text-2xl font-bold">0</p>
-    </div>
-  </div>
-</div>
-
-          <!-- Inactive Customers Table -->
-          <div class="bg-white p-6 rounded-lg shadow">
-            <h2 class="text-xl font-semibold mb-4">Inactive Customers</h2>
-            <table class="w-full border-collapse border border-gray-300">
-              <thead>
-                <tr class="bg-gray-100 text-center">
-                  <th class="border border-gray-300 px-4 py-2">S.No</th>
-                  <th class="border border-gray-300 px-4 py-2">Name</th>
-                  <th class="border border-gray-300 px-4 py-2">Phone Number</th>
-                  <th class="border border-gray-300 px-4 py-2">
-                    Days Inactive
-                  </th>
-                  <th class="border border-gray-300 px-4 py-2">Action</th>
-                </tr>
-              </thead>
-              <tbody id="inactiveTable"></tbody>
-            </table>
+    <!-- Main Content -->
+    <main class="pt-16 lg:pt-8 lg:ml-64 p-4 lg:p-6 space-y-6 lg:space-y-10">
+      <!-- Summary Cards -->
+      <h3 class="text-xl lg:text-2xl font-bold px-2 lg:px-0">
+        Customer Management
+      </h3>
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mb-6 lg:mb-8"
+      >
+        <!-- Total Customers -->
+        <div
+          class="bg-white p-4 lg:p-6 rounded-lg shadow flex items-center space-x-3 lg:space-x-4"
+        >
+          <div class="bg-blue-100 p-3 lg:p-4 rounded-full text-blue-500">
+            <svg
+              class="w-5 h-5 lg:w-6 lg:h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              ></path>
+            </svg>
           </div>
-
-          <!-- Active Customers Table -->
-          <div class="bg-white p-6 rounded-lg shadow">
-            <div class="flex items-center justify-between mb-4">
-              <h2 class="text-xl font-semibold">Active Customers</h2>
-              <select
-                id="filterType"
-                class="px-3 py-2 border rounded-md shadow-sm focus:ring focus:ring-blue-300"
-              >
-                <option value="All">All</option>
-                <option value="Prepaid">Prepaid</option>
-                <option value="Postpaid">Postpaid</option>
-              </select>
-            </div>
-            <table class="w-full border-collapse border border-gray-300">
-              <thead>
-                <tr class="bg-gray-100 text-center">
-                  <th class="border border-gray-300 px-4 py-2">S.No</th>
-                  <th class="border border-gray-300 px-4 py-2">Name</th>
-                  <th class="border border-gray-300 px-4 py-2">Phone Number</th>
-                  <th class="border border-gray-300 px-4 py-2">Type</th>
-                  <th class="border border-gray-300 px-4 py-2">
-                    Recharged Plan
-                  </th>
-                </tr>
-              </thead>
-              <tbody id="activeTable"></tbody>
-            </table>
+          <div>
+            <h3 class="text-gray-600 text-sm lg:text-base">Total Customers</h3>
+            <p id="totalCustomers" class="text-xl lg:text-2xl font-bold">0</p>
           </div>
+        </div>
 
-          <!-- Toast -->
-          <!-- Toast Container -->
-          <div
-            id="toast-container"
-            class="fixed top-6 right-6 space-y-3 z-[9999]"
-          ></div>
-        </main>
+        <!-- Active Customers -->
+        <div
+          class="bg-white p-4 lg:p-6 rounded-lg shadow flex items-center space-x-3 lg:space-x-4"
+        >
+          <div class="bg-green-100 p-3 lg:p-4 rounded-full text-green-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5 lg:w-6 lg:h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-gray-600 text-sm lg:text-base">Active Customers</h3>
+            <p id="activeCustomers" class="text-xl lg:text-2xl font-bold">0</p>
+          </div>
+        </div>
 
-        <!-- JS only once -->
-        <script src="customers.js"></script>
-      </body>
-    </html>
+        <!-- Inactive Customers -->
+        <div
+          class="bg-white p-4 lg:p-6 rounded-lg shadow flex items-center space-x-3 lg:space-x-4 md:col-span-2 lg:col-span-1"
+        >
+          <div class="bg-red-100 p-3 lg:p-4 rounded-full text-red-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5 lg:w-6 lg:h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.25-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-gray-600 text-sm lg:text-base">
+              Inactive Customers
+            </h3>
+            <p id="inactiveCustomers" class="text-xl lg:text-2xl font-bold">
+              0
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inactive Customers Table -->
+      <div class="bg-white p-4 lg:p-6 rounded-lg shadow">
+        <h2 class="text-lg lg:text-xl font-semibold mb-4">
+          Inactive Customers
+        </h2>
+        <div class="overflow-x-auto">
+          <table
+            class="w-full border-collapse border border-gray-400 min-w-full"
+          >
+            <thead>
+              <tr class="bg-gray-200 text-center">
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  S.No
+                </th>
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  Name
+                </th>
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  Phone Number
+                </th>
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  Days Inactive
+                </th>
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody id="inactiveTable"></tbody>
+          </table>
+        </div>
+        <!-- Inactive Customers Pagination -->
+        <div
+          id="inactivePagination"
+          class="flex justify-center lg:justify-end space-x-1 lg:space-x-2 mt-4 overflow-x-auto"
+        >
+          <!-- Pagination buttons will be inserted here -->
+        </div>
+      </div>
+
+      <!-- Active Customers -->
+      <div class="bg-white p-4 lg:p-6 rounded-lg shadow">
+        <div
+          class="flex flex-col lg:flex-row lg:items-center justify-between mb-4 space-y-3 lg:space-y-0"
+        >
+          <h2 class="text-lg lg:text-xl font-semibold">Active Customers</h2>
+
+          <div class="flex items-center space-x-2 text-sm lg:text-base">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5 lg:w-6 lg:h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
+              />
+            </svg>
+            <span class="whitespace-nowrap">Filter by Type:</span>
+            <select
+              id="filterType"
+              class="px-2 lg:px-3 py-1 lg:py-2 border rounded-md shadow-sm focus:ring focus:ring-purple-300 text-sm lg:text-base"
+            >
+              <option value="All">All</option>
+              <option value="Prepaid">Prepaid</option>
+              <option value="Postpaid">Postpaid</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+          <table class="border-collapse border border-gray-400 min-w-full">
+            <thead>
+              <tr class="bg-gray-200 text-center">
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  S.No
+                </th>
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  Name
+                </th>
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  Phone Number
+                </th>
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  Type
+                </th>
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  Recharged Plan
+                </th>
+              </tr>
+            </thead>
+            <tbody id="activeTable"></tbody>
+          </table>
+        </div>
+        <!-- Active Customers Pagination -->
+        <div
+          id="activePagination"
+          class="flex justify-center lg:justify-end space-x-1 lg:space-x-2 mt-4 overflow-x-auto"
+        >
+          <!-- Pagination buttons will be inserted here -->
+        </div>
+      </div>
+
+      <!-- Toast Container -->
+      <div
+        id="toast-container"
+        class="fixed top-6 right-6 space-y-3 z-[9999]"
+      ></div>
+    </main>
+
+    <script>
+      // Mobile sidebar functionality
+      const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+      const sidebar = document.getElementById("sidebar");
+      const mobileOverlay = document.getElementById("mobile-overlay");
+
+      function toggleSidebar() {
+        const isHidden = sidebar.classList.contains("-translate-x-full");
+
+        if (isHidden) {
+          // Show sidebar
+          sidebar.classList.remove("-translate-x-full");
+          sidebar.classList.add("translate-x-0");
+          mobileOverlay.classList.remove("hidden");
+        } else {
+          // Hide sidebar
+          sidebar.classList.add("-translate-x-full");
+          sidebar.classList.remove("translate-x-0");
+          mobileOverlay.classList.add("hidden");
+        }
+      }
+
+      mobileMenuBtn.addEventListener("click", toggleSidebar);
+      mobileOverlay.addEventListener("click", toggleSidebar);
+
+      // Close sidebar on escape key
+      document.addEventListener("keydown", (e) => {
+        if (
+          e.key === "Escape" &&
+          !sidebar.classList.contains("-translate-x-full")
+        ) {
+          toggleSidebar();
+        }
+      });
+
+      // Close sidebar when screen size changes to desktop
+      window.addEventListener("resize", () => {
+        if (window.innerWidth >= 1024) {
+          sidebar.classList.remove("-translate-x-full");
+          sidebar.classList.add("translate-x-0");
+          mobileOverlay.classList.add("hidden");
+        } else {
+          // Reset to hidden state on mobile
+          sidebar.classList.add("-translate-x-full");
+          sidebar.classList.remove("translate-x-0");
+          mobileOverlay.classList.add("hidden");
+        }
+      });
+    </script>
+    <script src="customers.js"></script>
   </body>
 </html>
