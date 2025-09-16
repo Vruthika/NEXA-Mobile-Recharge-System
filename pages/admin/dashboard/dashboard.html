@@ -5,12 +5,356 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+
     <script src="./dashboard.js"></script>
   </head>
-  <body>
-    <!-- Navbar (fixed top) -->
-    <!-- <div id="navbar" class="fixed top-0 left-0 right-0 z-50"></div> -->
-    <!-- Sidebar (fixed left, below navbar) -->
-    <div id="sidebar" class="fixed left-0 w-64 z-40"></div>
+  <body class="bg-gray-100">
+    <!-- Mobile Menu Button -->
+    <button
+      id="mobile-menu-btn"
+      class="lg:hidden fixed top-4 right-4 z-50 bg-white p-2 rounded-lg shadow-md hover:bg-gray-50 transition-colors"
+      aria-label="Toggle sidebar"
+    >
+      <svg
+        class="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16"
+        ></path>
+      </svg>
+    </button>
+
+    <!-- Mobile Overlay -->
+    <div
+      id="mobile-overlay"
+      class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 hidden"
+    ></div>
+
+    <!-- Sidebar -->
+    <div
+      id="sidebar"
+      class="fixed left-0 w-64 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300"
+    ></div>
+
+    <!-- Main Content -->
+    <main class="pt-16 lg:pt-8 lg:ml-64 p-4 lg:p-6 space-y-6 lg:space-y-10">
+      <!-- Summary Cards -->
+      <h3 class="text-xl lg:text-2xl font-bold px-2 lg:px-0">
+        Admin Dashboard
+      </h3>
+      
+      
+      <!-- Customer Detail Cards -->
+      <div>
+        <p class="text-l lg:text-xl font-semibold px-2 lg:px-1 mb-4 lg:mb-2">
+          Customers Summary
+        </p>
+        <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mb-6 lg:mb-8"
+        >
+        <!-- Total Customers -->
+        <div
+        class="bg-white p-4 lg:p-6 rounded-lg shadow flex items-center space-x-3 lg:space-x-4"
+        >
+        <div class="bg-blue-100 p-3 lg:p-4 rounded-full text-blue-500">
+          <svg
+              class="w-5 h-5 lg:w-6 lg:h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              >
+              <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              ></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-gray-600 text-sm lg:text-base">Total Customers</h3>
+            <p id="totalCustomers" class="text-xl lg:text-2xl font-bold">0</p>
+          </div>
+        </div>
+        
+        <!-- Active Customers -->
+        <div
+        class="bg-white p-4 lg:p-6 rounded-lg shadow flex items-center space-x-3 lg:space-x-4"
+        >
+          <div class="bg-cyan-100 p-3 lg:p-4 rounded-full text-cyan-500">
+            <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+              class="w-5 h-5 lg:w-6 lg:h-6"
+            >
+            <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"
+            />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-gray-600 text-sm lg:text-base">Active Customers</h3>
+            <p id="activeCustomers" class="text-xl lg:text-2xl font-bold">0</p>
+          </div>
+        </div>
+        
+        <!-- Inactive Customers -->
+        <div
+          class="bg-white p-4 lg:p-6 rounded-lg shadow flex items-center space-x-3 lg:space-x-4 md:col-span-2 lg:col-span-1"
+        >
+        <div class="bg-yellow-100 text-yellow-500 p-3 lg:p-4 rounded-full ">
+            <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5 lg:w-6 lg:h-6"
+              >
+              <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.25-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-gray-600 text-sm lg:text-base">
+              Inactive Customers
+            </h3>
+            <p id="inactiveCustomers" class="text-xl lg:text-2xl font-bold">
+              0
+            </p>
+          </div>
+        </div>
+      </div>
+      </div>
+      
+    
+    <!-- Transaction Detail Cards -->
+      <div>
+      <p class="text-l lg:text-xl font-semibold px-2 lg:px-1 mb-4 lg:mb-2">
+          Transaction Summary
+      </p>
+        <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mb-6 lg:mb-8"
+        >
+        <!-- Total Transaction -->
+        <div
+        class="bg-white p-4 lg:p-6 rounded-lg shadow flex items-center space-x-3 lg:space-x-4"
+        >
+        <div class="bg-purple-100 text-purple-500 p-3 lg:p-4 rounded-full ">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
+</svg>
+
+          </div>
+          <div>
+            <h3 class="text-gray-600 text-sm lg:text-base">Total Transactions</h3>
+            <p id="totalCustomers" class="text-xl lg:text-2xl font-bold">0</p>
+          </div>
+        </div>
+        
+        <!-- Success % -->
+        <div
+        class="bg-white p-4 lg:p-6 rounded-lg shadow flex items-center space-x-3 lg:space-x-4"
+        >
+          <div class="bg-emerald-100 text-emerald-500 p-3 lg:p-4 rounded-full ">
+           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+</svg>
+
+          </div>
+          <div>
+            <h3 class="text-gray-600 text-sm lg:text-base">Success Percentage</h3>
+            <p id="activeCustomers" class="text-xl lg:text-2xl font-bold">0</p>
+          </div>
+        </div>
+        
+        <!-- Failure % -->
+        <div
+          class="bg-white p-4 lg:p-6 rounded-lg shadow flex items-center space-x-3 lg:space-x-4 md:col-span-2 lg:col-span-1"
+        >
+        <div class="bg-red-100 p-3 lg:p-4 rounded-full text-red-500">
+           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+</svg>
+
+          </div>
+          <div>
+            <h3 class="text-gray-600 text-sm lg:text-base">
+              Failure Percentage
+            </h3>
+            <p id="inactiveCustomers" class="text-xl lg:text-2xl font-bold">
+              0
+            </p>
+          </div>
+        </div>
+      </div>
+      </div>
+    
+    
+    <!-- Most Popular Plan Cards -->
+      <div>
+  <p class="text-l lg:text-xl font-semibold px-2 lg:px-0 mb-4 lg:mb-2">
+    Most Popular Plans
+  </p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mb-6 lg:mb-8">
+    
+    <!-- Plan Card 1 -->
+    <div class="bg-white p-4 lg:p-6 rounded-lg shadow">
+      <div class="flex items-start space-x-3 lg:space-x-4">
+        <div class="bg-indigo-100 text-indigo-500 p-3 lg:p-4 rounded-full">
+         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+</svg>
+
+        </div>
+        <div>
+          <h3 class="text-gray-700 text-sm lg:text-base font-semibold">
+            1.5GB/day – 84 Days
+          </h3>
+          <p class="text-gray-500 text-sm">Most chosen prepaid pack with daily data</p>
+          <p class="text-gray-900 font-bold text-lg">₹599</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan Card 2 -->
+    <div class="bg-white p-4 lg:p-6 rounded-lg shadow">
+      <div class="flex items-start space-x-3 lg:space-x-4">
+        <div class="bg-pink-100 text-pink-500 p-3 lg:p-4 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+  <path stroke-linecap="round" stroke-linejoin="round" d="M15.91 11.672a.375.375 0 0 1 0 .656l-5.603 3.113a.375.375 0 0 1-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112Z" />
+</svg>
+
+
+        </div>
+        <div>
+          <h3 class="text-gray-700 text-sm lg:text-base font-semibold">
+            Unlimited 5G + OTT
+          </h3>
+          <p class="text-gray-500 text-sm">Postpaid plan with OTT subscriptions</p>
+          <p class="text-gray-900 font-bold text-lg">₹999</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan Card 3 -->
+    <div class="bg-white p-4 lg:p-6 rounded-lg shadow">
+      <div class="flex items-start space-x-3 lg:space-x-4">
+        <div class="bg-orange-100 text-orange-500 p-3 lg:p-4 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+</svg>
+
+        </div>
+        <div>
+          <h3 class="text-gray-700 text-sm lg:text-base font-semibold">
+            Annual Plan – 2GB/day
+          </h3>
+          <p class="text-gray-500 text-sm">1 year validity with daily data benefits</p>
+          <p class="text-gray-900 font-bold text-lg">₹2999</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+      </div>
+
+
+
+    <!-- Revenue Summary Charts -->
+      <div>
+  <p class="text-l lg:text-xl font-semibold px-2 lg:px-0 mb-4 lg:mb-2">
+    Revenue Summary
+  </p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6 mb-6 lg:mb-8">
+    
+    <!-- Prepaid Revenue Chart -->
+    <div class="bg-white p-4 lg:p-6 rounded-lg shadow">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Prepaid Revenue</h3>
+      <div id="prepaidChart" style="height: 350px; width: 100%;"></div>
+    </div>
+
+    <!-- Postpaid Revenue Chart -->
+    <div class="bg-white p-4 lg:p-6 rounded-lg shadow">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Postpaid Revenue</h3>
+      <div id="postpaidChart" style="height: 350px; width: 100%;"></div>
+    </div>
+
+  </div>
+      </div>
+          
+  </main>
+
+    <script>
+      // Mobile sidebar functionality
+      const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+      const sidebar = document.getElementById("sidebar");
+      const mobileOverlay = document.getElementById("mobile-overlay");
+
+      function toggleSidebar() {
+        const isHidden = sidebar.classList.contains("-translate-x-full");
+
+        if (isHidden) {
+          // Show sidebar
+          sidebar.classList.remove("-translate-x-full");
+          sidebar.classList.add("translate-x-0");
+          mobileOverlay.classList.remove("hidden");
+        } else {
+          // Hide sidebar
+          sidebar.classList.add("-translate-x-full");
+          sidebar.classList.remove("translate-x-0");
+          mobileOverlay.classList.add("hidden");
+        }
+      }
+
+      mobileMenuBtn.addEventListener("click", toggleSidebar);
+      mobileOverlay.addEventListener("click", toggleSidebar);
+
+      // Close sidebar on escape key
+      document.addEventListener("keydown", (e) => {
+        if (
+          e.key === "Escape" &&
+          !sidebar.classList.contains("-translate-x-full")
+        ) {
+          toggleSidebar();
+        }
+      });
+
+      // Close sidebar when screen size changes to desktop
+      window.addEventListener("resize", () => {
+        if (window.innerWidth >= 1024) {
+          sidebar.classList.remove("-translate-x-full");
+          sidebar.classList.add("translate-x-0");
+          mobileOverlay.classList.add("hidden");
+        } else {
+          // Reset to hidden state on mobile
+          sidebar.classList.add("-translate-x-full");
+          sidebar.classList.remove("translate-x-0");
+          mobileOverlay.classList.add("hidden");
+        }
+      });
+    </script>
+    <script src="dashboard.js"></script>
+  </body>
+</html>
+
   </body>
 </html>

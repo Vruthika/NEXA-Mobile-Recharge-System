@@ -8,7 +8,7 @@ function loadComponent(id, filepath) {
     .catch((error) => console.error("Error loading navbar:", error));
 }
 
-loadComponent("navbar", "/components/navbar.html");
+// loadComponent("navbar", "/components/navbar.html");
 loadComponent("sidebar", "/components/admin-sidebar.html");
 
 function highlightActiveLink() {
@@ -19,7 +19,6 @@ function highlightActiveLink() {
     const href = link.getAttribute("href");
 
     if (currentPath.endsWith(href.replace("../", ""))) {
-      // Active link: purple base, dark purple on hover
       link.classList.add(
         "bg-purple-600",
         "text-white",
@@ -27,7 +26,6 @@ function highlightActiveLink() {
         "hover:bg-purple-700"
       );
     } else {
-      // Inactive links: plain style, no hover background
       link.classList.remove(
         "bg-purple-600",
         "text-white",
@@ -38,3 +36,106 @@ function highlightActiveLink() {
     }
   });
 }
+
+// Customer Data Fetch
+const url = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Customers";
+
+let inactiveCustomers = [];
+let activeCustomers = [];
+
+async function fetchDashboardData() {
+  try {
+    const res = await fetch(url);
+    const cust = await res.json();
+
+    inactiveCustomers = cust.filter((s) => s.status === "Inactive");
+    activeCustomers = cust.filter((s) => s.status === "Active");
+
+    updateDashboardCards();
+  } catch (e) {
+    console.error("Error fetching dashboard data:", e);
+  }
+}
+
+fetchDashboardData();
+
+// ==============================
+// Update Dashboard Summary Cards
+// ==============================
+function updateDashboardCards() {
+  const total = activeCustomers.length + inactiveCustomers.length;
+  const active = activeCustomers.length;
+  const inactive = inactiveCustomers.length;
+
+  document.getElementById("totalCustomers").innerText = total;
+  document.getElementById("activeCustomers").innerText = active;
+  document.getElementById("inactiveCustomers").innerText = inactive;
+}
+
+window.onload = function () {
+  // Prepaid Revenue Chart
+  var prepaidChart = new CanvasJS.Chart("prepaidChart", {
+    animationEnabled: true,
+    theme: "light2",
+    legend: {
+      verticalAlign: "bottom",
+      horizontalAlign: "center",
+      fontSize: 14,
+    },
+    data: [
+      {
+        type: "doughnut",
+        startAngle: 240,
+        innerRadius: 70,
+        indexLabel: "{label} - {y}%",
+        indexLabelFontSize: 14,
+        toolTipContent: "<b>{label}:</b> {y}%",
+        click: function (e) {
+          e.dataSeries.dataPoints.forEach((dp) => (dp.exploded = false));
+        },
+        dataPoints: [
+          { y: 25, label: "True Unlimited 5G Plans", color: "#A5B4FC " }, // soft lavender blue
+          { y: 15, label: "Top Up", color: "#86EFAC  " }, // mint green
+          { y: 20, label: "Annual Plans", color: "#7DD3FC " }, // soft sky blue
+          { y: 10, label: "3 GB/Day", color: "#C4B5FD" }, // light purple
+          { y: 10, label: "2.5 GB/Day", color: "#FDE68A " }, // light yellow
+          { y: 20, label: "2 GB/Day", color: "#ff90c7ff" }, // blue
+          { y: 10, label: "1.5 GB/Day", color: "#fac78cff  " }, // light orange
+        ],
+      },
+    ],
+  });
+
+  // Postpaid Revenue Chart
+  var postpaidChart = new CanvasJS.Chart("postpaidChart", {
+    animationEnabled: true,
+    theme: "light2",
+    legend: {
+      verticalAlign: "bottom",
+      horizontalAlign: "center",
+      fontSize: 14,
+    },
+    data: [
+      {
+        type: "doughnut",
+        startAngle: 240,
+        innerRadius: 70,
+        indexLabel: "{label} - {y}%",
+        indexLabelFontSize: 16,
+        toolTipContent: "<b>{label}:</b> {y}%",
+        click: function (e) {
+          e.dataSeries.dataPoints.forEach((dp) => (dp.exploded = false));
+        },
+        dataPoints: [
+          { y: 35, label: "Individual Plans", color: "#93C5FD " }, // powder blue
+          { y: 25, label: "Family Pack", color: "#A7F3D0 " }, // soft mint
+          { y: 20, label: "JioHotstar Plans", color: "#a585f0ff" }, //purple
+          { y: 20, label: "Netflix Plans", color: "#fd99afff" }, // light pink
+        ],
+      },
+    ],
+  });
+
+  prepaidChart.render();
+  postpaidChart.render();
+};
