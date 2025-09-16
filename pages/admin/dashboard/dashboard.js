@@ -38,14 +38,14 @@ function highlightActiveLink() {
 }
 
 // Customer Data Fetch
-const url = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Customers";
+const customersURL = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Customers";
 
 let inactiveCustomers = [];
 let activeCustomers = [];
 
 async function fetchDashboardData() {
   try {
-    const res = await fetch(url);
+    const res = await fetch(customersURL);
     const cust = await res.json();
 
     inactiveCustomers = cust.filter((s) => s.status === "Inactive");
