@@ -113,10 +113,13 @@ function showToast(message) {
 function renderInactive() {
   let tbody = document.getElementById("inactiveTable");
   tbody.innerHTML = "";
+  let sortedCustomers = inactiveCustomers
+    .slice()
+    .sort((a, b) => b.days - a.days);
 
   let start = (inactiveCurrentPage - 1) * inactiveRowsPerPage;
   let end = start + inactiveRowsPerPage;
-  let paginated = inactiveCustomers.slice(start, end);
+  let paginated = sortedCustomers.slice(start, end);
 
   paginated.forEach((c, index) => {
     tbody.innerHTML += `
