@@ -40,13 +40,20 @@ function highlightActiveLink() {
 // Customer Data Fetch
 const customersURL = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Customers";
 
+// Transactions Data Fetch
+const transactionsURL =
+  "https://68ca32f2430c4476c3488311.mockapi.io/Transactions";
+
 let inactiveCustomers = [];
 let activeCustomers = [];
+let transactions = [];
 
 async function fetchDashboardData() {
   try {
-    const res = await fetch(customersURL);
-    const cust = await res.json();
+    const customerRes = await fetch(customersURL);
+    const transactionRes = await fetch(transactionsURL);
+    const cust = await customerRes.json();
+    transactions = await transactionRes.json();
 
     inactiveCustomers = cust.filter((s) => s.status === "Inactive");
     activeCustomers = cust.filter((s) => s.status === "Active");
@@ -70,6 +77,24 @@ function updateDashboardCards() {
   document.getElementById("totalCustomers").innerText = total;
   document.getElementById("activeCustomers").innerText = active;
   document.getElementById("inactiveCustomers").innerText = inactive;
+  const totalTransactions = transactions.length;
+  const successTransactions = transactions.filter(
+    (t) => t.status === "Success"
+  ).length;
+  const failedTransactions = transactions.filter(
+    (t) => t.status === "Failed"
+  ).length;
+
+  document.getElementById("totalTransactions").innerText = totalTransactions;
+  document.getElementById("successTransaction").innerText =
+    totalTransactions > 0
+      ? ((successTransactions / totalTransactions) * 100).toFixed(2) + "%"
+      : "0%";
+
+  document.getElementById("failedTransaction").innerText =
+    totalTransactions > 0
+      ? ((failedTransactions / totalTransactions) * 100).toFixed(2) + "%"
+      : "0%";
 }
 
 window.onload = function () {
