@@ -63,9 +63,39 @@ async function fetchTransactions() {
 }
 fetchTransactions();
 
+// Fetch Plans and populate the dropdown
+async function fetchPlans() {
+  try {
+    const res = await fetch(
+      "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans"
+    );
+    const plans = await res.json();
+
+    const filterPlan = document.getElementById("filterPlan");
+    if (filterPlan) {
+      // Reset dropdown
+      filterPlan.innerHTML = `<option value="All">All</option>`;
+
+      // Populate from API response
+      plans.forEach((plan) => {
+        const option = document.createElement("option");
+        option.value = plan.name;
+        option.textContent = plan.name;
+        filterPlan.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching plans:", error);
+  }
+}
+
+// Load plans after DOM is ready
+document.addEventListener("DOMContentLoaded", fetchPlans);
+
 function applyFilters() {
   const typeFilter = document.getElementById("filterType").value;
   const statusFilter = document.getElementById("filterStatus").value;
+  const planFilter = document.getElementById("filterPlan").value;
   const searchInput = document
     .getElementById("searchNameOrNumber")
     .value.toLowerCase()
@@ -75,12 +105,13 @@ function applyFilters() {
     const typeMatch = typeFilter === "All" || transaction.type === typeFilter;
     const statusMatch =
       statusFilter === "All" || transaction.status === statusFilter;
+    const planMatch = planFilter === "All" || transaction.plan === planFilter;
     const searchMatch =
       searchInput === "" ||
       transaction.name.toLowerCase().includes(searchInput) ||
       transaction.phone.toString().includes(searchInput);
 
-    return typeMatch && statusMatch && searchMatch;
+    return typeMatch && statusMatch && searchMatch && planMatch;
   });
 
   transactionCurrentPage = 1;
@@ -91,6 +122,7 @@ function applyFilters() {
 function initializeFilters() {
   const typeFilter = document.getElementById("filterType");
   const statusFilter = document.getElementById("filterStatus");
+  const planFilter = document.getElementById("filterPlan");
   const searchInput = document.getElementById("searchNameOrNumber");
 
   if (typeFilter) {
@@ -99,6 +131,9 @@ function initializeFilters() {
 
   if (statusFilter) {
     statusFilter.addEventListener("change", applyFilters);
+  }
+  if (planFilter) {
+    planFilter.addEventListener("change", applyFilters);
   }
 
   if (searchInput) {
