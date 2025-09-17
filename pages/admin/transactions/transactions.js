@@ -43,9 +43,11 @@ const transactionsURL =
   "https://68ca32f2430c4476c3488311.mockapi.io/Transactions";
 
 let totalTransactions = [];
-let filteredType = [];
-let filteredStatus = [];
-let filteredPlan = [];
+let filteredTransactions = [];
+
+// let filteredType = [];
+// let filteredStatus = [];
+// let filteredPlan = [];
 
 let transactionCurrentPage = 1;
 const transactionRowsPerPage = 10;
@@ -55,6 +57,7 @@ async function fetchTransactions() {
     const res = await fetch(transactionsURL);
     const trans = await res.json();
     totalTransactions = [...trans];
+    filteredTransactions = [...trans]; // Initialize filtered array
 
     // Render tables after data fetch
     renderTransactions();
@@ -64,29 +67,38 @@ async function fetchTransactions() {
 }
 fetchTransactions();
 
-// Filter Type
-document.getElementById("filterType").addEventListener("change", (e) => {
-  const type = e.target.value;
-  if (type === "All") {
-    filteredType = [...totalTransactions];
-  } else {
-    filteredType = totalTransactions.filter((t) => t.type === type);
-  }
-  transactionCurrentPage = 1;
-  renderTransactions();
-});
+function applyFilters() {
+  const typeFilter = document.getElementById("filterType").value;
+  const statusFilter = document.getElementById("filterStatus").value;
 
-// Filter Status
-document.getElementById("filterStatus").addEventListener("change", (e) => {
-  const status = e.target.value;
-  if (status === "All") {
-    filteredStatus = [...totalTransactions];
-  } else {
-    filteredStatus = totalTransactions.filter((t) => t.status === status);
-  }
+  filteredTransactions = totalTransactions.filter((transaction) => {
+    const typeMatch = typeFilter === "All" || transaction.type === typeFilter;
+    const statusMatch =
+      statusFilter === "All" || transaction.status === statusFilter;
+
+    return typeMatch && statusMatch;
+  });
+
   transactionCurrentPage = 1;
   renderTransactions();
-});
+}
+
+// Initialize event listeners after DOM is loaded
+function initializeFilters() {
+  const typeFilter = document.getElementById("filterType");
+  const statusFilter = document.getElementById("filterStatus");
+
+  if (typeFilter) {
+    typeFilter.addEventListener("change", applyFilters);
+  }
+
+  if (statusFilter) {
+    statusFilter.addEventListener("change", applyFilters);
+  }
+}
+
+// Wait for DOM to be fully loaded
+document.addEventListener("DOMContentLoaded", initializeFilters);
 
 // Total Transactions + Pagination
 function renderTransactions() {
@@ -95,7 +107,7 @@ function renderTransactions() {
 
   let start = (transactionCurrentPage - 1) * transactionRowsPerPage;
   let end = start + transactionRowsPerPage;
-  let paginated = totalTransactions.slice(start, end);
+  let paginated = filteredTransactions.slice(start, end);
 
   paginated.forEach((t, index) => {
     tbody.innerHTML += `
@@ -116,7 +128,9 @@ function renderTransactionPagination() {
   let pagination = document.getElementById("transactionPagination");
   pagination.innerHTML = "";
 
-  let totalPages = Math.ceil(totalTransactions.length / transactionRowsPerPage);
+  let totalPages = Math.ceil(
+    filteredTransactions.length / transactionRowsPerPage
+  );
   if (totalPages === 0) return;
 
   // Prev Button
