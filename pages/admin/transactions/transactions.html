@@ -58,21 +58,20 @@
     class="flex flex-col lg:flex-row lg:items-center justify-between mb-4 space-y-3 lg:space-y-0"
   >
     <!-- Search by Name or Number -->
-    <div class="flex items-center text-sm lg:text-base">
-      <!-- Search Icon (hidden on mobile) -->
+    <div class="flex items-center space-x-2 text-sm lg:text-base">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none"
         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-        class="size-6 hidden sm:mr-2 sm:block">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="m21 21-5.197-5.197m0 0A7.5 7.5 
-            0 1 0 5.196 5.196a7.5 7.5 
-            0 0 0 10.607 10.607Z" />
+        class="size-6 ">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="m21 21-5.197-5.197m0 0A7.5 7.5 
+             0 1 0 5.196 5.196a7.5 7.5 
+             0 0 0 10.607 10.607Z" />
       </svg>
-      <span class="whitespace-nowrap mr-2">Search by Name or Number:</span>
+      <span class="whitespace-nowrap">Search by Name or Number:</span>
       <input type="text"
-    id="searchNameOrNumber"
-    class="w-44 sm:w-48 md:w-64 lg:w-72 px-2 lg:px-3 py-1 lg:py-2 border rounded-md shadow-sm 
-           focus:ring focus:ring-purple-300 text-sm lg:text-base">
+        id="searchNameOrNumber"
+        class="px-2 lg:px-3 py-1 lg:py-2 border rounded-md shadow-sm 
+               focus:ring focus:ring-purple-300 text-sm lg:text-base">
     </div>
 
     <!-- Filter by Type -->
@@ -98,7 +97,7 @@
     </div>
 
     <!-- Filter by Status -->
-    <div class="flex items-center space-x-2 text-sm lg:text-base mr-2">
+    <div class="flex items-center space-x-2 text-sm lg:text-base mr-3">
       <span class="whitespace-nowrap">Filter by Status:</span>
       <select id="filterStatus"
         class="px-2 lg:px-3 py-1 lg:py-2 border rounded-md shadow-sm 
