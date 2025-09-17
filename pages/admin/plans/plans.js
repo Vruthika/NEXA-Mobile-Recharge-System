@@ -43,6 +43,7 @@ function highlightActiveLink() {
 const plansURL = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans";
 let totalCategories = [];
 let totalPlans = [];
+let filteredPlans = [];
 
 async function fetchPlans() {
   try {
@@ -52,6 +53,7 @@ async function fetchPlans() {
       ...new Map(plans.map((plan) => [plan.category, plan.type])).entries(),
     ].map(([category, type]) => ({ category, type }));
     totalPlans = [...plans];
+    filteredPlans = [...plans];
     updateCards();
     renderCategory();
     renderPlan();
@@ -189,7 +191,7 @@ function renderPlan() {
 
   let start = (planCurrentPage - 1) * planRowsPerPage;
   let end = start + planRowsPerPage;
-  let paginated = totalPlans.slice(start, end);
+  let paginated = filteredPlans.slice(start, end);
 
   paginated.forEach((p, index) => {
     tbody.innerHTML += `
@@ -229,7 +231,7 @@ function renderPlanPagination() {
   let pagination = document.getElementById("planPagination");
   pagination.innerHTML = "";
 
-  let totalPages = Math.ceil(totalPlans.length / planRowsPerPage);
+  let totalPages = Math.ceil(filteredPlans.length / planRowsPerPage);
   if (totalPages === 0) return;
 
   // Prev Button
@@ -295,3 +297,24 @@ function renderPlanPagination() {
   });
   pagination.appendChild(nextBtn);
 }
+
+// Filter Plans
+document.addEventListener("DOMContentLoaded", () => {
+  const filterDropdown = document.getElementById("filterType");
+  if (filterDropdown) {
+    filterDropdown.addEventListener("change", (e) => {
+      const type = e.target.value;
+
+      if (type === "All") {
+        filteredPlans = [...totalPlans];
+      } else {
+        filteredPlans = totalPlans.filter(
+          (p) => p.type.toLowerCase() === type.toLowerCase()
+        );
+      }
+
+      planCurrentPage = 1;
+      renderPlan();
+    });
+  }
+});
