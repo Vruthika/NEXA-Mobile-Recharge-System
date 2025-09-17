@@ -45,10 +45,6 @@ const transactionsURL =
 let totalTransactions = [];
 let filteredTransactions = [];
 
-// let filteredType = [];
-// let filteredStatus = [];
-// let filteredPlan = [];
-
 let transactionCurrentPage = 1;
 const transactionRowsPerPage = 10;
 
@@ -70,13 +66,21 @@ fetchTransactions();
 function applyFilters() {
   const typeFilter = document.getElementById("filterType").value;
   const statusFilter = document.getElementById("filterStatus").value;
+  const searchInput = document
+    .getElementById("searchNameOrNumber")
+    .value.toLowerCase()
+    .trim();
 
   filteredTransactions = totalTransactions.filter((transaction) => {
     const typeMatch = typeFilter === "All" || transaction.type === typeFilter;
     const statusMatch =
       statusFilter === "All" || transaction.status === statusFilter;
+    const searchMatch =
+      searchInput === "" ||
+      transaction.name.toLowerCase().includes(searchInput) ||
+      transaction.phone.toString().includes(searchInput);
 
-    return typeMatch && statusMatch;
+    return typeMatch && statusMatch && searchMatch;
   });
 
   transactionCurrentPage = 1;
@@ -87,6 +91,7 @@ function applyFilters() {
 function initializeFilters() {
   const typeFilter = document.getElementById("filterType");
   const statusFilter = document.getElementById("filterStatus");
+  const searchInput = document.getElementById("searchNameOrNumber");
 
   if (typeFilter) {
     typeFilter.addEventListener("change", applyFilters);
@@ -94,6 +99,10 @@ function initializeFilters() {
 
   if (statusFilter) {
     statusFilter.addEventListener("change", applyFilters);
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener("input", applyFilters);
   }
 }
 
@@ -123,7 +132,6 @@ function renderTransactions() {
 
   renderTransactionPagination();
 }
-
 function renderTransactionPagination() {
   let pagination = document.getElementById("transactionPagination");
   pagination.innerHTML = "";
