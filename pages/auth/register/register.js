@@ -23,7 +23,7 @@ document
       return;
     }
 
-    // Mobile number validation (10 digits, only numbers)
+    // Mobile number validation (10 digits, only numbers starting with 6-9)
     const phoneRegex = /^[6-9]\d{9}$/;
     if (!phoneRegex.test(formData.phone)) {
       showError("Please enter a valid 10-digit mobile number");
@@ -43,12 +43,36 @@ document
     // Show loading state
     showLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      showLoading(false);
-      console.log("Registration data:", formData);
-      showSuccessMessage();
-    }, 2000);
+    // Send data to MockAPI (POST request)
+    fetch(customerURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: formData.name,
+        phone: formData.phone,
+        password: formData.password,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        showLoading(false);
+        console.log("Raw data from API:", data);
+
+        // Cleaned object (without id, createdAt, avatar)
+        const cleaned = {
+          name: data.name,
+          phone: data.phone,
+          password: data.password,
+        };
+        console.log("Cleaned Data:", cleaned);
+
+        showSuccessMessage();
+      })
+      .catch((err) => {
+        showLoading(false);
+        showError("Failed to register user");
+        console.error(err);
+      });
   });
 
 function showError(message) {
@@ -91,6 +115,8 @@ function closeSuccessMessage() {
   document.getElementById("success-message").classList.add("hidden");
   // Reset form
   document.getElementById("registerForm").reset();
+  // Redirect to login page
+  window.location.href = "../login/login.html";
 }
 
 // Add floating animation to background elements
@@ -155,3 +181,5 @@ if ("ontouchstart" in window) {
     });
   });
 }
+
+const customerURL = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Customers";
