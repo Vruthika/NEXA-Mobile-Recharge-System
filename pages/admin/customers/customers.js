@@ -8,7 +8,7 @@ function loadComponent(id, filepath) {
     .catch((error) => console.error("Error loading navbar:", error));
 }
 
-loadComponent("navbar", "/components/navbar.html");
+// loadComponent("navbar", "/components/navbar.html");
 loadComponent("sidebar", "/components/admin-sidebar.html");
 
 function highlightActiveLink() {
