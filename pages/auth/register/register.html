@@ -3,113 +3,434 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register</title>
+    <title>NEXA - Mobile Recharge Registration</title>
+    <meta
+      name="description"
+      content="Create your NEXA account for seamless mobile recharge services"
+    />
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Custom CSS Variables for Mobile Recharge Theme */
+      :root {
+        --recharge-primary: 260 100% 60%;
+        --recharge-secondary: 240 100% 70%;
+        --recharge-accent: 220 100% 75%;
+        --recharge-light: 220 100% 95%;
+
+        --gradient-primary: linear-gradient(
+          135deg,
+          hsl(260 100% 60%),
+          hsl(240 100% 70%)
+        );
+        --gradient-secondary: linear-gradient(
+          135deg,
+          hsl(240 100% 70%),
+          hsl(220 100% 75%)
+        );
+        --gradient-bg: linear-gradient(
+          45deg,
+          hsl(210 100% 97%),
+          hsl(220 100% 95%)
+        );
+        --gradient-card: linear-gradient(
+          145deg,
+          hsl(0 0% 100%),
+          hsl(220 60% 98%)
+        );
+
+        --shadow-card: 0 20px 60px -12px hsl(260 100% 60% / 0.25);
+        --shadow-button: 0 8px 25px -8px hsl(260 100% 60% / 0.5);
+        --shadow-input: 0 4px 15px -4px hsl(220 100% 75% / 0.2);
+      }
+
+      /* Custom Tailwind Configuration */
+      .bg-gradient-primary {
+        background: var(--gradient-primary);
+      }
+
+      .bg-gradient-secondary {
+        background: var(--gradient-secondary);
+      }
+
+      .bg-gradient-bg {
+        background: var(--gradient-bg);
+      }
+
+      .bg-gradient-card {
+        background: var(--gradient-card);
+      }
+
+      .shadow-card {
+        box-shadow: var(--shadow-card);
+      }
+
+      .shadow-button {
+        box-shadow: var(--shadow-button);
+      }
+
+      .shadow-input {
+        box-shadow: var(--shadow-input);
+      }
+
+      .text-gradient {
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* Custom Animations */
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(45deg);
+        }
+        50% {
+          transform: translateY(-20px) rotate(45deg);
+        }
+      }
+
+      @keyframes bounce-custom {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      .animate-bounce-custom {
+        animation: bounce-custom 3s ease-in-out infinite;
+      }
+
+      /* Input Focus Styles */
+      .input-enhanced:focus {
+        outline: none;
+        border-color: hsl(var(--recharge-primary));
+        box-shadow: 0 0 0 2px hsl(var(--recharge-primary) / 0.2),
+          var(--shadow-input);
+      }
+
+      .input-enhanced:hover {
+        box-shadow: 0 8px 25px -8px hsl(220 100% 75% / 0.3);
+      }
+
+      /* Button Styles */
+      .btn-primary {
+        background: var(--gradient-primary);
+        box-shadow: var(--shadow-button);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .btn-primary:hover {
+        opacity: 0.9;
+        transform: scale(1.02);
+      }
+
+      .btn-primary:active {
+        transform: scale(0.98);
+      }
+
+      /* Logo Container */
+      .logo-container {
+        position: relative;
+      }
+
+      /* Responsive Animations - Reduce on smaller screens */
+      @media (max-width: 640px) {
+        .animate-float {
+          animation: float 8s ease-in-out infinite;
+        }
+
+        .animate-bounce-custom {
+          animation: bounce-custom 4s ease-in-out infinite;
+        }
+
+        .btn-primary:hover {
+          transform: scale(1.01);
+        }
+      }
+
+      /* Responsive Background Elements */
+      @media (max-width: 768px) {
+        .bg-circle-1 {
+          width: 200px !important;
+          height: 250px !important;
+          top: -80px !important;
+          right: -40px !important;
+        }
+
+        .bg-circle-2 {
+          width: 200px !important;
+          height: 250px !important;
+          bottom: -80px !important;
+          left: -40px !important;
+        }
+
+        .decorative-1 {
+          width: 60px !important;
+          height: 60px !important;
+          top: 40px !important;
+          left: 15px !important;
+        }
+
+        .decorative-2 {
+          width: 50px !important;
+          height: 50px !important;
+          bottom: 80px !important;
+          right: 15px !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .bg-circle-1 {
+          width: 160px !important;
+          height: 200px !important;
+          opacity: 0.4 !important;
+          top: -60px !important;
+          right: -30px !important;
+        }
+
+        .bg-circle-2 {
+          width: 160px !important;
+          height: 200px !important;
+          opacity: 0.4 !important;
+          bottom: -60px !important;
+          left: -30px !important;
+        }
+
+        .decorative-1 {
+          width: 50px !important;
+          height: 50px !important;
+          top: 30px !important;
+          left: 10px !important;
+        }
+
+        .decorative-2 {
+          width: 40px !important;
+          height: 40px !important;
+          bottom: 60px !important;
+          right: 10px !important;
+        }
+      }
+
+      /* Remove all scrollbars */
+      html,
+      body {
+        overflow: hidden;
+        height: 100dvh;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
   </head>
   <body
-    class="min-h-screen flex items-center justify-center bg-blue-200 relative overflow-hidden"
+    class="h-screen flex items-center justify-center overflow-hidden bg-gradient-bg p-4 sm:p-6 md:p-8"
   >
-    <!-- Background Circles -->
+    <!-- Animated Background Circles -->
     <div
-      class="w-80 h-[450px] rounded-full absolute rotate-45 -top-40 -right-20 bg-blue-500"
+      class="bg-circle-1 fixed w-80 h-[450px] rounded-full -top-40 -right-20 bg-gradient-primary opacity-70 animate-float"
     ></div>
     <div
-      class="w-80 h-[450px] rounded-full absolute rotate-45 -bottom-40 -left-20 bg-blue-500"
+      class="bg-circle-2 fixed w-80 h-[450px] rounded-full -bottom-40 -left-20 bg-gradient-secondary opacity-70 animate-float"
     ></div>
 
-    <!-- Register Form -->
+    <!-- Additional decorative elements -->
     <div
-      class="bg-white shadow-2xl rounded-2xl w-full max-w-md p-8 border border-gray-200 relative z-10"
+      class="decorative-1 absolute w-32 h-32 rounded-full top-20 left-20 bg-gradient-secondary opacity-30 animate-bounce-custom"
+      style="animation-delay: 1s; animation-duration: 3s"
+    ></div>
+    <div
+      class="decorative-2 absolute w-24 h-24 rounded-full bottom-32 right-32 bg-gradient-primary opacity-40 animate-bounce-custom"
+      style="animation-delay: 2s; animation-duration: 4s"
+    ></div>
+
+    <!-- Register Form Card -->
+    <div
+      class="w-full max-w-md relative z-10 shadow-card rounded-2xl border-0 bg-gradient-card backdrop-blur-sm p-4 sm:p-6 mx-4 max-h-[90vh] overflow-y-hidden"
     >
-      <!-- Logo -->
-      <div class="flex flex-col items-center mb-8">
-        <img
-          src="/assets/images/logo.png"
-          alt="NEXA Logo"
-          class="w-16 h-16 rounded-full shadow-2xl mb-2 border-2 border-purple-500"
-        />
-        <h1 class="text-3xl font-bold text-gray-800">Create Account</h1>
-        <p class="text-sm font-semibold text-gray-500 mt-1">Join NEXA today!</p>
+      <!-- Logo and Header -->
+      <div class="flex flex-col items-center mb-4 sm:mb-6">
+        <div class="logo-container mb-2 sm:mb-3">
+          <img
+            src="/assets/images/logo.png"
+            alt="NEXA Logo"
+            class="w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-button border-2 transition-transform duration-300 hover:scale-110 cursor-pointer"
+            style="border-color: hsl(var(--recharge-primary))"
+          />
+        </div>
+        <h1
+          class="text-xl sm:text-2xl md:text-3xl font-bold text-gradient mb-1"
+        >
+          Create Account
+        </h1>
+        <p class="text-xs sm:text-sm font-semibold text-gray-500 text-center">
+          Join NEXA Mobile Recharge today!
+        </p>
       </div>
 
       <!-- Form -->
-      <form class="space-y-2">
-        <!-- Name -->
-        <div>
-          <label for="name" class="block text-sm font-medium text-gray-700"
-            >Name</label
-          >
+      <form id="registerForm" class="space-y-3 sm:space-y-4">
+        <!-- Name Field -->
+        <div class="space-y-1">
+          <label for="name" class="block text-sm font-medium text-gray-700">
+            Name
+          </label>
           <input
             type="text"
             id="name"
+            name="name"
             placeholder="Enter your name"
-            class="mt-2 w-full px-4 py-3 rounded-lg bg-gray-50 text-gray-800 placeholder-gray-400 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            class="input-enhanced w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-gray-50 text-gray-800 placeholder-gray-400 border border-gray-300 shadow-input transition-all duration-300 text-sm sm:text-base"
             aria-label="Name"
-          />
-        </div>
-        <!-- Phone Number -->
-        <div>
-          <label for="phone" class="block text-sm font-medium text-gray-700"
-            >Phone Number</label
-          >
-          <input
-            type="text"
-            id="phone"
-            placeholder="Enter your phone number"
-            class="mt-2 w-full px-4 py-3 rounded-lg bg-gray-50 text-gray-800 placeholder-gray-400 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            aria-label="Phone Number"
+            required
           />
         </div>
 
-        <!-- Password -->
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-700"
-            >Password</label
-          >
+        <!-- Phone Number Field -->
+        <div class="space-y-1">
+          <label for="phone" class="block text-sm font-medium text-gray-700">
+            Phone Number
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            placeholder="Enter your phone number"
+            class="input-enhanced w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-gray-50 text-gray-800 placeholder-gray-400 border border-gray-300 shadow-input transition-all duration-300 text-sm sm:text-base"
+            aria-label="Phone Number"
+            required
+          />
+        </div>
+
+        <!-- Password Field -->
+        <div class="space-y-1">
+          <label for="password" class="block text-sm font-medium text-gray-700">
+            Password
+          </label>
           <input
             type="password"
             id="password"
+            name="password"
             placeholder="Create a password"
-            class="mt-2 w-full px-4 py-3 rounded-lg bg-gray-50 text-gray-800 placeholder-gray-400 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            class="input-enhanced w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-gray-50 text-gray-800 placeholder-gray-400 border border-gray-300 shadow-input transition-all duration-300 text-sm sm:text-base"
             aria-label="Password"
+            required
           />
         </div>
 
-        <!-- Re-enter Password -->
-        <div>
+        <!-- Confirm Password Field -->
+        <div class="space-y-1">
           <label
             for="confirm-password"
             class="block text-sm font-medium text-gray-700"
-            >Re-enter Password</label
           >
+            Re-enter Password
+          </label>
           <input
             type="password"
             id="confirm-password"
+            name="confirm-password"
             placeholder="Re-enter your password"
-            class="mt-2 w-full px-4 py-3 rounded-lg bg-gray-50 text-gray-800 placeholder-gray-400 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            class="input-enhanced w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-gray-50 text-gray-800 placeholder-gray-400 border border-gray-300 shadow-input transition-all duration-300 text-sm sm:text-base"
             aria-label="Confirm Password"
+            required
           />
         </div>
 
         <!-- Register Button -->
         <button
           type="submit"
-          class="w-full py-3 bg-gradient-to-r from-purple-500 to-blue-600 hover:opacity-90 rounded-lg font-semibold text-white shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+          class="btn-primary w-full py-2 sm:py-2.5 rounded-lg font-semibold text-white text-sm sm:text-base mt-4"
         >
-          Register
+          <span id="button-text">Register</span>
+          <span id="loading-spinner" class="hidden">
+            <svg
+              class="animate-spin -ml-1 mr-3 h-4 w-4 sm:h-5 sm:w-5 text-white inline"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Processing...
+          </span>
         </button>
       </form>
 
-      <!-- Already have account -->
-      <p class="text-center text-sm text-gray-600 mt-6">
+      <!-- Login Link -->
+      <p class="text-center text-xs sm:text-sm text-gray-600 mt-3 sm:mt-4">
         Already an existing user?
         <a
           href="../login/login.html"
-          class="font-semibold text-blue-600 hover:underline"
+          class="font-semibold transition-colors duration-200 hover:underline block sm:inline mt-1 sm:mt-0"
+          style="color: hsl(var(--recharge-secondary))"
+          onmouseover="this.style.color='hsl(var(--recharge-primary))'"
+          onmouseout="this.style.color='hsl(var(--recharge-secondary))'"
         >
           Click here to Login
         </a>
       </p>
     </div>
+
+    <!-- Success Message (Hidden by default) -->
+    <div
+      id="success-message"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+    >
+      <div
+        class="bg-white rounded-lg p-6 sm:p-8 max-w-sm w-full mx-4 text-center shadow-card"
+      >
+        <div
+          class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4"
+        >
+          <svg
+            class="w-6 h-6 sm:w-8 sm:h-8 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-2">
+          Registration Successful!
+        </h3>
+        <p class="text-sm sm:text-base text-gray-600 mb-4">
+          Welcome to NEXA Mobile Recharge. Your account has been created
+          successfully.
+        </p>
+        <button
+          onclick="closeSuccessMessage()"
+          class="btn-primary px-4 sm:px-6 py-2 rounded-lg text-white font-medium text-sm sm:text-base"
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+
+    <script src="./register.js"></script>
   </body>
 </html>
