@@ -43,50 +43,63 @@ document
     // Show loading state
     showLoading(true);
 
-    // Send data to MockAPI (POST request)
-    fetch(customerURL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: formData.name,
-        phone: formData.phone,
-        password: formData.password,
-      }),
-    })
+    // 🔹 Step 1: Check if user already exists by phone
+    fetch(`${customerURL}?phone=${formData.phone}`)
       .then((res) => res.json())
-      .then((data) => {
-        showLoading(false);
-        console.log("Raw data from API:", data);
+      .then((users) => {
+        if (users.length > 0) {
+          // User already registered
+          showLoading(false);
+          showError("User already registered");
+        } else {
+          // 🔹 Step 2: Register new user
+          fetch(customerURL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: formData.name,
+              phone: formData.phone,
+              password: formData.password,
+            }),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              showLoading(false);
+              console.log("Raw data from API:", data);
 
-        // Cleaned object (without id, createdAt, avatar)
-        const cleaned = {
-          name: data.name,
-          phone: data.phone,
-          password: data.password,
-        };
-        console.log("Cleaned Data:", cleaned);
+              const cleaned = {
+                name: data.name,
+                phone: data.phone,
+                password: data.password,
+              };
+              console.log("Cleaned Data:", cleaned);
 
-        showSuccessMessage();
+              showSuccessMessage();
+            })
+            .catch((err) => {
+              showLoading(false);
+              showError("Failed to register user");
+              console.error(err);
+            });
+        }
       })
       .catch((err) => {
         showLoading(false);
-        showError("Failed to register user");
+        showError("Something went wrong");
         console.error(err);
       });
   });
 
 function showError(message) {
-  // Create and show error message
-  const errorDiv = document.createElement("div");
-  errorDiv.className =
-    "fixed top-4 left-4 right-4 sm:top-4 sm:right-4 sm:left-auto bg-red-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow-lg z-50 animate-pulse text-sm sm:text-base max-w-sm sm:w-auto mx-auto sm:mx-0";
+  const errorDiv = document.getElementById("form-error");
   errorDiv.textContent = message;
-  document.body.appendChild(errorDiv);
+  errorDiv.classList.remove("hidden");
 
-  // Remove after 3 seconds
+  // Auto hide after 5s (optional, you can remove this if you want it persistent)
   setTimeout(() => {
-    errorDiv.remove();
-  }, 3000);
+    errorDiv.classList.add("hidden");
+    errorDiv.textContent = "";
+  }, 5000);
 }
 
 function showLoading(isLoading) {

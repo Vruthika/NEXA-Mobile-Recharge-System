@@ -84,17 +84,17 @@ document
   });
 
 function showError(message) {
-  // Create and show error message
-  const errorDiv = document.createElement("div");
-  errorDiv.className =
-    "fixed top-4 left-4 right-4 sm:top-4 sm:right-4 sm:left-auto bg-red-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow-lg z-50 animate-pulse text-sm sm:text-base max-w-sm sm:w-auto mx-auto sm:mx-0";
-  errorDiv.textContent = message;
-  document.body.appendChild(errorDiv);
+  const errorDiv = document.getElementById("form-error");
+  if (!errorDiv) return; // safety check
 
-  // Remove after 3 seconds
+  errorDiv.textContent = message;
+  errorDiv.classList.remove("hidden");
+
+  // Auto-hide after 3s
   setTimeout(() => {
-    errorDiv.remove();
-  }, 3000);
+    errorDiv.classList.add("hidden");
+    errorDiv.textContent = "";
+  }, 5000);
 }
 
 function showLoading(isLoading) {
