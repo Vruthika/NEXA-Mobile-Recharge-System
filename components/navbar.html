@@ -1,21 +1,119 @@
-<nav
-  class="flex bg-slate-900 shadow-lg p-4 text-white items-center justify-between"
->
-  <div class="flex items-center gap-4">
-    <div class="flex">
-      <img
-        src="/assets/images/logo.png"
-        alt="Logo"
-        height="60"
-        width="60"
-        class="rounded-2xl"
-      />
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEXA Navbar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100">
+    <!-- Navbar -->
+    <nav
+      class="flex bg-[#1E3A8A] shadow-lg p-4 text-white items-center justify-between"
+    >
+      <!-- Left: Logo -->
+      <div class="flex items-center gap-3">
+        <img
+          src="/assets/images/logo.png"
+          alt="Logo"
+          class="w-12 h-12 rounded-2xl"
+        />
+        <span class="text-2xl font-bold">NEXA</span>
+      </div>
+
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex items-center gap-4 mr-6">
+        <a
+          href="#"
+          class="px-4 py-2 bg-[#CBD5E1] text-black hover:bg-purple-600 rounded-lg transition font-medium"
+        >
+          Home
+        </a>
+        <a
+          href="#"
+          class="px-4 py-2 bg-[#CBD5E1] text-black hover:bg-purple-600 rounded-lg transition font-medium"
+        >
+          Plans
+        </a>
+        <a
+          href="#"
+          class="px-4 py-2 bg-[#CBD5E1] text-black hover:bg-purple-600 rounded-lg transition font-medium"
+        >
+          FAQ
+        </a>
+        <a
+          href="#"
+          class="px-4 py-2 bg-[#CBD5E1] text-black hover:bg-purple-600 rounded-lg transition font-medium"
+        >
+          Support
+        </a>
+        <button
+          class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition font-semibold"
+        >
+          Register / Login
+        </button>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <div class="md:hidden">
+        <button id="menuBtn" class="focus:outline-none">
+          <svg
+            class="w-8 h-8"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Mobile Dropdown -->
+    <div
+      id="mobileMenu"
+      class="hidden bg-slate-800 text-white md:hidden p-4 space-y-3"
+    >
+      <a
+        href="#"
+        class="block w-full text-center px-4 py-2 bg-slate-700 hover:bg-purple-600 rounded-lg"
+        >Home</a
+      >
+      <a
+        href="#"
+        class="block w-full text-center px-4 py-2 bg-slate-700 hover:bg-purple-600 rounded-lg"
+        >Plans</a
+      >
+      <a
+        href="#"
+        class="block w-full text-center px-4 py-2 bg-slate-700 hover:bg-purple-600 rounded-lg"
+        >FAQ</a
+      >
+      <a
+        href="#"
+        class="block w-full text-center px-4 py-2 bg-slate-700 hover:bg-purple-600 rounded-lg"
+        >Support</a
+      >
+      <button
+        class="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold"
+      >
+        Register / Login
+      </button>
     </div>
-    <div class="text-3xl font-bold flex">NEXA</div>
-  </div>
-  <div class="flex items-center mr-8 gap-8">
-    <button class="bg-purple-600 hover:bg-purple-700 p-2 rounded m">
-      Register/ Login
-    </button>
-  </div>
-</nav>
+
+    <script>
+      const menuBtn = document.getElementById("menuBtn");
+      const mobileMenu = document.getElementById("mobileMenu");
+
+      menuBtn.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+      });
+    </script>
+  </body>
+</html>
