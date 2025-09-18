@@ -55,58 +55,60 @@
 
   <!-- Filters and Search  -->
   <div
-    class="flex flex-col lg:flex-row lg:items-center justify-between mb-4 space-y-3 lg:space-y-0"
-  >
+  class="flex flex-col lg:flex-row lg:items-center justify-between mb-4 space-y-3 lg:space-y-0"
+>
+
+
     <!-- Search by Name or Number -->
-    <div class="flex items-center md:space-x-2 text-sm lg:text-base">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-        class="size-6  hidden sm:mr-2 sm:block">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="m21 21-5.197-5.197m0 0A7.5 7.5 
-             0 1 0 5.196 5.196a7.5 7.5 
-             0 0 0 10.607 10.607Z" />
-      </svg>
-      <span class="whitespace-nowrap mr-2">Search by Name or Number:</span>
-      <input type="text"
-        id="searchNameOrNumber"
-        class="w-40 sm:w-48 md:w-60 px-2 lg:px-3 py-1 lg:py-2 border rounded-md shadow-sm 
-               focus:ring focus:ring-purple-300 text-sm lg:text-base">
-    </div>
+<div class="flex items-center gap-2 text-sm lg:text-base">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+    class="w-5 h-5 text-gray-600">
+    <path stroke-linecap="round" stroke-linejoin="round"
+      d="m21 21-5.197-5.197m0 0A7.5 7.5 
+         0 1 0 5.196 5.196a7.5 7.5 
+         0 0 0 10.607 10.607Z" />
+  </svg>
+  <label for="searchNameOrNumber" class="whitespace-nowrap">Search:</label>
+  <input type="text" id="searchNameOrNumber"
+    class="w-48 sm:w-56 px-2 py-1 border rounded-md shadow-sm 
+           focus:ring focus:ring-purple-300 text-sm">
+</div>
 
-    <!-- Filter by Type -->
-    <div class="flex items-center space-x-2 text-sm lg:text-base">
-      <span class="whitespace-nowrap">Filter by Type:</span>
-      <select id="filterType"
-        class="px-2 lg:px-3 py-1 lg:py-2 border rounded-md shadow-sm 
-               focus:ring focus:ring-purple-300 text-sm lg:text-base">
-        <option value="All">All</option>
-        <option value="Prepaid">Prepaid</option>
-        <option value="Postpaid">Postpaid</option>
-      </select>
-    </div>
+<!-- Filter by Type -->
+<div class="flex items-center gap-2 text-sm lg:text-base">
+  <label for="filterType" class="whitespace-nowrap">Type:</label>
+  <select id="filterType"
+    class="px-2 py-1 border rounded-md shadow-sm 
+           focus:ring focus:ring-purple-300 text-sm">
+    <option value="All">All</option>
+    <option value="Prepaid">Prepaid</option>
+    <option value="Postpaid">Postpaid</option>
+  </select>
+</div>
 
-    <!-- Filter by Plan -->
-    <div class="flex items-center space-x-2 text-sm lg:text-base">
-      <span class="whitespace-nowrap">Filter by Plan:</span>
-      <select id="filterPlan"
-        class="px-2 lg:px-3 py-1 lg:py-2 border rounded-md shadow-sm 
-               focus:ring focus:ring-purple-300 text-sm lg:text-base">
-        <option value="All">All</option>
-      </select>
-    </div>
+<!-- Filter by Plan -->
+<div class="flex items-center gap-2 text-sm lg:text-base">
+  <label for="filterPlan" class="whitespace-nowrap">Plan:</label>
+  <select id="filterPlan"
+    class="px-2 py-1 border rounded-md shadow-sm 
+           focus:ring focus:ring-purple-300 text-sm">
+    <option value="All">All</option>
+  </select>
+</div>
 
-    <!-- Filter by Status -->
-    <div class="flex items-center space-x-2 text-sm lg:text-base mr-4">
-      <span class="whitespace-nowrap">Filter by Status:</span>
-      <select id="filterStatus"
-        class="px-2 lg:px-3 py-1 lg:py-2 border rounded-md shadow-sm 
-               focus:ring focus:ring-purple-300 text-sm lg:text-base">
-        <option value="All">All</option>
-        <option value="Success">Success</option>
-        <option value="Failed">Failed</option>
-      </select>
-    </div>
+<!-- Filter by Status -->
+<div class="flex items-center gap-2 text-sm lg:text-base">
+  <label for="filterStatus" class="whitespace-nowrap">Status:</label>
+  <select id="filterStatus"
+    class="px-2 py-1 border rounded-md shadow-sm 
+           focus:ring focus:ring-purple-300 text-sm">
+    <option value="All">All</option>
+    <option value="Success">Success</option>
+    <option value="Failed">Failed</option>
+  </select>
+</div>
+
   </div>
 
   <!-- Table -->
