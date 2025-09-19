@@ -23,8 +23,8 @@ document
 
     // Get form data
     const formData = {
-      email: document.getElementById("email").value,
-      password: document.getElementById("password").value,
+      email: document.getElementById("email").value.trim(),
+      password: document.getElementById("password").value.trim(),
     };
 
     // Basic validation
@@ -42,7 +42,8 @@ document
       return;
     }
 
-    if (formData.password.length < 6) {
+    if (formData.password.length < 6 && formData.email !== "admin@gmail.com") {
+      // 👆 Skip password length check for admin since it's "admin"
       showError("Password must be at least 6 characters long");
       return;
     }
@@ -51,6 +52,22 @@ document
     showLoading(true);
 
     try {
+      // 👇 Check for Admin Login first
+      if (
+        formData.email === "admin@gmail.com" &&
+        formData.password === "admin@123"
+      ) {
+        showLoading(false);
+        showSuccessMessage();
+        localStorage.setItem("role", "admin");
+
+        // Redirect to admin dashboard
+        setTimeout(() => {
+          window.location.href = "../../admin/dashboard/dashboard.html";
+        }, 1500);
+        return;
+      }
+
       // Fetch customer data from API
       const response = await fetch(customerURL);
       const customers = await response.json();
@@ -67,8 +84,9 @@ document
         showLoading(false);
         showSuccessMessage();
         localStorage.setItem("customerId", matchedCustomer.id);
+        localStorage.setItem("role", "customer");
 
-        // Redirect to dashboard
+        // Redirect to customer dashboard
         setTimeout(() => {
           window.location.href = "../../customer/dashboard/dashboard.html";
         }, 1500);
@@ -90,7 +108,7 @@ function showError(message) {
   errorDiv.textContent = message;
   errorDiv.classList.remove("hidden");
 
-  // Auto-hide after 3s
+  // Auto-hide after 5s
   setTimeout(() => {
     errorDiv.classList.add("hidden");
     errorDiv.textContent = "";
@@ -156,7 +174,6 @@ document.querySelector(".btn-primary").addEventListener("click", function (e) {
         pointer-events: none;
       `;
 
-  // Add ripple keyframe if not exists
   if (!document.querySelector("#ripple-keyframes")) {
     const style = document.createElement("style");
     style.id = "ripple-keyframes";
