@@ -1,4 +1,5 @@
 // Form handling JavaScript
+// Form handling JavaScript
 document
   .getElementById("registerForm")
   .addEventListener("submit", function (e) {
@@ -43,11 +44,13 @@ document
     // Show loading state
     showLoading(true);
 
-    // 🔹 Step 1: Check if user already exists by phone
-    fetch(`${customerURL}?phone=${formData.phone}`)
+    // 🔹 Step 1: Fetch all users and check if phone already exists
+    fetch(customerURL)
       .then((res) => res.json())
       .then((users) => {
-        if (users.length > 0) {
+        const existingUser = users.find((u) => u.phone === formData.phone);
+
+        if (existingUser) {
           // User already registered
           showLoading(false);
           showError("User already registered");
