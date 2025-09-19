@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Report and Analytics</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="./report.js"></script>
   </head>
   <body class="bg-gray-100">
@@ -212,6 +215,72 @@
               0
             </p>
           </div>
+        </div>
+      </div>
+
+      <!-- Date Filter -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">
+          Filter by Date Range
+        </h2>
+        <div class="flex flex-wrap gap-4 items-end">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >From Date</label
+            >
+            <input
+              type="date"
+              id="fromDate"
+              class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >To Date</label
+            >
+            <input
+              type="date"
+              id="toDate"
+              class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            />
+          </div>
+          <button
+            onclick="applyDateFilter()"
+            class="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-700 transition duration-300"
+          >
+            Apply Filter
+          </button>
+          <button
+            onclick="resetFilter()"
+            class="px-6 py-2 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 transition duration-300"
+          >
+            Reset
+          </button>
+          <button
+            onclick="exportToPDF()"
+            class="px-6 py-2 bg-green-500 text-white font-semibold rounded-lg hover:from-violet-600 hover:to-purple-700 transition duration-300"
+          >
+            Export PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Charts -->
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">
+            Revenue Trend
+          </h3>
+          <div class="flex-1 flex items-center justify-center">
+            <canvas id="revenueChart" width="400" height="300"></canvas>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">
+            Plan-wise Revenue
+          </h3>
+          <canvas id="planChart" width="400" height="200"></canvas>
         </div>
       </div>
 
