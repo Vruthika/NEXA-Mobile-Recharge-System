@@ -37,54 +37,97 @@ function highlightActiveLink() {
   });
 }
 
-// Customer Data Fetch
+// API URLs
 const transactionsURL =
   "https://68ca32f2430c4476c3488311.mockapi.io/Transactions";
 const plansURL = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans";
 const customersURL = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Customers";
 
+// Global variables
 let transactions = [];
 let plans = [];
 let inactiveCustomers = [];
 let activeCustomers = [];
-let filteredActive = [];
 let filteredTransactions = [];
-let revenueChart, planChart;
+let revenueChart, planChart, prepaidChart, postpaidChart;
+
+// Load CanvasJS dynamically
+function loadCanvasJS() {
+  return new Promise((resolve, reject) => {
+    if (window.CanvasJS) {
+      resolve();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://canvasjs.com/assets/script/canvasjs.min.js";
+    script.onload = () => {
+      console.log("CanvasJS loaded successfully");
+      resolve();
+    };
+    script.onerror = () => {
+      console.error("Failed to load CanvasJS");
+      reject();
+    };
+    document.head.appendChild(script);
+  });
+}
 
 async function fetchReportData() {
   try {
-    const [transactionRes, plansRes] = await Promise.all([
+    // Load CanvasJS first
+    await loadCanvasJS();
+
+    const [transactionRes, plansRes, customerRes] = await Promise.all([
       fetch(transactionsURL),
       fetch(plansURL),
+      fetch(customersURL),
     ]);
 
     transactions = await transactionRes.json();
     plans = await plansRes.json();
-    const res = await fetch(customersURL);
-    const cust = await res.json();
+    const customers = await customerRes.json();
 
-    inactiveCustomers = cust.filter((s) => s.status === "Inactive");
-    activeCustomers = cust.filter((s) => s.status === "Active");
-    filteredActive = [...activeCustomers];
+    inactiveCustomers = customers.filter((s) => s.status === "Inactive");
+    activeCustomers = customers.filter((s) => s.status === "Active");
 
-    // ✅ Initialize filteredTransactions here
     filteredTransactions = [...transactions];
 
-    updateCards();
+    console.log("Data loaded:", {
+      transactions: transactions.length,
+      plans: plans.length,
+      customers: customers.length,
+    });
 
-    // ✅ Create charts after data is ready
+    updateCards();
     createRevenueChart();
     createPlanChart();
+    updateRevenueCharts();
+    populateFilterDropdowns();
   } catch (e) {
     console.error("Error fetching report data:", e);
   }
 }
 
-fetchReportData();
+// Populate filter dropdowns
+function populateFilterDropdowns() {
+  // Get unique categories from plans
+  const categories = [...new Set(plans.map((p) => p.category))].filter(Boolean);
+
+  const categoryFilter = document.getElementById("categoryFilter");
+  if (categoryFilter) {
+    categoryFilter.innerHTML = '<option value="">All Categories</option>';
+    categories.forEach((category) => {
+      const option = document.createElement("option");
+      option.value = category;
+      option.textContent = category;
+      categoryFilter.appendChild(option);
+    });
+  }
+}
 
 // Update Summary Cards
 function updateCards() {
-  // Use the filtered list instead of all transactions
   const totalTransactions = filteredTransactions.length;
   const successTransactions = filteredTransactions.filter(
     (t) => t.status === "Success"
@@ -93,17 +136,19 @@ function updateCards() {
     (t) => t.status === "Failed"
   );
 
-  // 🔹 Calculate total revenue from successful transactions (filtered)
+  // Calculate total revenue from successful transactions (filtered)
   let totalRevenue = 0;
   successTransactions.forEach((t) => {
     const plan = plans.find((p) => p.name === t.plan);
     if (plan) {
-      totalRevenue += parseFloat(plan.price); // ensure number
+      totalRevenue += parseFloat(plan.price) || 0;
     }
   });
 
   // Update DOM
-  document.getElementById("totalRevenue").innerText = `Rs. ${totalRevenue}`;
+  document.getElementById(
+    "totalRevenue"
+  ).innerText = `Rs. ${totalRevenue.toLocaleString()}`;
   document.getElementById("totalTransactions").innerText = totalTransactions;
   document.getElementById("successRate").innerText =
     totalTransactions > 0
@@ -116,11 +161,176 @@ function updateCards() {
       ? ((failedTransactions.length / totalTransactions) * 100).toFixed(2) + "%"
       : "0%";
 
-  // If active/inactive customers must also respect the date filter,
-  // then calculate them from filteredTransactions instead of global arrays.
   document.getElementById("activeCustomers").innerText = activeCustomers.length;
   document.getElementById("inactiveCustomers").innerText =
     inactiveCustomers.length;
+}
+
+// Calculate Revenue for CanvasJS Charts
+function calculateRevenue() {
+  console.log("=== Calculating Revenue for CanvasJS Charts ===");
+
+  const successfulTransactions = filteredTransactions.filter(
+    (t) => t.status === "Success"
+  );
+  const revenueByPlan = {};
+
+  successfulTransactions.forEach((transaction) => {
+    const plan = plans.find((p) => p.name === transaction.plan);
+
+    if (plan) {
+      const planName = plan.name;
+      const amount = parseFloat(plan.price) || 0;
+
+      if (revenueByPlan[planName]) {
+        revenueByPlan[planName] += amount;
+      } else {
+        revenueByPlan[planName] = amount;
+      }
+    }
+  });
+
+  console.log("Revenue by plan:", revenueByPlan);
+  return revenueByPlan;
+}
+
+// Create Chart Data Points for CanvasJS
+function createChartDataPoints(revenueData, planType) {
+  console.log(`Creating chart data for ${planType}`);
+
+  const colors = [
+    "#A5B4FC",
+    "#86EFAC",
+    "#7DD3FC",
+    "#C4B5FD",
+    "#FDE68A",
+    "#FF90C7",
+    "#FAC78C",
+    "#93C5FD",
+    "#A7F3D0",
+    "#A585F0",
+    "#FD99AF",
+    "#FBBF24",
+  ];
+
+  const filteredRevenue = {};
+
+  // Filter revenue by plan type
+  Object.entries(revenueData).forEach(([planName, revenue]) => {
+    const plan = plans.find((p) => p.name === planName);
+
+    if (plan && plan.type) {
+      const planTypeStr = plan.type.toLowerCase();
+      const targetType = planType.toLowerCase();
+
+      if (
+        planTypeStr.includes(targetType) ||
+        targetType.includes(planTypeStr)
+      ) {
+        filteredRevenue[planName] = revenue;
+      }
+    }
+  });
+
+  const filteredTotal = Object.values(filteredRevenue).reduce(
+    (sum, amount) => sum + amount,
+    0
+  );
+
+  if (filteredTotal === 0) {
+    return [{ y: 100, label: `No ${planType} Data`, color: "#E5E7EB" }];
+  }
+
+  // Convert to chart data
+  const dataPoints = Object.entries(filteredRevenue)
+    .map(([planName, revenue], index) => ({
+      y: parseFloat(((revenue / filteredTotal) * 100).toFixed(1)),
+      label: planName,
+      color: colors[index % colors.length],
+      revenue: revenue, // Add revenue for tooltip
+    }))
+    .filter((point) => point.y > 0)
+    .sort((a, b) => b.y - a.y);
+
+  return dataPoints.length > 0
+    ? dataPoints
+    : [{ y: 100, label: `No ${planType} Data`, color: "#E5E7EB" }];
+}
+
+// Update Revenue Charts (CanvasJS)
+function updateRevenueCharts() {
+  if (!window.CanvasJS) {
+    console.warn("CanvasJS not loaded yet");
+    return;
+  }
+
+  const revenueData = calculateRevenue();
+  console.log("Final revenue data for charts:", revenueData);
+
+  const prepaidData = createChartDataPoints(revenueData, "prepaid");
+  const postpaidData = createChartDataPoints(revenueData, "postpaid");
+
+  // Common chart configuration
+  const commonConfig = {
+    animationEnabled: true,
+    theme: "light2",
+    width: 400,
+    height: 350,
+    legend: {
+      verticalAlign: "bottom",
+      horizontalAlign: "center",
+      fontSize: 12,
+    },
+    data: [
+      {
+        type: "doughnut",
+        startAngle: 240,
+        innerRadius: 70,
+        indexLabel: "{label} - {y}%",
+        indexLabelFontSize: 10,
+        toolTipContent:
+          "<b>{label}:</b><br/>Revenue: Rs.{revenue}<br/>Percentage: {y}%",
+        click: function (e) {
+          e.dataSeries.dataPoints.forEach((dp) => (dp.exploded = false));
+        },
+      },
+    ],
+  };
+
+  // Prepaid Revenue Chart
+  if (prepaidChart) prepaidChart.destroy();
+  prepaidChart = new CanvasJS.Chart("prepaidChart", {
+    ...commonConfig,
+    title: {
+      text: "Prepaid Revenue Distribution",
+      fontSize: 16,
+    },
+    data: [
+      {
+        ...commonConfig.data[0],
+        dataPoints: prepaidData,
+      },
+    ],
+  });
+
+  // Postpaid Revenue Chart
+  if (postpaidChart) postpaidChart.destroy();
+  postpaidChart = new CanvasJS.Chart("postpaidChart", {
+    ...commonConfig,
+    title: {
+      text: "Postpaid Revenue Distribution",
+      fontSize: 16,
+    },
+    data: [
+      {
+        ...commonConfig.data[0],
+        dataPoints: postpaidData,
+      },
+    ],
+  });
+
+  prepaidChart.render();
+  postpaidChart.render();
 }
 
 function createRevenueChart() {
@@ -133,14 +343,12 @@ function createRevenueChart() {
       const plan = plans.find((p) => p.name === t.plan);
       if (!plan) return;
 
-      // Force parsing YYYY-MM-DD or similar
       const dateParts = t.date.split("-");
       if (dateParts.length < 3) return;
 
       const year = parseInt(dateParts[0]);
-      const month = parseInt(dateParts[1]) - 1; // JS months are 0-based
+      const month = parseInt(dateParts[1]) - 1;
       const day = parseInt(dateParts[2]);
-
       const date = new Date(year, month, day);
 
       if (isNaN(date.getTime())) {
@@ -219,103 +427,43 @@ function createPlanChart() {
   const data = Object.values(planRevenue);
 
   const softMutedColors = [
-    "#F8BBD9", // Soft Pink
-    "#7DD3FC", // Bright Sky Blue
-    "#FDE047", // Soft Yellow
-    "#D4C5F9", // Medium Lavender
-    "#FFCAB0", // Peach
-    "#6EE7B7", // Fresh Mint
-    "#FBBF24", // Golden Yellow
-    "#F472B6", // Rose Pink
-    "#60A5FA", // Medium Blue
-    "#A3E635", // Lime Green
-    "#FED7AA", // Orange
-    "#C084FC", // Purple
-    "#34D399", // Emerald
-    "#FACC15", // Amber
-    "#F87171", // Light Red
-    "#38BDF8", // Cyan
-    "#A855F7", // Violet
-    "#10B981", // Teal
-    "#FCD34D", // Light Orange
-    "#EC4899", // Hot Pink
-    "#3B82F6", // Blue
-    "#84CC16", // Green
-    "#F97316", // Deep Orange
-    "#8B5CF6", // Deep Purple
-    "#059669", // Deep Teal
-    "#EAB308", // Yellow
-    "#f9a0a0ff ", // Red
-    "#0EA5E9", // Light Blue
-    "#7C3AED", // Indigo
-    "#22C55E", // Bright Green
-    "#F59E0B", // Amber Orange
-    "#D946EF", // Magenta
+    "#F8BBD9",
+    "#7DD3FC",
+    "#FDE047",
+    "#D4C5F9",
+    "#FFCAB0",
+    "#6EE7B7",
+    "#FBBF24",
+    "#F472B6",
+    "#60A5FA",
+    "#A3E635",
+    "#FED7AA",
+    "#C084FC",
+    "#34D399",
+    "#FACC15",
+    "#F87171",
+    "#38BDF8",
+    "#A855F7",
+    "#10B981",
+    "#FCD34D",
+    "#EC4899",
+    "#3B82F6",
+    "#84CC16",
+    "#F97316",
+    "#8B5CF6",
+    "#059669",
+    "#EAB308",
+    "#f9a0a0ff",
+    "#0EA5E9",
+    "#7C3AED",
+    "#22C55E",
+    "#F59E0B",
+    "#D946EF",
   ];
 
-  // Function to get maximally different colors for adjacent sectors
-  const getDistributedColors = (count) => {
-    if (count <= softMutedColors.length) {
-      // Color families organized to ensure maximum contrast between adjacent colors
-      const colorFamilies = [
-        {
-          colors: ["#F8BBD9", "#F472B6", "#EC4899", "#F87171"],
-          family: "pink",
-        }, // Pinks/Roses
-        {
-          colors: ["#7DD3FC", "#60A5FA", "#38BDF8", "#3B82F6", "#0EA5E9"],
-          family: "blue",
-        }, // Blues
-        {
-          colors: ["#FDE047", "#FBBF24", "#FACC15", "#FCD34D", "#EAB308"],
-          family: "yellow",
-        }, // Yellows/Golds
-        {
-          colors: ["#6EE7B7", "#34D399", "#10B981", "#22C55E"],
-          family: "green",
-        }, // Greens/Mints
-        {
-          colors: ["#FFCAB0", "#FED7AA", "#F97316", "#F59E0B"],
-          family: "orange",
-        }, // Oranges/Peaches
-        {
-          colors: ["#D4C5F9", "#C084FC", "#A855F7", "#8B5CF6", "#7C3AED"],
-          family: "purple",
-        }, // Purples/Lavenders
-        { colors: ["#A3E635", "#84CC16"], family: "lime" }, // Lime/Light Green
-        { colors: ["#059669"], family: "teal" }, // Teal
-        { colors: ["#f9a0a0ff ", "#D946EF"], family: "accent" }, // Accent colors
-      ];
-
-      // Smart distribution to maximize contrast between adjacent sectors
-      const selectedColors = [];
-      let familyIndex = 0;
-      let colorIndex = 0;
-
-      for (let i = 0; i < count; i++) {
-        const family = colorFamilies[familyIndex % colorFamilies.length];
-        selectedColors.push(family.colors[colorIndex % family.colors.length]);
-
-        // Move to next family to ensure different color family for next sector
-        familyIndex++;
-
-        // When we've cycled through all families, move to next color in each family
-        if (familyIndex % colorFamilies.length === 0) {
-          colorIndex++;
-        }
-      }
-
-      return selectedColors;
-    } else {
-      // For very large datasets, use the predefined array cyclically
-      return Array.from(
-        { length: count },
-        (_, i) => softMutedColors[i % softMutedColors.length]
-      );
-    }
-  };
-
-  const backgroundColors = getDistributedColors(labels.length);
+  const backgroundColors = labels.map(
+    (_, i) => softMutedColors[i % softMutedColors.length]
+  );
 
   if (planChart) planChart.destroy();
   planChart = new Chart(ctx, {
@@ -341,10 +489,8 @@ function createPlanChart() {
           position: "bottom",
           labels: {
             usePointStyle: true,
-            padding: 20,
-            font: {
-              size: 12,
-            },
+            padding: 15,
+            font: { size: 11 },
           },
         },
         tooltip: {
@@ -368,81 +514,153 @@ function createPlanChart() {
   });
 }
 
-// Date Filter
-function applyDateFilter() {
-  const from = document.getElementById("fromDate").value;
-  const to = document.getElementById("toDate").value;
+// Enhanced Filter Functions
+function applyFilters() {
+  const fromDate = document.getElementById("fromDate")?.value;
+  const toDate = document.getElementById("toDate")?.value;
+  const monthFilter = document.getElementById("monthFilter")?.value;
+  const typeFilter = document.getElementById("typeFilter")?.value;
+  const categoryFilter = document.getElementById("categoryFilter")?.value;
 
-  filteredTransactions = transactions.filter((t) => {
-    if (!t.date) return false; // skip transactions without date
-    const txDate = new Date(t.date);
+  console.log("Applying filters:", {
+    fromDate,
+    toDate,
+    monthFilter,
+    typeFilter,
+    categoryFilter,
+  });
 
-    if (from && txDate < new Date(from)) return false;
-    if (to && txDate > new Date(to)) return false;
+  filteredTransactions = transactions.filter((transaction) => {
+    // Date range filter
+    if (transaction.date) {
+      const txDate = new Date(transaction.date);
+      if (fromDate && txDate < new Date(fromDate)) return false;
+      if (toDate && txDate > new Date(toDate + "T23:59:59")) return false;
+    }
+
+    // Month filter
+    if (monthFilter && transaction.date) {
+      const txDate = new Date(transaction.date);
+      const txMonth =
+        txDate.getFullYear() +
+        "-" +
+        String(txDate.getMonth() + 1).padStart(2, "0");
+      if (txMonth !== monthFilter) return false;
+    }
+
+    // Type filter (Prepaid/Postpaid)
+    if (typeFilter) {
+      const plan = plans.find((p) => p.name === transaction.plan);
+      if (
+        !plan ||
+        !plan.type ||
+        plan.type.toLowerCase() !== typeFilter.toLowerCase()
+      )
+        return false;
+    }
+
+    // Category filter
+    if (categoryFilter) {
+      const plan = plans.find((p) => p.name === transaction.plan);
+      if (!plan || !plan.category || plan.category !== categoryFilter)
+        return false;
+    }
 
     return true;
   });
 
-  updateCards(); // Update summary cards
-  createRevenueChart(); // Update revenue chart
-  createPlanChart(); // Update plan chart
+  console.log(
+    `Filtered transactions: ${filteredTransactions.length}/${transactions.length}`
+  );
+
+  // Update all components
+  updateCards();
+  createRevenueChart();
+  createPlanChart();
+  updateRevenueCharts();
+}
+
+// Individual filter functions for backward compatibility
+function applyDateFilter() {
+  applyFilters();
+}
+
+function applyMonthFilter() {
+  const monthFilter = document.getElementById("monthFilter")?.value;
+  if (monthFilter) {
+    // Clear date filters when month filter is applied
+    const fromDate = document.getElementById("fromDate");
+    const toDate = document.getElementById("toDate");
+    if (fromDate) fromDate.value = "";
+    if (toDate) toDate.value = "";
+  }
+  applyFilters();
+}
+
+function applyTypeFilter() {
+  applyFilters();
+}
+
+function applyCategoryFilter() {
+  applyFilters();
 }
 
 function resetFilter() {
-  document.getElementById("fromDate").value = "";
-  document.getElementById("toDate").value = "";
+  // Clear all filter inputs
+  const filters = [
+    "fromDate",
+    "toDate",
+    "monthFilter",
+    "typeFilter",
+    "categoryFilter",
+  ];
+  filters.forEach((filterId) => {
+    const element = document.getElementById(filterId);
+    if (element) element.value = "";
+  });
+
+  // Reset filtered data
   filteredTransactions = [...transactions];
 
-  updateCards(); // Update summary cards
-  createRevenueChart(); // Update revenue chart
-  createPlanChart(); // Update plan chart
+  // Update all components
+  updateCards();
+  createRevenueChart();
+  createPlanChart();
+  updateRevenueCharts();
 }
 
 // Export PDF
 function exportToPDF() {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF("landscape"); // 🔹 Landscape mode
+  const doc = new jsPDF("landscape");
 
-  // 🔹 Decide which data to export
   const exportData =
-    filteredTransactions && filteredTransactions.length > 0
-      ? filteredTransactions
-      : transactions;
+    filteredTransactions.length > 0 ? filteredTransactions : transactions;
 
-  // 🔹 Add title
-  doc.setFontSize(16);
   doc.setFontSize(18);
   doc.text("NEXA", 14, 20);
-
   doc.setFontSize(16);
-  doc.text("Transactions Report", 14, 30); // moved below
+  doc.text("Transactions Report", 14, 30);
 
-  // 🔹 Show applied date range (if any)
-  const from = document.getElementById("fromDate").value;
-  const to = document.getElementById("toDate").value;
-
-  // Start position for table
+  const fromDate = document.getElementById("fromDate")?.value;
+  const toDate = document.getElementById("toDate")?.value;
   let nextY = 40;
 
-  if (from || to) {
+  if (fromDate || toDate) {
     let rangeText = "Date Range: ";
-    rangeText += from ? from : "All";
+    rangeText += fromDate ? fromDate : "All";
     rangeText += " to ";
-    rangeText += to ? to : "All";
-
+    rangeText += toDate ? toDate : "All";
     doc.setFontSize(12);
     doc.text(rangeText, 14, nextY);
-
-    nextY += 10; // ✅ Add gap below the date range before table
+    nextY += 10;
   }
 
-  // 🔹 Prepare table data
   const tableData = exportData.map((t, index) => {
     const matchedPlan = plans.find((p) => p.name === t.plan);
     const price = matchedPlan ? matchedPlan.price : "-";
-
     return [
-      index + 1, // S.No
+      index + 1,
       t.transaction_id,
       t.name,
       t.phone,
@@ -454,7 +672,6 @@ function exportToPDF() {
     ];
   });
 
-  // 🔹 Define table headers
   const headers = [
     [
       "S.No",
@@ -469,79 +686,35 @@ function exportToPDF() {
     ],
   ];
 
-  // 🔹 Generate table with proper spacing
   doc.autoTable({
     head: headers,
     body: tableData,
-    startY: nextY, // ✅ Dynamic start position
+    startY: nextY,
     styles: { fontSize: 9, cellPadding: 3 },
-    headStyles: { fillColor: [59, 130, 246] }, // blue header
-    alternateRowStyles: { fillColor: [245, 245, 245] }, // zebra striping
+    headStyles: { fillColor: [59, 130, 246] },
+    alternateRowStyles: { fillColor: [245, 245, 245] },
     columnStyles: {
-      0: { cellWidth: 15 }, // S.No
-      1: { cellWidth: 30 }, // Transaction ID
-      2: { cellWidth: 35 }, // Name
-      3: { cellWidth: 35 }, // Phone
-      4: { cellWidth: 25 }, // Type
-      5: { cellWidth: 55 }, // Plan
-      6: { cellWidth: 20 }, // Price
-      7: { cellWidth: 30 }, // Date
-      8: { cellWidth: 25 }, // Status
+      0: { cellWidth: 15 },
+      1: { cellWidth: 30 },
+      2: { cellWidth: 35 },
+      3: { cellWidth: 35 },
+      4: { cellWidth: 25 },
+      5: { cellWidth: 55 },
+      6: { cellWidth: 20 },
+      7: { cellWidth: 30 },
+      8: { cellWidth: 25 },
     },
   });
 
-  // 🔹 Save PDF
   doc.save("recharge_transactions_report.pdf");
 }
 
-fetchReportData();
+// Initialize application
+document.addEventListener("DOMContentLoaded", function () {
+  fetchReportData();
+});
 
-// function createPlanChart() {
-//   const ctx = document.getElementById("planChart").getContext("2d");
-//   const planRevenue = {};
-
-//   filteredTransactions
-//     .filter((t) => t.status === "Success")
-//     .forEach((t) => {
-//       const plan = plans.find((p) => p.name === t.plan);
-//       if (!plan) return;
-//       planRevenue[t.plan] = (planRevenue[t.plan] || 0) + parseFloat(plan.price);
-//     });
-
-//   const labels = Object.keys(planRevenue);
-//   const data = Object.values(planRevenue);
-
-//   // Generate soft pastel-like colors, evenly spread across the wheel
-//   const backgroundColors = labels.map((_, i) => {
-//     const hue = (i * 360) / labels.length; // evenly spread hues
-//     return `hsl(${hue}, 50%, 75%)`; // softer pastel tones
-//   });
-
-//   if (planChart) planChart.destroy();
-//   planChart = new Chart(ctx, {
-//     type: "pie",
-//     data: {
-//       labels,
-//       datasets: [
-//         {
-//           label: "Revenue by Plan",
-//           data,
-//           backgroundColor: backgroundColors,
-//           hoverOffset: 10,
-//         },
-//       ],
-//     },
-//     options: {
-//       responsive: true,
-//       plugins: {
-//         legend: {
-//           position: "bottom",
-//           labels: {
-//             usePointStyle: true,
-//             padding: 20,
-//           },
-//         },
-//       },
-//     },
-//   });
-// }
+// Fallback initialization
+window.onload = function () {
+  fetchReportData();
+};
