@@ -1,5 +1,4 @@
 // Form handling JavaScript
-// Form handling JavaScript
 document
   .getElementById("registerForm")
   .addEventListener("submit", function (e) {
@@ -63,6 +62,7 @@ document
               name: formData.name,
               phone: formData.phone,
               password: formData.password,
+              status: "Active",
             }),
           })
             .then((res) => res.json())
