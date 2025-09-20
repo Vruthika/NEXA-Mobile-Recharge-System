@@ -5,55 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NEXA Navbar</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
   </head>
   <body class="bg-gray-100">
     <!-- Navbar -->
-    <nav
-      class="flex bg-[#1E3A8A] shadow-lg p-4 text-white items-center justify-between"
-    >
-      <!-- Left: Logo -->
-      <div class="flex items-center gap-3">
-        <img
-          src="/assets/images/logo.png"
-          alt="Logo"
-          class="w-12 h-12 rounded-2xl"
-        />
-        <span class="text-2xl font-bold">NEXA</span>
-      </div>
+     <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
 
-      <!-- Desktop Menu -->
-      <div class="hidden md:flex items-center gap-4 mr-6">
-        <a
-          href="#"
-          class="px-4 py-2 bg-[#CBD5E1] text-black hover:bg-purple-600 rounded-lg transition font-medium"
-        >
-          Home
-        </a>
-        <a
-          href="#"
-          class="px-4 py-2 bg-[#CBD5E1] text-black hover:bg-purple-600 rounded-lg transition font-medium"
-        >
-          Plans
-        </a>
-        <a
-          href="#"
-          class="px-4 py-2 bg-[#CBD5E1] text-black hover:bg-purple-600 rounded-lg transition font-medium"
-        >
-          FAQ
-        </a>
-        <a
-          href="#"
-          class="px-4 py-2 bg-[#CBD5E1] text-black hover:bg-purple-600 rounded-lg transition font-medium"
-        >
-          Support
-        </a>
-        <button
-          class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition font-semibold"
-        >
-          Register / Login
-        </button>
-      </div>
+     
+    <header
+        class="flex justify-between items-center py-4 border-b border-border-light dark:border-border-dark"
+      >
+        <!-- Logo + Name wrapper -->
+        <div class="flex items-center space-x-3">
+          <img
+            src="/assets/images/logo.png"
+            alt="Logo"
+            class="h-14 w-14 rounded-full"
+          />
+          <div class="text-3xl font-bold">NEXA</div>
+        </div>
 
+        <!-- Search -->
+        <div class="flex-1 max-w-xs mx-4">
+          <div class="relative">
+            <input
+              class="w-full bg-gray-100 border dark:bg-gray-700 dark:text-white border-gray-300 rounded-md pl-10 pr-4 py-2 focus:ring-primary focus:border-primary"
+              placeholder="Search"
+              type="text"
+            />
+            <span
+              class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              >search</span
+            >
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex items-center space-x-4">
+          <a
+            class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary"
+            href="#"
+            >Home</a
+          >
+          <a
+            class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary"
+            href="#"
+            >Plans</a
+          >
+          <a
+            class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary"
+            href="#"
+            >FAQ</a
+          >
+          <a
+            class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary"
+            href="#"
+            >Support</a
+          >
+          <button
+            class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
+          >
+            <span class="material-icons text-gray-600 dark:text-gray-300"
+              >person</span
+            >
+          </button>
+        </div>
+      </header>
+      </div>
       <!-- Mobile Menu Button -->
       <div class="md:hidden">
         <button id="menuBtn" class="focus:outline-none">
