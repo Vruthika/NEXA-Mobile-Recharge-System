@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nexa Groups</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              inter: ["Inter", "sans-serif"],
+            },
+            animation: {
+              float: "float 6s ease-in-out infinite",
+              "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+              "bounce-slow": "bounce 3s infinite",
+            },
+            keyframes: {
+              float: {
+                "0%, 100%": { transform: "translateY(0px)" },
+                "50%": { transform: "translateY(-20px)" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      /* Base animations */
+      .fade-in-up {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+      }
+      .fade-in-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Staggered animations */
+      .stagger-item {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      .stagger-item.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Pulse animation */
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+
+      /* Floating animation */
+      @keyframes float {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+      .float {
+        animation: float 4s ease-in-out infinite;
+      }
+
+      /* Form submission success animation */
+      .form-success-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .form-success-overlay.visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      .success-message {
+        background: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        text-align: center;
+        transform: scale(0.8);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      .form-success-overlay.visible .success-message {
+        transform: scale(1);
+      }
+      .thumbs-up {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        display: inline-block;
+        animation: thumbsUp 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      }
+      @keyframes thumbsUp {
+        0% {
+          transform: scale(0) rotate(-45deg);
+        }
+        50% {
+          transform: scale(1.2) rotate(10deg);
+        }
+        100% {
+          transform: scale(1) rotate(0deg);
+        }
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="font-inter antialiased">
+    <!-- Header -->
+    <header
+      class="fixed top-0 w-full bg-white/95 backdrop-blur-md z-50 border-b border-gray-100"
+    >
+      <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <img
+              src="/assets/images/logo.png"
+              alt="NEXA"
+              class="h-14 w-14 rounded-full border-2 border-violet-500"
+            />
+            <h2
+              class="text-3xl font-bold bg-gradient-to-r from-indigo-700 via-sky-500 to-cyan-500 bg-clip-text text-transparent"
+            >
+              NEXA
+            </h2>
+          </div>
+
+          <!-- Desktop Navigation -->
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-8">
+              <a
+                href="#home"
+                class="text-gray-600 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-all duration-300 relative group"
+              >
+                Home
+                <span
+                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-violet-600 transition-all duration-300 group-hover:w-full"
+                ></span>
+              </a>
+              <a
+                href="#solutions"
+                class="text-gray-600 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-all duration-300 relative group"
+              >
+                Solutions
+                <span
+                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-violet-600 transition-all duration-300 group-hover:w-full"
+                ></span>
+              </a>
+              <a
+                href="#features"
+                class="text-gray-600 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-all duration-300 relative group"
+              >
+                Features
+                <span
+                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-violet-600 transition-all duration-300 group-hover:w-full"
+                ></span>
+              </a>
+              <a
+                href="#nexa-groups"
+                class="text-gray-600 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-all duration-300 relative group"
+              >
+                Nexa Groups
+                <span
+                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-violet-600 transition-all duration-300 group-hover:w-full"
+                ></span>
+              </a>
+              <a
+                href="#case-studies"
+                class="text-gray-600 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-all duration-300 relative group"
+              >
+                Case Studies
+                <span
+                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-violet-600 transition-all duration-300 group-hover:w-full"
+                ></span>
+              </a>
+              <a
+                href="#contact"
+                class="text-gray-600 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-all duration-300 relative group"
+              >
+                Contact
+                <span
+                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-violet-600 transition-all duration-300 group-hover:w-full"
+                ></span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Mobile menu button -->
+          <div class="md:hidden">
+            <button
+              id="mobile-menu-button"
+              class="text-gray-600 hover:text-purple-600 focus:outline-none"
+            >
+              <svg
+                class="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="md:hidden hidden">
+          <div
+            class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-100"
+          >
+            <a
+              href="#home"
+              class="text-gray-600 hover:text-purple-600 block px-3 py-2 text-base font-medium"
+              >Home</a
+            >
+            <a
+              href="#solutions"
+              class="text-gray-600 hover:text-purple-600 block px-3 py-2 text-base font-medium"
+              >Solutions</a
+            >
+            <a
+              href="#features"
+              class="text-gray-600 hover:text-purple-600 block px-3 py-2 text-base font-medium"
+              >Features</a
+            >
+            <a
+              href="#nexa-groups"
+              class="text-gray-600 hover:text-purple-600 block px-3 py-2 text-base font-medium"
+              >Nexa Groups</a
+            >
+            <a
+              href="#case-studies"
+              class="text-gray-600 hover:text-purple-600 block px-3 py-2 text-base font-medium"
+              >Case Studies</a
+            >
+            <a
+              href="#contact"
+              class="text-gray-600 hover:text-purple-600 block px-3 py-2 text-base font-medium"
+              >Contact</a
+            >
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section
+      id="home"
+      class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pt-20"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div class="space-y-8">
+            <h1
+              class="text-5xl lg:text-6xl font-bold leading-tight text-gray-900"
+            >
+              Enterprise<br />
+              <span
+                class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent"
+                >Networking</span
+              ><br />
+              Solutions
+            </h1>
+            <p class="text-xl text-gray-600 leading-relaxed">
+              Transform your business with Nexa's advanced networking
+              infrastructure, designed for reliability, security, and
+              scalability to meet the demands of modern enterprises.
+            </p>
+            <p class="text-lg text-gray-600 mt-4">
+              Our comprehensive networking solutions integrate seamlessly with
+              your existing systems while providing the foundation for future
+              growth and digital transformation initiatives.
+            </p>
+            <div class="pt-4">
+              <a
+                href="#solutions"
+                class="inline-block px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+                >Explore Solutions</a
+              >
+            </div>
+          </div>
+          <div class="relative">
+            <div class="relative overflow-hidden rounded-3xl shadow-2xl">
+              <img
+                src="https://images.pexels.com/photos/1181467/pexels-photo-1181467.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                alt="Enterprise Networking"
+                class="w-full h-96 lg:h-[500px] object-cover transform hover:scale-105 transition-transform duration-700"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-blue-600/20 to-transparent"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Solutions Section -->
+    <section
+      id="solutions"
+      class="py-20 bg-gradient-to-br from-slate-50 to-indigo-50"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            Comprehensive Networking Solutions
+          </h2>
+          <div
+            class="w-24 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto rounded-full"
+          ></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- SD-WAN -->
+          <div
+            class="feature-card bg-white p-8 rounded-3xl shadow-xl transform hover:scale-105 hover:shadow-2xl transition-all duration-500 group"
+          >
+            <div class="text-center">
+              <div
+                class="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-8 w-8 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                SD-WAN Solutions
+              </h3>
+              <p class="text-gray-600 leading-relaxed">
+                Optimize your wide area network with software-defined technology
+                that enhances performance, reduces costs, and simplifies
+                management across multiple locations.
+              </p>
+            </div>
+          </div>
+
+          <!-- Network Security -->
+          <div
+            class="feature-card bg-white p-8 rounded-3xl shadow-xl transform hover:scale-105 hover:shadow-2xl transition-all duration-500 group"
+          >
+            <div class="text-center">
+              <div
+                class="w-16 h-16 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-8 w-8 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                Network Security
+              </h3>
+              <p class="text-gray-600 leading-relaxed">
+                Protect your critical assets with comprehensive security
+                solutions including next-gen firewalls, intrusion prevention,
+                and advanced threat protection systems.
+              </p>
+            </div>
+          </div>
+
+          <!-- Cloud Networking -->
+          <div
+            class="feature-card bg-white p-8 rounded-3xl shadow-xl transform hover:scale-105 hover:shadow-2xl transition-all duration-500 group"
+          >
+            <div class="text-center">
+              <div
+                class="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-8 w-8 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                Cloud Networking
+              </h3>
+              <p class="text-gray-600 leading-relaxed">
+                Seamlessly connect your on-premises infrastructure with cloud
+                environments through secure, high-performance networking
+                solutions designed for hybrid and multi-cloud architectures.
+              </p>
+            </div>
+          </div>
+
+          <!-- Wireless Infrastructure -->
+          <div
+            class="feature-card bg-white p-8 rounded-3xl shadow-xl transform hover:scale-105 hover:shadow-2xl transition-all duration-500 group"
+          >
+            <div class="text-center">
+              <div
+                class="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-8 w-8 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                Wireless Infrastructure
+              </h3>
+              <p class="text-gray-600 leading-relaxed">
+                Deploy enterprise-grade wireless networks with high-density
+                coverage, seamless roaming, and advanced security features to
+                support your mobile workforce and IoT initiatives.
+              </p>
+            </div>
+          </div>
+
+          <!-- Network Automation -->
+          <div
+            class="feature-card bg-white p-8 rounded-3xl shadow-xl transform hover:scale-105 hover:shadow-2xl transition-all duration-500 group"
+          >
+            <div class="text-center">
+              <div
+                class="w-16 h-16 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-8 w-8 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                Network Automation
+              </h3>
+              <p class="text-gray-600 leading-relaxed">
+                Streamline operations with intelligent automation tools that
+                reduce manual tasks, minimize errors, and accelerate service
+                delivery through programmable infrastructure.
+              </p>
+            </div>
+          </div>
+
+          <!-- Managed Services -->
+          <div
+            class="feature-card bg-white p-8 rounded-3xl shadow-xl transform hover:scale-105 hover:shadow-2xl transition-all duration-500 group"
+          >
+            <div class="text-center">
+              <div
+                class="w-16 h-16 bg-gradient-to-r from-teal-500 to-green-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-8 w-8 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                Managed Services
+              </h3>
+              <p class="text-gray-600 leading-relaxed">
+                Focus on your core business while our experts handle the design,
+                implementation, and ongoing management of your network
+                infrastructure with 24/7 monitoring and support.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            Key Features & Benefits
+          </h2>
+          <div
+            class="w-24 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto rounded-full"
+          ></div>
+          <p class="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
+            Our enterprise networking solutions deliver tangible business
+            outcomes through these powerful capabilities.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center mb-20">
+          <div class="space-y-6">
+            <h3 class="text-3xl font-bold text-gray-900">
+              Scalable Architecture
+            </h3>
+            <p class="text-lg text-gray-600 leading-relaxed">
+              Our networking solutions are built on a modular architecture that
+              grows with your business, allowing you to add capacity, features,
+              and locations without disruptive overhauls.
+            </p>
+            <ul class="space-y-3">
+              <li class="flex items-start">
+                <svg
+                  class="h-6 w-6 text-green-500 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-gray-600"
+                  >Modular expansion capabilities</span
+                >
+              </li>
+              <li class="flex items-start">
+                <svg
+                  class="h-6 w-6 text-green-500 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-gray-600">Seamless capacity upgrades</span>
+              </li>
+              <li class="flex items-start">
+                <svg
+                  class="h-6 w-6 text-green-500 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-gray-600"
+                  >Future-proof technology foundation</span
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="relative">
+            <img
+              src="https://images.pexels.com/photos/1476321/pexels-photo-1476321.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+              alt="Scalable Architecture"
+              class="rounded-3xl shadow-xl w-full h-auto"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center mb-20">
+          <div class="relative order-2 md:order-1">
+            <img
+              src="https://images.pexels.com/photos/5473298/pexels-photo-5473298.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+              alt="Intelligent Management"
+              class="rounded-3xl shadow-xl w-full h-auto"
+            />
+          </div>
+          <div class="space-y-6 order-1 md:order-2">
+            <h3 class="text-3xl font-bold text-gray-900">
+              Intelligent Management
+            </h3>
+            <p class="text-lg text-gray-600 leading-relaxed">
+              Gain unprecedented visibility and control over your network with
+              AI-powered analytics and intuitive management interfaces that
+              simplify complex operations.
+            </p>
+            <ul class="space-y-3">
+              <li class="flex items-start">
+                <svg
+                  class="h-6 w-6 text-green-500 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-gray-600"
+                  >AI-driven network optimization</span
+                >
+              </li>
+              <li class="flex items-start">
+                <svg
+                  class="h-6 w-6 text-green-500 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-gray-600"
+                  >Real-time performance analytics</span
+                >
+              </li>
+              <li class="flex items-start">
+                <svg
+                  class="h-6 w-6 text-green-500 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-gray-600"
+                  >Centralized management console</span
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          <div class="space-y-6">
+            <h3 class="text-3xl font-bold text-gray-900">
+              Enterprise-Grade Security
+            </h3>
+            <p class="text-lg text-gray-600 leading-relaxed">
+              Protect your business with multi-layered security that safeguards
+              your data, applications, and infrastructure from evolving threats
+              while maintaining compliance with industry regulations.
+            </p>
+            <ul class="space-y-3">
+              <li class="flex items-start">
+                <svg
+                  class="h-6 w-6 text-green-500 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-gray-600">Advanced threat protection</span>
+              </li>
+              <li class="flex items-start">
+                <svg
+                  class="h-6 w-6 text-green-500 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-gray-600">Zero-trust architecture</span>
+              </li>
+              <li class="flex items-start">
+                <svg
+                  class="h-6 w-6 text-green-500 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span class="text-gray-600">Compliance-ready solutions</span>
+              </li>
+            </ul>
+          </div>
+          <div class="relative">
+            <img
+              src="https://images.pexels.com/photos/5380642/pexels-photo-5380642.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+              alt="Enterprise-Grade Security"
+              class="rounded-3xl shadow-xl w-full h-auto"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Nexa Groups Section -->
+    <section id="nexa-groups" class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            Nexa Groups
+          </h2>
+          <div
+            class="w-24 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto rounded-full"
+          ></div>
+          <p class="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
+            Our specialized business units delivering industry-specific
+            networking solutions and services.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <!-- Group 1 -->
+          <div
+            class="bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-all duration-300 border border-gray-100"
+          >
+            <div class="h-3 bg-gradient-to-r from-blue-500 to-cyan-500"></div>
+            <div class="p-8">
+              <div
+                class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-6"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-8 w-8 text-blue-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 mb-3">
+                Nexa Enterprise
+              </h3>
+              <p class="text-gray-600 mb-4">
+                Comprehensive networking solutions for large corporations and
+                multinational enterprises with complex infrastructure needs.
+              </p>
+              <a href="#" class="text-blue-600 font-medium flex items-center">
+                Learn More
+                <svg
+                  class="h-4 w-4 ml-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Group 2 -->
+          <div
+            class="bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-all duration-300 border border-gray-100"
+          >
+            <div
+              class="h-3 bg-gradient-to-r from-purple-500 to-violet-500"
+            ></div>
+            <div class="p-8">
+              <div
+                class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center mb-6"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-8 w-8 text-purple-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 mb-3">Nexa Secure</h3>
+              <p class="text-gray-600 mb-4">
+                Specialized in cybersecurity solutions, network protection, and
+                compliance services for organizations with sensitive data
+                requirements.
+              </p>
+              <a href="#" class="text-purple-600 font-medium flex items-center">
+                Learn More
+                <svg
+                  class="h-4 w-4 ml-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Group 3 -->
+          <div
+            class="bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-all duration-300 border border-gray-100"
+          >
+            <div class="h-3 bg-gradient-to-r from-green-500 to-teal-500"></div>
+            <div class="p-8">
+              <div
+                class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mb-6"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-8 w-8 text-green-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 mb-3">Nexa SMB</h3>
+              <p class="text-gray-600 mb-4">
+                Tailored networking solutions for small and medium businesses,
+                offering scalable and cost-effective infrastructure with
+                simplified management.
+              </p>
+              <a href="#" class="text-green-600 font-medium flex items-center">
+                Learn More
+                <svg
+                  class="h-4 w-4 ml-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Group 4 -->
+          <div
+            class="bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-all duration-300 border border-gray-100"
+          >
+            <div class="h-3 bg-gradient-to-r from-red-500 to-orange-500"></div>
+            <div class="p-8">
+              <div
+                class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mb-6"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-8 w-8 text-red-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 mb-3">
+                Nexa Innovation
+              </h3>
+              <p class="text-gray-600 mb-4">
+                Research and development unit focused on emerging technologies
+                like AI-driven networks, quantum networking, and next-generation
+                connectivity solutions.
+              </p>
+              <a href="#" class="text-red-600 font-medium flex items-center">
+                Learn More
+                <svg
+                  class="h-4 w-4 ml-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Case Studies Section -->
+    <section id="case-studies" class="py-20 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            Success Stories
+          </h2>
+          <div
+            class="w-24 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto rounded-full"
+          ></div>
+          <p class="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
+            See how our enterprise networking solutions have transformed
+            businesses across industries.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Case Study 1 -->
+          <div
+            class="bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-all duration-300"
+          >
+            <div class="h-48 overflow-hidden">
+              <img
+                src="https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                alt="Financial Services Case Study"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div class="p-8">
+              <div class="flex items-center mb-4">
+                <span
+                  class="text-sm font-medium px-3 py-1 bg-blue-100 text-blue-800 rounded-full"
+                  >Financial Services</span
+                >
+              </div>
+              <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                Global Bank Network Transformation
+              </h3>
+              <p class="text-gray-600 mb-4">
+                A leading multinational bank modernized their network
+                infrastructure across 2,500 branches, reducing operational costs
+                by 35% while enhancing security and customer experience.
+              </p>
+              <div class="flex items-center justify-between mt-6">
+                <span class="text-blue-600 font-medium">Read Case Study</span>
+                <svg
+                  class="h-5 w-5 text-blue-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Case Study 2 -->
+          <div
+            class="bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-all duration-300"
+          >
+            <div class="h-48 overflow-hidden">
+              <img
+                src="https://images.pexels.com/photos/1170412/pexels-photo-1170412.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                alt="Healthcare Case Study"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div class="p-8">
+              <div class="flex items-center mb-4">
+                <span
+                  class="text-sm font-medium px-3 py-1 bg-green-100 text-green-800 rounded-full"
+                  >Healthcare</span
+                >
+              </div>
+              <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                Hospital Network Modernization
+              </h3>
+              <p class="text-gray-600 mb-4">
+                A regional healthcare system implemented our secure networking
+                solution to support telemedicine, IoT medical devices, and
+                electronic health records across 12 facilities.
+              </p>
+              <div class="flex items-center justify-between mt-6">
+                <span class="text-blue-600 font-medium">Read Case Study</span>
+                <svg
+                  class="h-5 w-5 text-blue-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Case Study 3 -->
+          <div
+            class="bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-all duration-300"
+          >
+            <div class="h-48 overflow-hidden">
+              <img
+                src="https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                alt="Manufacturing Case Study"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div class="p-8">
+              <div class="flex items-center mb-4">
+                <span
+                  class="text-sm font-medium px-3 py-1 bg-purple-100 text-purple-800 rounded-full"
+                  >Manufacturing</span
+                >
+              </div>
+              <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                Smart Factory Connectivity
+              </h3>
+              <p class="text-gray-600 mb-4">
+                A global manufacturer deployed our industrial networking
+                solution to connect 15,000 IoT sensors and automated systems,
+                increasing production efficiency by 28%.
+              </p>
+              <div class="flex items-center justify-between mt-6">
+                <span class="text-blue-600 font-medium">Read Case Study</span>
+                <svg
+                  class="h-5 w-5 text-blue-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section
+      id="contact"
+      class="py-20 bg-gradient-to-br from-blue-600 to-indigo-600 text-white"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div class="space-y-8">
+            <h2 class="text-4xl lg:text-5xl font-bold mb-6">
+              Ready to Transform Your Network?
+            </h2>
+            <p class="text-xl leading-relaxed">
+              Our networking experts are ready to help you design, implement,
+              and optimize the perfect solution for your business needs. Contact
+              us today for a consultation.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4">
+              <a
+                href="#"
+                class="inline-block px-8 py-4 bg-white text-blue-600 font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+                >Schedule a Consultation</a
+              >
+              <a
+                href="#"
+                class="inline-block px-8 py-4 bg-transparent border-2 border-white text-white font-medium rounded-xl hover:bg-white/10 transform hover:-translate-y-1 transition-all duration-300"
+                >Download Brochure</a
+              >
+            </div>
+          </div>
+          <div class="bg-white rounded-3xl shadow-2xl p-8">
+            <h3 class="text-2xl font-bold text-gray-900 mb-6">Get in Touch</h3>
+            <form id="contactForm" class="space-y-6">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <label
+                    for="name"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >Name</label
+                  >
+                  <input
+                    type="text"
+                    id="name"
+                    class="w-full px-4 text-black py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-600"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="email"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >Email</label
+                  >
+                  <input
+                    type="email"
+                    id="email"
+                    class="w-full px-4 py-3 text-black rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  />
+                </div>
+              </div>
+              <div>
+                <label
+                  for="company"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Company</label
+                >
+                <input
+                  type="text"
+                  id="company"
+                  class="w-full px-4 py-3 text-black rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label
+                  for="message"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Message</label
+                >
+                <textarea
+                  id="message"
+                  rows="4"
+                  class="w-full px-4 py-3 text-black rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                ></textarea>
+              </div>
+              <button
+                type="submit"
+                class="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+              >
+                Send Message
+              </button>
+            </form>
+          </div>
+
+          <!-- Form Success Overlay -->
+          <div id="formSuccessOverlay" class="form-success-overlay">
+            <div class="success-message">
+              <div class="thumbs-up">👍</div>
+              <h3 class="text-2xl font-bold text-gray-900 mb-2">Thank You!</h3>
+              <p class="text-gray-600 mb-4">
+                Your message has been sent successfully.
+              </p>
+              <button
+                id="closeSuccessBtn"
+                class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div>
+            <h3 class="text-lg font-semibold mb-4 text-purple-400">
+              Our Offerings
+            </h3>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-300 hover:text-white transition-colors"
+                  >Mobile Services</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-300 hover:text-white transition-colors"
+                  >Broadband</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-300 hover:text-white transition-colors"
+                  >Enterprise Solutions</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-300 hover:text-white transition-colors"
+                  >Cloud Services</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold mb-4 text-blue-400">Support</h3>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-300 hover:text-white transition-colors"
+                  >Help Center</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-300 hover:text-white transition-colors"
+                  >Contact Us</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-300 hover:text-white transition-colors"
+                  >Technical Support</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-300 hover:text-white transition-colors"
+                  >Community</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold mb-4 text-violet-400">
+              Our Company
+            </h3>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-300 hover:text-white transition-colors"
+                  >About Nexa</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-300 hover:text-white transition-colors"
+                  >Careers</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-300 hover:text-white transition-colors"
+                  >Investor Relations</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-300 hover:text-white transition-colors"
+                  >Press Releases</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold mb-4 text-purple-400">
+              Connect with Us
+            </h3>
+            <div class="flex space-x-4 mb-4">
+              <a
+                href="#"
+                class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition-colors"
+              >
+                <span class="text-sm">f</span>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors"
+              >
+                <span class="text-sm">t</span>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 bg-violet-600 rounded-full flex items-center justify-center hover:bg-violet-700 transition-colors"
+              >
+                <span class="text-sm">in</span>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center hover:bg-purple-600 transition-colors"
+              >
+                <span class="text-sm">ig</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-800 pt-8 mt-8 text-center">
+          <p class="text-gray-300">
+            © 2025 Nexa. All rights reserved. |
+            <a href="#" class="hover:text-white transition-colors"
+              >Privacy Policy</a
+            >
+            |
+            <a href="#" class="hover:text-white transition-colors"
+              >Terms of Service</a
+            >
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById("mobile-menu-button");
+        const mobileMenu = document.getElementById("mobile-menu");
+
+        if (mobileMenuButton && mobileMenu) {
+          mobileMenuButton.addEventListener("click", () => {
+            mobileMenu.classList.toggle("hidden");
+          });
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+          anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute("href"));
+            if (target) {
+              target.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }
+          });
+        });
+
+        // Header background change on scroll
+        window.addEventListener("scroll", () => {
+          const header = document.querySelector("header");
+          if (window.scrollY > 100) {
+            header.classList.add("bg-white/98");
+            header.classList.remove("bg-white/95");
+          } else {
+            header.classList.add("bg-white/95");
+            header.classList.remove("bg-white/98");
+          }
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+          threshold: 0.1,
+          rootMargin: "0px 0px -50px 0px",
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("animate-fadeInUp");
+
+              // Add staggered animation for child elements if they have the stagger-children class
+              if (entry.target.classList.contains("stagger-children")) {
+                const children = entry.target.querySelectorAll(".stagger-item");
+                children.forEach((child, index) => {
+                  setTimeout(() => {
+                    child.classList.add("visible");
+                  }, index * 100);
+                });
+              }
+            }
+          });
+        }, observerOptions);
+
+        // Observe all cards and sections
+        document
+          .querySelectorAll(".feature-card, .case-study, .solution-card")
+          .forEach((el, index) => {
+            el.style.transitionDelay = `${index * 0.1}s`;
+            observer.observe(el);
+          });
+
+        // Add floating animation to hero image
+        const heroImages = document.querySelectorAll(".hero-section img");
+        heroImages.forEach((img) => {
+          img.classList.add("float");
+        });
+
+        // Add pulse animation to primary CTA buttons
+        const ctaButtons = document.querySelectorAll(".bg-gradient-to-r");
+        ctaButtons.forEach((button) => {
+          if (!button.classList.contains("from-red-500")) {
+            // Avoid adding to certain gradient buttons
+            button.classList.add("pulse");
+          }
+        });
+
+        // Add staggered animation to Nexa Groups cards
+        const groupsSection = document.querySelector("#nexa-groups");
+        if (groupsSection) {
+          groupsSection.classList.add("stagger-children");
+          const groupCards = groupsSection.querySelectorAll(".rounded-3xl");
+          groupCards.forEach((card) => {
+            card.classList.add("stagger-item");
+          });
+          observer.observe(groupsSection);
+        }
+
+        // Form submission animation
+        const contactForm = document.getElementById("contactForm");
+        const formSuccessOverlay =
+          document.getElementById("formSuccessOverlay");
+        const closeSuccessBtn = document.getElementById("closeSuccessBtn");
+
+        if (contactForm) {
+          contactForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // Add loading state to button
+            const submitBtn = contactForm.querySelector(
+              'button[type="submit"]'
+            );
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = "Sending...";
+            submitBtn.disabled = true;
+
+            // Simulate form submission (would be replaced with actual AJAX in production)
+            setTimeout(() => {
+              // Show success overlay
+              formSuccessOverlay.classList.add("visible");
+
+              // Reset form and button
+              contactForm.reset();
+              submitBtn.textContent = originalText;
+              submitBtn.disabled = false;
+            }, 1500);
+          });
+        }
+
+        if (closeSuccessBtn) {
+          closeSuccessBtn.addEventListener("click", function () {
+            formSuccessOverlay.classList.remove("visible");
+          });
+        }
+
+        // Add custom CSS for animations
+        const style = document.createElement("style");
+        style.textContent = `
+              .animate-fadeInUp {
+                  animation: fadeInUp 0.6s ease-out forwards;
+              }
+             
+              @keyframes fadeInUp {
+                  from {
+                      opacity: 0;
+                      transform: translateY(30px);
+                  }
+                  to {
+                      opacity: 1;
+                      transform: translateY(0);
+                  }
+              }
+             
+              .feature-card, .solution-card, .case-study {
+                  opacity: 0;
+                  transform: translateY(30px);
+                  transition: all 0.6s ease-out;
+              }
+              
+              /* Button hover effect */
+              .btn-hover-effect {
+                  position: relative;
+                  overflow: hidden;
+              }
+              
+              .btn-hover-effect:after {
+                  content: '';
+                  position: absolute;
+                  top: 0;
+                  left: -100%;
+                  width: 100%;
+                  height: 100%;
+                  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                  transition: 0.5s;
+              }
+              
+              .btn-hover-effect:hover:after {
+                  left: 100%;
+              }
+          `;
+        document.head.appendChild(style);
+
+        // Add hover effect to all buttons
+        document.querySelectorAll("button, a.inline-block").forEach((btn) => {
+          btn.classList.add("btn-hover-effect");
+        });
+      });
+    </script>
+  </body>
+</html>

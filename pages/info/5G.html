@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nexa - 5G Network</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              inter: ["Inter", "sans-serif"],
+            },
+            animation: {
+              float: "float 6s ease-in-out infinite",
+              "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+              "bounce-slow": "bounce 3s infinite",
+            },
+            keyframes: {
+              float: {
+                "0%, 100%": { transform: "translateY(0px)" },
+                "50%": { transform: "translateY(-20px)" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="font-inter antialiased">
+    <!-- Header -->
+    <header
+      class="fixed top-0 w-full bg-white/95 backdrop-blur-md z-50 border-b border-gray-100"
+    >
+      <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <img
+              src="/assets/images/logo.png"
+              alt="NEXA"
+              class="h-14 w-14 rounded-full border-2 border-violet-500"
+            />
+            <h2
+              class="text-3xl font-bold bg-gradient-to-r from-indigo-700 via-sky-500 to-cyan-500 bg-clip-text text-transparent"
+            >
+              NEXA
+            </h2>
+          </div>
+
+          <!-- Desktop Navigation -->
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-8">
+              <a
+                href="#home"
+                class="text-gray-600 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-all duration-300 relative group"
+              >
+                Home
+                <span
+                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-violet-600 transition-all duration-300 group-hover:w-full"
+                ></span>
+              </a>
+              <a
+                href="#what-is-5g"
+                class="text-gray-600 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-all duration-300 relative group"
+              >
+                What is 5G
+                <span
+                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-violet-600 transition-all duration-300 group-hover:w-full"
+                ></span>
+              </a>
+              <a
+                href="#benefits"
+                class="text-gray-600 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-all duration-300 relative group"
+              >
+                Benefits
+                <span
+                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-violet-600 transition-all duration-300 group-hover:w-full"
+                ></span>
+              </a>
+
+              <a
+                href="#coverage"
+                class="text-gray-600 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-all duration-300 relative group"
+              >
+                Coverage
+                <span
+                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-violet-600 transition-all duration-300 group-hover:w-full"
+                ></span>
+              </a>
+              <a
+                href="#faq"
+                class="text-gray-600 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-all duration-300 relative group"
+              >
+                FAQ
+                <span
+                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-violet-600 transition-all duration-300 group-hover:w-full"
+                ></span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Mobile menu button -->
+          <div class="md:hidden">
+            <button
+              id="mobile-menu-button"
+              class="text-gray-600 hover:text-purple-600 focus:outline-none"
+            >
+              <svg
+                class="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="md:hidden hidden">
+          <div
+            class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-100"
+          >
+            <a
+              href="#home"
+              class="text-gray-600 hover:text-purple-600 block px-3 py-2 text-base font-medium"
+              >Home</a
+            >
+            <a
+              href="#what-is-5g"
+              class="text-gray-600 hover:text-purple-600 block px-3 py-2 text-base font-medium"
+              >What is 5G</a
+            >
+            <a
+              href="#benefits"
+              class="text-gray-600 hover:text-purple-600 block px-3 py-2 text-base font-medium"
+              >Benefits</a
+            >
+
+            <a
+              href="#coverage"
+              class="text-gray-600 hover:text-purple-600 block px-3 py-2 text-base font-medium"
+              >Coverage</a
+            >
+            <a
+              href="#faq"
+              class="text-gray-600 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-all duration-300 relative group"
+            >
+              FAQ
+              <span
+                class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-violet-600 transition-all duration-300 group-hover:w-full"
+              ></span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section
+      id="home"
+      class="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50 pt-20"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div class="space-y-8">
+            <h1
+              class="text-5xl lg:text-6xl font-bold leading-tight text-gray-900"
+            >
+              Experience<br />
+              <span
+                class="bg-gradient-to-r from-purple-600 via-violet-600 to-blue-400 bg-clip-text text-transparent"
+                >TRUE 5G</span
+              ><br />
+              Network Power.
+            </h1>
+            <p class="text-xl text-gray-600 leading-relaxed">
+              Unleash the future with lightning-fast speeds, ultra-low latency,
+              and revolutionary connectivity that transforms how you live, work,
+              and play.
+            </p>
+            <p class="text-lg text-gray-600 mt-4">
+              NEXA's advanced 5G network delivers unprecedented speeds,
+              reliability, and connectivity options for both personal and
+              business use. Our nationwide infrastructure ensures you stay
+              connected wherever you go.
+            </p>
+          </div>
+          <div class="relative">
+            <div class="relative overflow-hidden rounded-3xl shadow-2xl">
+              <img
+                src="/assets/images/5G_card.png"
+                alt="5G Technology Network"
+                class="w-full h-96 lg:h-[500px] object-cover transform hover:scale-105 transition-transform duration-700"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-purple-600/20 to-transparent"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- What is 5G Section -->
+    <section
+      id="what-is-5g"
+      class="py-20 bg-gradient-to-br from-slate-50 to-blue-50"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            What is 5G Technology?
+          </h2>
+          <div
+            class="w-24 h-1 bg-gradient-to-r from-purple-600 to-violet-600 mx-auto rounded-full"
+          ></div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div class="space-y-6">
+            <p class="text-lg text-gray-600 leading-relaxed">
+              5G is the 5th generation mobile network. It is a new global
+              wireless standard after 1G, 2G, 3G, and 4G networks. 5G enables a
+              new kind of network that is designed to connect virtually everyone
+              and everything together including machines, objects, and devices.
+            </p>
+
+            <p class="text-lg text-gray-600 leading-relaxed">
+              With breakthrough speeds, minimal lag, and massive capacity, 5G is
+              set to revolutionize industries from healthcare to manufacturing,
+              entertainment to transportation. It's not just an upgrade—it's a
+              transformation in how we connect.
+            </p>
+
+            <p class="text-lg text-gray-600 leading-relaxed">
+              NEXA's 5G network utilizes cutting-edge technology including
+              massive MIMO, beamforming, and millimeter wave spectrum to deliver
+              unprecedented performance and reliability across urban centers and
+              expanding into suburban and rural areas.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            <div
+              class="text-center p-6 bg-white rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-300"
+            >
+              <h3
+                class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent mb-2"
+              >
+                10x
+              </h3>
+              <p class="text-gray-600 font-medium">Faster Speeds</p>
+            </div>
+            <div
+              class="text-center p-6 bg-white rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-300"
+            >
+              <h3
+                class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent mb-2"
+              >
+                1ms
+              </h3>
+              <p class="text-gray-600 font-medium">Latency</p>
+            </div>
+            <div
+              class="text-center p-6 bg-white rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-300"
+            >
+              <h3
+                class="text-3xl font-bold bg-gradient-to-r from-violet-600 to-blue-400 bg-clip-text text-transparent mb-2"
+              >
+                100x
+              </h3>
+              <p class="text-gray-600 font-medium">Device Capacity</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="benefits" class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            Benefits of 5G
+          </h2>
+          <div
+            class="w-24 h-1 bg-gradient-to-r from-purple-600 to-violet-600 mx-auto rounded-full"
+          ></div>
+          <p class="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
+            5G is more than just faster speeds. It's a technological leap that
+            enables new experiences and capabilities.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Enhanced Mobile Broadband -->
+          <div
+            class="bg-gradient-to-br from-purple-50 to-violet-50 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <div
+              class="w-16 h-16 bg-gradient-to-r from-purple-600 to-violet-600 rounded-2xl flex items-center justify-center mb-6"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">
+              Enhanced Mobile Broadband
+            </h3>
+            <p class="text-gray-600">
+              Experience blazing-fast download speeds up to 10 Gbps, enabling 4K
+              streaming, instant downloads, and seamless cloud gaming anywhere.
+            </p>
+          </div>
+
+          <!-- Ultra-Reliable Low Latency -->
+          <div
+            class="bg-gradient-to-br from-blue-50 to-cyan-50 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <div
+              class="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-6"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">
+              Ultra-Low Latency
+            </h3>
+            <p class="text-gray-600">
+              With response times as low as 1 millisecond, experience real-time
+              interactions for gaming, autonomous vehicles, and remote
+              operations.
+            </p>
+          </div>
+
+          <!-- Massive IoT Connectivity -->
+          <div
+            class="bg-gradient-to-br from-green-50 to-emerald-50 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <div
+              class="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-6"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">
+              Massive IoT Connectivity
+            </h3>
+            <p class="text-gray-600">
+              Connect up to 1 million devices per square kilometer, enabling
+              smart cities, industrial automation, and intelligent
+              infrastructure.
+            </p>
+          </div>
+
+          <!-- Network Slicing -->
+          <div
+            class="bg-gradient-to-br from-amber-50 to-orange-50 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <div
+              class="w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center mb-6"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">
+              Network Slicing
+            </h3>
+            <p class="text-gray-600">
+              Customized network experiences for different applications and
+              services, ensuring optimal performance for critical functions.
+            </p>
+          </div>
+
+          <!-- Extended Battery Life -->
+          <div
+            class="bg-gradient-to-br from-teal-50 to-cyan-50 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <div
+              class="w-16 h-16 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-6"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">
+              Extended Battery Life
+            </h3>
+            <p class="text-gray-600">
+              IoT devices can operate for years on a single charge with 5G's
+              power-efficient connectivity, enabling long-term deployments.
+            </p>
+          </div>
+
+          <!-- Enhanced Security -->
+          <div
+            class="bg-gradient-to-br from-indigo-50 to-blue-50 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <div
+              class="w-16 h-16 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-2xl flex items-center justify-center mb-6"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">
+              Enhanced Security
+            </h3>
+            <p class="text-gray-600">
+              Advanced encryption and security protocols protect your data and
+              privacy in an increasingly connected world.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5G Technology Showcase Section -->
+    <section id="plans" class="py-20 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            5G Technology Applications
+          </h2>
+          <div
+            class="w-24 h-1 bg-gradient-to-r from-purple-600 to-violet-600 mx-auto rounded-full"
+          ></div>
+          <p class="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
+            Discover how NEXA's 5G technology is transforming industries and
+            everyday experiences.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Smart Cities -->
+          <div
+            class="bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-all duration-300"
+          >
+            <div class="h-48 overflow-hidden">
+              <img
+                src="https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                alt="Smart City"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div class="p-8">
+              <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                Smart Cities
+              </h3>
+              <p class="text-gray-600 mb-4">
+                5G enables intelligent traffic management, energy-efficient
+                buildings, and public safety systems that make urban living
+                safer and more sustainable. NEXA's infrastructure powers the
+                cities of tomorrow with real-time data processing and
+                automation.
+              </p>
+              <p class="text-gray-600">
+                Our partnerships with municipal governments have already
+                deployed smart lighting, waste management, and environmental
+                monitoring solutions in over 25 cities nationwide.
+              </p>
+            </div>
+          </div>
+
+          <!-- Healthcare Revolution -->
+          <div
+            class="bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-all duration-300"
+          >
+            <div class="h-48 overflow-hidden">
+              <img
+                src="https://images.pexels.com/photos/7089401/pexels-photo-7089401.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                alt="Healthcare Technology"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div class="p-8">
+              <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                Healthcare Revolution
+              </h3>
+              <p class="text-gray-600 mb-4">
+                Remote surgeries, real-time patient monitoring, and AI-powered
+                diagnostics are transforming healthcare delivery. NEXA's
+                ultra-reliable low latency communication (URLLC) ensures
+                critical medical applications perform flawlessly.
+              </p>
+              <p class="text-gray-600">
+                Our dedicated healthcare network slices provide secure,
+                prioritized connectivity for hospitals and emergency services,
+                with 99.999% reliability even during peak demand.
+              </p>
+            </div>
+          </div>
+
+          <!-- Immersive Entertainment -->
+          <div
+            class="bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-all duration-300"
+          >
+            <div class="h-48 overflow-hidden">
+              <img
+                src="https://images.pexels.com/photos/8721318/pexels-photo-8721318.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                alt="VR Entertainment"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div class="p-8">
+              <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                Immersive Entertainment
+              </h3>
+              <p class="text-gray-600 mb-4">
+                Experience cloud gaming with zero lag, 8K streaming without
+                buffering, and virtual reality experiences that blur the line
+                between digital and physical worlds. NEXA's 5G network delivers
+                the bandwidth and responsiveness needed for next-generation
+                entertainment.
+              </p>
+              <p class="text-gray-600">
+                Our partnership with leading content providers ensures optimized
+                delivery of immersive experiences directly to your devices,
+                anywhere within our coverage area.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Coverage Map Section -->
+    <section id="coverage" class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            5G Coverage Map
+          </h2>
+          <div
+            class="w-24 h-1 bg-gradient-to-r from-purple-600 to-violet-600 mx-auto rounded-full"
+          ></div>
+          <p class="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
+            Our 5G network is rapidly expanding across India with comprehensive
+            coverage in major metropolitan areas and growing presence in tier 2
+            and tier 3 cities.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+          <div class="space-y-6">
+            <h3 class="text-3xl font-bold text-gray-900">
+              Nationwide Expansion
+            </h3>
+            <p class="text-lg text-gray-600">
+              NEXA is investing ₹50,000 crores in our 5G infrastructure over the
+              next 3 years to ensure comprehensive coverage across urban,
+              suburban, and rural areas. Our network engineers are deploying
+              advanced small cell technology and massive MIMO installations to
+              optimize coverage and capacity.
+            </p>
+            <p class="text-lg text-gray-600">
+              Our unique spectrum portfolio combines low-band coverage (700
+              MHz), mid-band capacity (3.5 GHz), and high-band mmWave (26 GHz)
+              to deliver the perfect balance of coverage, speed, and reliability
+              in every environment.
+            </p>
+            <p class="text-lg text-gray-600">
+              NEXA's 5G network currently covers over 500 districts across
+              India, with new areas being added weekly. Our interactive coverage
+              map is updated daily to reflect the latest expansion.
+            </p>
+          </div>
+          <div class="bg-gray-100 rounded-3xl overflow-hidden shadow-xl">
+            <div class="relative h-[500px] w-full">
+              <img
+                src="https://images.pexels.com/photos/7412095/pexels-photo-7412095.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                alt="India 5G Coverage Map"
+                class="w-full h-full object-cover"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end justify-center pb-8"
+              >
+                <button
+                  class="bg-white text-purple-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-purple-600 hover:text-white transition-all duration-300"
+                >
+                  Check Your Area
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center"
+        >
+          <div
+            class="p-6 bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl shadow-md"
+          >
+            <h3
+              class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent mb-2"
+            >
+              250+
+            </h3>
+            <p class="text-gray-600 font-medium">Cities with 5G Coverage</p>
+            <p class="text-gray-500 text-sm mt-2">
+              Including all metro cities and state capitals
+            </p>
+          </div>
+          <div
+            class="p-6 bg-gradient-to-br from-violet-50 to-indigo-50 rounded-2xl shadow-md"
+          >
+            <h3
+              class="text-4xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent mb-2"
+            >
+              85%
+            </h3>
+            <p class="text-gray-600 font-medium">Urban Population Covered</p>
+            <p class="text-gray-500 text-sm mt-2">
+              With 60% suburban coverage and expanding
+            </p>
+          </div>
+          <div
+            class="p-6 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl shadow-md"
+          >
+            <h3
+              class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent mb-2"
+            >
+              75,000+
+            </h3>
+            <p class="text-gray-600 font-medium">5G Towers Deployed</p>
+            <p class="text-gray-500 text-sm mt-2">
+              With 1,000+ new installations monthly
+            </p>
+          </div>
+          <div
+            class="p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl shadow-md"
+          >
+            <h3
+              class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2"
+            >
+              2025
+            </h3>
+            <p class="text-gray-600 font-medium">Nationwide Coverage Goal</p>
+            <p class="text-gray-500 text-sm mt-2">
+              95% population coverage target
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 bg-gray-50" id="faq">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-bold text-gray-900 mb-6">
+            Frequently Asked Questions
+          </h2>
+          <div
+            class="w-24 h-1 bg-gradient-to-r from-purple-600 to-violet-600 mx-auto rounded-full"
+          ></div>
+          <p class="mt-6 text-lg text-gray-600 max-w-3xl mx-auto">
+            Get answers to the most common questions about NEXA's 5G technology,
+            coverage, and capabilities.
+          </p>
+        </div>
+
+        <div class="space-y-6">
+          <!-- FAQ Item 1 -->
+          <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+            <button
+              class="w-full px-6 py-5 text-left focus:outline-none flex justify-between items-center"
+            >
+              <span class="text-lg font-semibold text-gray-900"
+                >What devices are compatible with 5G?</span
+              >
+              <svg
+                class="h-5 w-5 text-purple-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            <div class="px-6 pb-5">
+              <p class="text-gray-600">
+                Most newer smartphones released after 2020 support 5G
+                connectivity. Popular 5G-compatible devices include iPhone 12
+                and newer models, Samsung Galaxy S20 and above, Google Pixel 5
+                and newer, and most recent OnePlus, Xiaomi, Oppo, and Vivo
+                flagship devices. Check our compatibility tool to see if your
+                device is 5G-ready or visit any NEXA store for a free device
+                assessment.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ Item 2 -->
+          <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+            <button
+              class="w-full px-6 py-5 text-left focus:outline-none flex justify-between items-center"
+            >
+              <span class="text-lg font-semibold text-gray-900"
+                >How much faster is 5G compared to 4G?</span
+              >
+              <svg
+                class="h-5 w-5 text-purple-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            <div class="px-6 pb-5">
+              <p class="text-gray-600">
+                NEXA's 5G network delivers speeds up to 10 times faster than 4G
+                LTE. While 4G typically provides 20-100 Mbps, our 5G network can
+                reach speeds of 1-2 Gbps in optimal conditions, with average
+                speeds of 300-500 Mbps in most covered areas. This means you can
+                download a full HD movie in seconds rather than minutes,
+                experience buffer-free 4K streaming, and enjoy lag-free cloud
+                gaming.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ Item 3 -->
+          <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+            <button
+              class="w-full px-6 py-5 text-left focus:outline-none flex justify-between items-center"
+            >
+              <span class="text-lg font-semibold text-gray-900"
+                >Is 5G available in my area?</span
+              >
+              <svg
+                class="h-5 w-5 text-purple-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            <div class="px-6 pb-5">
+              <p class="text-gray-600">
+                Our 5G network is currently available in over 250 major cities
+                across India, with rapid expansion ongoing. All metropolitan
+                areas and state capitals have comprehensive coverage, with
+                service expanding to tier 2 and tier 3 cities monthly. Use our
+                interactive coverage checker tool on the NEXA app or website to
+                see detailed coverage information for your specific location,
+                including estimated speeds and network type (mmWave or Sub-6).
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ Item 4 -->
+          <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+            <button
+              class="w-full px-6 py-5 text-left focus:outline-none flex justify-between items-center"
+            >
+              <span class="text-lg font-semibold text-gray-900"
+                >Do I need a new SIM card for 5G?</span
+              >
+              <svg
+                class="h-5 w-5 text-purple-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            <div class="px-6 pb-5">
+              <p class="text-gray-600">
+                Yes, to access NEXA's 5G network, you'll need our 5G-enabled SIM
+                card. These new SIMs support advanced network features like
+                network slicing and enhanced security protocols. Existing
+                customers can upgrade to a 5G SIM for free at any NEXA store or
+                request a home delivery through our app. The SIM replacement
+                process preserves your existing number and account details, with
+                activation typically completed within minutes.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ Item 5 -->
+          <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+            <button
+              class="w-full px-6 py-5 text-left focus:outline-none flex justify-between items-center"
+            >
+              <span class="text-lg font-semibold text-gray-900"
+                >How does 5G benefit everyday activities?</span
+              >
+              <svg
+                class="h-5 w-5 text-purple-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            <div class="px-6 pb-5">
+              <p class="text-gray-600">
+                5G transforms everyday digital experiences in numerous ways.
+                Video calls become crystal clear with no lag, even in crowded
+                areas. Social media uploads happen instantly, even for
+                high-resolution content. Navigation apps update in real-time
+                with enhanced accuracy. Smart home devices respond immediately
+                to commands. Mobile payments process faster with enhanced
+                security. And entertainment options expand with access to cloud
+                gaming, augmented reality experiences, and buffer-free 4K/8K
+                streaming anywhere within our coverage area.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ Item 6 -->
+          <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+            <button
+              class="w-full px-6 py-5 text-left focus:outline-none flex justify-between items-center"
+            >
+              <span class="text-lg font-semibold text-gray-900"
+                >Is 5G safe?</span
+              >
+              <svg
+                class="h-5 w-5 text-purple-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            <div class="px-6 pb-5">
+              <p class="text-gray-600">
+                Yes, 5G technology is safe. It operates within strict safety
+                guidelines established by international regulatory bodies. 5G
+                radio waves are a form of non-ionizing radiation, which means
+                they don't have enough energy to damage DNA or cells directly.
+                NEXA's 5G network complies with all safety standards set by the
+                International Commission on Non-Ionizing Radiation Protection
+                (ICNIRP) and has been thoroughly tested to ensure it poses no
+                health risks to the public.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section
+      class="py-20 bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600"
+    >
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-4xl font-bold text-white mb-6">
+          Ready to Experience the 5G Revolution?
+        </h2>
+        <p class="text-xl text-purple-100 mb-10 max-w-3xl mx-auto">
+          Join millions of NEXA customers already enjoying the power of true 5G
+          connectivity. Upgrade today and transform how you connect, work, and
+          play.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <button
+            class="bg-white text-purple-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300"
+          >
+            Upgrade to 5G
+          </button>
+          <button
+            class="bg-transparent text-white border-2 border-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white/10 transition-all duration-300"
+          >
+            Check Coverage
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div>
+            <div class="flex items-center gap-2 mb-6">
+              <img
+                src="/assets/images/logo.png"
+                alt="NEXA"
+                class="h-10 w-10 rounded-full border-2 border-violet-500"
+              />
+              <h2
+                class="text-2xl font-bold bg-gradient-to-r from-purple-400 via-violet-400 to-blue-400 bg-clip-text text-transparent"
+              >
+                NEXA
+              </h2>
+            </div>
+            <p class="text-gray-400 mb-4">
+              Connecting the future with revolutionary 5G technology.
+            </p>
+            <div class="flex space-x-4">
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-colors duration-300"
+              >
+                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-colors duration-300"
+              >
+                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-colors duration-300"
+              >
+                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300"
+                  >Home</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300"
+                  >About Us</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300"
+                  >5G Plans</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300"
+                  >Coverage Map</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300"
+                  >Support</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Support</h3>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300"
+                  >FAQs</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300"
+                  >Contact Us</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300"
+                  >Network Status</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300"
+                  >Device Compatibility</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300"
+                  >Store Locator</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Contact</h3>
+            <ul class="space-y-2 text-gray-400">
+              <li class="flex items-start space-x-3">
+                <svg
+                  class="h-6 w-6 text-gray-500 flex-shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <span>NEXA Tower, Cyber City, Gurugram, India</span>
+              </li>
+              <li class="flex items-start space-x-3">
+                <svg
+                  class="h-6 w-6 text-gray-500 flex-shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+                <span>support@nexa.com</span>
+              </li>
+              <li class="flex items-start space-x-3">
+                <svg
+                  class="h-6 w-6 text-gray-500 flex-shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                  />
+                </svg>
+                <span>1800-NEXA-5G (1800-639-254)</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div
+          class="mt-12 pt-8 border-t border-gray-800 text-center text-gray-400"
+        >
+          <p>© 2023 NEXA Telecommunications. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Wait for DOM to be fully loaded before initializing JavaScript
+      document.addEventListener("DOMContentLoaded", () => {
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById("mobile-menu-button");
+        if (mobileMenuButton) {
+          mobileMenuButton.addEventListener("click", function () {
+            const mobileMenu = document.getElementById("mobile-menu");
+            if (mobileMenu) {
+              mobileMenu.classList.toggle("hidden");
+            }
+          });
+        }
+
+        // FAQ accordion functionality
+        document
+          .querySelectorAll(".bg-white.rounded-2xl button")
+          .forEach((button) => {
+            button.addEventListener("click", () => {
+              // Find the content div which is a sibling of the button
+              const content = button
+                .closest(".bg-white.rounded-2xl")
+                .querySelector(".px-6.pb-5");
+              if (content) {
+                content.classList.toggle("hidden");
+
+                // Update the icon
+                const icon = button.querySelector("svg path");
+                if (icon) {
+                  if (content.classList.contains("hidden")) {
+                    icon.setAttribute("d", "M19 9l-7 7-7-7");
+                  } else {
+                    icon.setAttribute("d", "M19 14l-7-7-7 7");
+                  }
+                }
+              }
+            });
+          });
+
+        // Initialize FAQ items - show first one by default
+        const faqItems = document.querySelectorAll(".bg-white.rounded-2xl");
+        if (faqItems.length > 0) {
+          const firstContent = faqItems[0].querySelector(".px-6.pb-5");
+          if (firstContent) {
+            firstContent.classList.remove("hidden");
+          }
+          const firstIcon = faqItems[0].querySelector("svg path");
+          if (firstIcon) {
+            firstIcon.setAttribute("d", "M19 14l-7-7-7 7");
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
