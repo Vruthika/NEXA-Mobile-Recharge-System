@@ -50,7 +50,7 @@
 
       <!-- Plans Cards -->
       <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6 mb-6 lg:mb-8"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mb-6 lg:mb-8"
       >
         <!-- Total Categories -->
         <div
@@ -75,6 +75,65 @@
           <div>
             <h3 class="text-gray-600 text-sm lg:text-base">Total Categories</h3>
             <p id="totalCategories" class="text-xl lg:text-2xl font-bold">0</p>
+          </div>
+        </div>
+        <!-- Prepaid Categories -->
+        <div
+          class="bg-white p-4 lg:p-6 rounded-lg shadow flex items-center space-x-3 lg:space-x-4"
+        >
+          <div class="bg-orange-100 p-3 lg:p-4 rounded-full text-orange-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-gray-600 text-sm lg:text-base">
+              Prepaid Categories
+            </h3>
+            <p id="prepaidCategories" class="text-xl lg:text-2xl font-bold">
+              0
+            </p>
+          </div>
+        </div>
+
+        <!-- Postpaid Categories -->
+        <div
+          class="bg-white p-4 lg:p-6 rounded-lg shadow flex items-center space-x-3 lg:space-x-4"
+        >
+          <div class="bg-orange-100 p-3 lg:p-4 rounded-full text-orange-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-gray-600 text-sm lg:text-base">
+              Postpaid Categories
+            </h3>
+            <p id="postpaidCategories" class="text-xl lg:text-2xl font-bold">
+              0
+            </p>
           </div>
         </div>
 
@@ -103,72 +162,58 @@
             <p id="totalPlans" class="text-xl lg:text-2xl font-bold">0</p>
           </div>
         </div>
-      </div>
 
-      <!-- Categories Table -->
-      <div class="bg-white p-4 lg:p-6 rounded-lg shadow">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg lg:text-xl font-semibold">Categories</h2>
-          <!-- Add Button -->
-          <button
-            class="px-4 py-2 flex items-center space-x-2 bg-purple-500 text-white font-medium rounded-lg shadow hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
-          >
+        <!-- Prepaid Plans -->
+        <div
+          class="bg-white p-4 lg:p-6 rounded-lg shadow flex items-center space-x-3 lg:space-x-4"
+        >
+          <div class="bg-indigo-100 p-3 lg:p-4 rounded-full text-indigo-500">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke-width="2"
+              stroke-width="1.5"
               stroke="currentColor"
-              class="w-5 h-5"
+              class="size-6"
             >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
+                d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"
               />
             </svg>
-            <span>Add</span>
-          </button>
+          </div>
+          <div>
+            <h3 class="text-gray-600 text-sm lg:text-base">Prepaid Plans</h3>
+            <p id="prepaidPlans" class="text-xl lg:text-2xl font-bold">0</p>
+          </div>
         </div>
 
-        <!-- Table -->
-        <div class="overflow-x-auto">
-          <table
-            class="w-full border-collapse border border-gray-400 min-w-full"
-          >
-            <thead>
-              <tr class="bg-gray-200 text-center">
-                <th
-                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
-                >
-                  S.No
-                </th>
-                <th
-                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
-                >
-                  Category Name
-                </th>
-                <th
-                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
-                >
-                  Type
-                </th>
-                <th
-                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
-                >
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody id="categoryTable"></tbody>
-          </table>
-        </div>
-
-        <!-- Category Table Pagination -->
+        <!-- Postpaid Plans -->
         <div
-          id="categoryPagination"
-          class="flex justify-center lg:justify-end space-x-1 lg:space-x-2 mt-4 overflow-x-auto"
-        ></div>
+          class="bg-white p-4 lg:p-6 rounded-lg shadow flex items-center space-x-3 lg:space-x-4"
+        >
+          <div class="bg-indigo-100 p-3 lg:p-4 rounded-full text-indigo-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-gray-600 text-sm lg:text-base">Postpaid Plans</h3>
+            <p id="postpaidPlans" class="text-xl lg:text-2xl font-bold">0</p>
+          </div>
+        </div>
       </div>
 
       <!-- Plans Table -->
@@ -178,7 +223,31 @@
         >
           <h2 class="text-lg lg:text-xl font-semibold">Plans</h2>
 
-          <div class="flex items-center space-x-10">
+          <div class="flex items-center space-x-4">
+            <!-- Filter by Category -->
+            <div class="flex items-center space-x-2 text-sm lg:text-base">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-5 h-5 lg:w-6 lg:h-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
+                />
+              </svg>
+              <span class="whitespace-nowrap">Category:</span>
+              <select
+                id="filterCategory"
+                class="px-2 lg:px-3 py-1 lg:py-2 border rounded-md shadow-sm focus:ring focus:ring-purple-300 text-sm lg:text-base"
+              >
+                <option value="All">All</option>
+              </select>
+            </div>
             <!-- Filter by Type -->
             <div class="flex items-center space-x-2 text-sm lg:text-base">
               <svg
@@ -195,7 +264,7 @@
                   d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
                 />
               </svg>
-              <span class="whitespace-nowrap">Filter by Type:</span>
+              <span class="whitespace-nowrap">Type:</span>
               <select
                 id="filterType"
                 class="px-2 lg:px-3 py-1 lg:py-2 border rounded-md shadow-sm focus:ring focus:ring-purple-300 text-sm lg:text-base"
@@ -205,8 +274,10 @@
                 <option value="Postpaid">Postpaid</option>
               </select>
             </div>
+
             <!-- Add Button -->
             <button
+              id="addPlanBtn"
               class="px-4 py-2 flex items-center space-x-2 bg-purple-500 text-white font-medium rounded-lg shadow hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
             >
               <svg
@@ -274,6 +345,20 @@
           id="planPagination"
           class="flex justify-center lg:justify-end space-x-1 lg:space-x-2 mt-4 overflow-x-auto"
         ></div>
+      </div>
+
+      <!-- Modal Overlay -->
+      <div
+        id="modalOverlay"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"
+      >
+        <div class="flex items-center justify-center min-h-screen p-4">
+          <div
+            class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+          >
+            <!-- Modal content will be dynamically inserted here -->
+          </div>
+        </div>
       </div>
 
       <!-- Toast Container -->
