@@ -68,16 +68,58 @@ async function fetchCustomers() {
 fetchCustomers();
 
 // Deactivate Inactive Customers
-function deactivateInactive(index) {
-  let removed = inactiveCustomers.splice(index, 1);
-  if (
-    inactiveCurrentPage >
-    Math.ceil(inactiveCustomers.length / inactiveRowsPerPage)
-  ) {
-    inactiveCurrentPage = Math.max(1, inactiveCurrentPage - 1);
+let deleteIndex = null; // Store the customer index temporarily
+
+function showDeleteModal(index) {
+  deleteIndex = index;
+  document.getElementById("deleteModal").classList.remove("hidden");
+  document.getElementById("deleteModal").classList.add("flex");
+}
+
+function hideDeleteModal() {
+  deleteIndex = null;
+  document.getElementById("deleteModal").classList.add("hidden");
+  document.getElementById("deleteModal").classList.remove("flex");
+}
+
+document
+  .getElementById("cancelDelete")
+  .addEventListener("click", hideDeleteModal);
+
+document.getElementById("confirmDelete").addEventListener("click", () => {
+  if (deleteIndex !== null) {
+    deactivateInactive(deleteIndex);
   }
-  renderInactive();
-  showToast(`${removed[0].name} (${removed[0].phone}) has been deactivated`);
+  hideDeleteModal();
+});
+
+async function deactivateInactive(index) {
+  const customer = inactiveCustomers[index];
+
+  try {
+    // Send DELETE request to MockAPI
+    const res = await fetch(`${customersURL}/${customer.id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) throw new Error("Failed to delete customer");
+
+    // Remove from local list only if DELETE succeeds
+    inactiveCustomers.splice(index, 1);
+
+    if (
+      inactiveCurrentPage >
+      Math.ceil(inactiveCustomers.length / inactiveRowsPerPage)
+    ) {
+      inactiveCurrentPage = Math.max(1, inactiveCurrentPage - 1);
+    }
+
+    renderInactive();
+    showToast(`${customer.name} (${customer.phone}) has been deactivated`);
+  } catch (err) {
+    console.error("Error deleting customer:", err);
+    showToast("❌ Failed to delete customer. Please try again.");
+  }
 }
 
 // Filter Active Customers
@@ -113,13 +155,10 @@ function showToast(message) {
 function renderInactive() {
   let tbody = document.getElementById("inactiveTable");
   tbody.innerHTML = "";
-  let sortedCustomers = inactiveCustomers
-    .slice()
-    .sort((a, b) => b.days - a.days);
 
   let start = (inactiveCurrentPage - 1) * inactiveRowsPerPage;
   let end = start + inactiveRowsPerPage;
-  let paginated = sortedCustomers.slice(start, end);
+  let paginated = inactiveCustomers.slice(start, end);
 
   paginated.forEach((c, index) => {
     tbody.innerHTML += `
@@ -130,7 +169,7 @@ function renderInactive() {
         <td class="p-3 border">${c.days}</td>
         <td class="p-3 border">
           <button class="px-3 py-1 bg-red-500 text-white rounded-md"
-            onclick="deactivateInactive(${start + index})">Deactivate</button>
+            onclick="showDeleteModal(${index})">Deactivate</button>
         </td>
       </tr>`;
   });
@@ -225,8 +264,8 @@ function renderActive() {
         <td class="p-3 border">${start + index + 1}</td>
         <td class="p-3 border">${c.name}</td>
         <td class="p-3 border">${c.phone}</td>
-        <td class="p-3 border">${c.type}</td>
-        <td class="p-3 border">${c.plan}</td>
+        <td class="p-3 border">${c.type ? c.type : "-"}</td>
+      <td class="p-3 border">${c.plan ? c.plan : "-"}</td>
       </tr>`;
   });
 
