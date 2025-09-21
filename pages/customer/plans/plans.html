@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Prepaid &amp; Postpaid Plans</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#6D28D9", // Violet
+              "background-light": "#F3F4F6", // Light Gray
+              "background-dark": "#1F2937", // Dark Gray
+              "card-light": "#FFFFFF",
+              "card-dark": "#374151",
+              "text-light": "#111827",
+              "text-dark": "#F9FAFB",
+              "accent-light": "#E9D5FF", // Light Lavender
+              "accent-dark": "#4C1D95", // Darker Violet
+              "border-light": "#E5E7EB",
+              "border-dark": "#4B5563",
+            },
+            fontFamily: {
+              display: ["Poppins", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              lg: "1rem",
+              xl: "1.5rem",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+      }
+      .modal-overlay {
+        backdrop-filter: blur(10px);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      }
+      .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark overflow-x-hidden"
+  >
+    <!-- Full Width Header -->
+    <div id="navbar"></div>
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <main class="py-8">
+        <div class="text-center mb-10">
+          <div
+            class="inline-flex bg-card-light dark:bg-card-dark p-1 rounded-full border border-border-light dark:border-border-dark"
+          >
+            <button
+              id="prepaid-tab"
+              class="px-6 sm:px-8 py-2 rounded-full bg-primary text-white text-base sm:text-lg font-semibold transition-all"
+            >
+              Prepaid
+            </button>
+            <button
+              id="postpaid-tab"
+              class="px-6 sm:px-8 py-2 rounded-full text-text-light dark:text-text-dark text-base sm:text-lg font-semibold transition-all hover:bg-gray-100 dark:hover:bg-gray-600"
+            >
+              Postpaid
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+          <!-- Sidebar -->
+          <aside class="w-full lg:w-1/4">
+            <h2 class="text-xl font-semibold mb-4">Plan Category</h2>
+            <div class="space-y-2" id="category-list">
+              <!-- Categories will be loaded dynamically -->
+              <div class="text-center py-4">
+                <div
+                  class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"
+                ></div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Main Content -->
+          <div class="w-full lg:w-3/4">
+            <div
+              class="flex flex-col sm:flex-row justify-between items-center mb-6"
+            >
+              <h2
+                class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-0"
+                id="section-title"
+              >
+                Popular Plans
+              </h2>
+              <div class="relative">
+                <input
+                  id="plan-search"
+                  class="bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark rounded-full py-2 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                  placeholder="Search plans..."
+                  type="text"
+                />
+                <span
+                  class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  >search</span
+                >
+              </div>
+            </div>
+
+            <!-- Plans Container -->
+            <div id="plans-container">
+              <!-- Loading state -->
+              <div class="text-center py-12">
+                <div
+                  class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"
+                ></div>
+                <p class="text-gray-600 dark:text-gray-400">Loading plans...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Plan Details Modal -->
+    <div id="plan-modal" class="fixed inset-0 z-50 hidden">
+      <div
+        class="modal-overlay absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+      >
+        <div
+          class="bg-card-light dark:bg-card-dark rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto relative"
+        >
+          <button
+            id="close-modal"
+            class="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+          >
+            <span class="material-icons">close</span>
+          </button>
+
+          <div class="p-8">
+            <div class="text-center mb-6">
+              <div
+                class="w-20 h-20 bg-gradient-to-r from-primary to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              >
+                <span class="material-icons text-white text-3xl">sim_card</span>
+              </div>
+              <h3 class="text-2xl font-bold mb-2" id="modal-plan-name">
+                Plan Name
+              </h3>
+              <p
+                class="text-gray-600 dark:text-gray-400"
+                id="modal-plan-category"
+              >
+                Category
+              </p>
+            </div>
+
+            <div class="space-y-6">
+              <div class="text-center">
+                <div
+                  class="text-4xl font-bold text-primary mb-2"
+                  id="modal-plan-price"
+                >
+                  ₹0
+                </div>
+                <p
+                  class="text-gray-600 dark:text-gray-400"
+                  id="modal-plan-validity"
+                >
+                  Validity
+                </p>
+              </div>
+
+              <div>
+                <h4 class="font-semibold mb-3">Description</h4>
+                <p
+                  class="text-gray-600 dark:text-gray-400"
+                  id="modal-plan-description"
+                >
+                  Plan description
+                </p>
+              </div>
+
+              <div>
+                <h4 class="font-semibold mb-3">Benefits</h4>
+                <ul class="space-y-2" id="modal-plan-benefits">
+                  <!-- Benefits will be loaded dynamically -->
+                </ul>
+              </div>
+
+              <button
+                class="w-full bg-gradient-to-r from-primary to-purple-600 text-white py-4 rounded-xl font-semibold text-lg hover:shadow-lg transition-all"
+                onclick="window.location.href='/pages/customer/payment/payment.html'"
+              >
+                Buy Now
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="footer"></div>
+
+    <script>
+      // Global variables
+      let allPlans = [];
+      let allTransactions = [];
+      let currentCategory = "Popular Plans";
+      let currentType = "Prepaid";
+      let isSearchActive = false;
+
+      // Predefined categories for prepaid plans
+      const predefinedPrepaidCategories = [
+        "Popular Plans",
+        "True Unlimited 5G Plans",
+        "Top Up",
+        "Annual Plans",
+        "3 GB/ Day",
+        "2.5 GB/ Day",
+        "2 GB/ Day",
+        "1.5 GB/ Day",
+      ];
+
+      // DOM elements
+      const categoryList = document.getElementById("category-list");
+      const plansContainer = document.getElementById("plans-container");
+      const sectionTitle = document.getElementById("section-title");
+      const planModal = document.getElementById("plan-modal");
+      const prepaidTab = document.getElementById("prepaid-tab");
+      const postpaidTab = document.getElementById("postpaid-tab");
+      const planSearch = document.getElementById("plan-search");
+
+      // API URLs
+      const PLANS_API_URL =
+        "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans";
+      const TRANSACTIONS_API_URL =
+        "https://68ca32f2430c4476c3488311.mockapi.io/Transactions";
+
+      // Fetch data from APIs
+      async function fetchData() {
+        try {
+          const [plansResponse, transactionsResponse] = await Promise.all([
+            fetch(PLANS_API_URL),
+            fetch(TRANSACTIONS_API_URL),
+          ]);
+
+          if (!plansResponse.ok || !transactionsResponse.ok) {
+            throw new Error("Failed to fetch data");
+          }
+
+          allPlans = await plansResponse.json();
+          allTransactions = await transactionsResponse.json();
+
+          console.log("Fetched plans:", allPlans);
+          console.log("Fetched transactions:", allTransactions);
+
+          initializePage();
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          plansContainer.innerHTML =
+            '<div class="text-center text-red-500 py-8">Failed to load plans. Please try again later.</div>';
+          categoryList.innerHTML =
+            '<div class="text-center text-red-500 py-4">Failed to load categories.</div>';
+        }
+      }
+
+      // Get popular plans based on transaction data
+      function getPopularPlans() {
+        // Count transactions per plan
+        const planTransactionCount = {};
+
+        allTransactions.forEach((transaction) => {
+          const planId = transaction.planId;
+          if (planId) {
+            planTransactionCount[planId] =
+              (planTransactionCount[planId] || 0) + 1;
+          }
+        });
+
+        // Sort plans by transaction count and get top 6
+        const sortedPlans = allPlans
+          .filter((plan) => plan.type === "Prepaid")
+          .map((plan) => ({
+            ...plan,
+            transactionCount: planTransactionCount[plan.id] || 0,
+          }))
+          .sort((a, b) => b.transactionCount - a.transactionCount)
+          .slice(0, 6);
+
+        console.log("Popular plans:", sortedPlans);
+        return sortedPlans;
+      }
+
+      // Initialize page
+      function initializePage() {
+        loadCategories();
+        renderPlans(currentCategory);
+      }
+
+      // Load categories in sidebar
+      function loadCategories() {
+        let categories;
+
+        if (currentType === "Prepaid") {
+          categories = predefinedPrepaidCategories;
+        } else {
+          // For postpaid, use categories from API
+          categories = [
+            ...new Set(
+              allPlans
+                .filter((plan) => plan.type === "Postpaid")
+                .map((plan) => plan.category)
+            ),
+          ];
+        }
+
+        categoryList.innerHTML = categories
+          .map(
+            (category, index) => `
+          <button
+            class="category-btn block w-full text-left px-4 py-3 rounded-lg font-semibold transition-all ${
+              index === 0
+                ? "bg-accent-light dark:bg-accent-dark text-primary dark:text-white"
+                : "bg-card-light dark:bg-card-dark hover:bg-gray-100 dark:hover:bg-gray-700"
+            }"
+            data-category="${category}"
+          >
+            ${category}
+          </button>
+        `
+          )
+          .join("");
+
+        // Add click listeners
+        document.querySelectorAll(".category-btn").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            currentCategory = e.target.dataset.category;
+            isSearchActive = false;
+            clearSearchInputs();
+            updateActiveCategory(e.target);
+            renderPlans(currentCategory);
+          });
+        });
+      }
+
+      // Clear all search inputs
+      function clearSearchInputs() {
+        planSearch.value = "";
+        document.getElementById("search-input").value = "";
+        document.getElementById("mobile-search-input").value = "";
+      }
+
+      // Update active category in sidebar
+      function updateActiveCategory(activeBtn) {
+        document.querySelectorAll(".category-btn").forEach((btn) => {
+          btn.className =
+            "category-btn block w-full text-left px-4 py-3 rounded-lg font-semibold transition-all bg-card-light dark:bg-card-dark hover:bg-gray-100 dark:hover:bg-gray-700";
+        });
+        if (activeBtn) {
+          activeBtn.className =
+            "category-btn block w-full text-left px-4 py-3 rounded-lg font-semibold transition-all bg-accent-light dark:bg-accent-dark text-primary dark:text-white";
+        }
+      }
+
+      // Update active filter tag
+      function updateActiveFilterTag(activeBtn) {
+        document.querySelectorAll(".filter-tag").forEach((btn) => {
+          btn.className =
+            "filter-tag px-4 py-2 rounded-full font-medium transition-all bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark border border-border-light dark:border-border-dark hover:bg-gray-100 dark:hover:bg-gray-700";
+        });
+        if (activeBtn) {
+          activeBtn.className =
+            "filter-tag px-4 py-2 rounded-full font-medium transition-all bg-primary text-white";
+        }
+      }
+
+      // Render plans
+      function renderPlans(category) {
+        sectionTitle.textContent = category;
+        let filteredPlans = [];
+
+        if (category === "Popular Plans" && currentType === "Prepaid") {
+          // Get top 6 popular plans based on transactions
+          filteredPlans = getPopularPlans();
+        } else {
+          // Filter plans by category and type
+          filteredPlans = allPlans.filter(
+            (plan) => plan.category === category && plan.type === currentType
+          );
+        }
+
+        console.log("Filtered plans:", filteredPlans);
+
+        if (filteredPlans.length === 0) {
+          plansContainer.innerHTML = `
+            <div class="text-center py-12">
+              <div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="material-icons text-4xl text-gray-400">search_off</span>
+              </div>
+              <h3 class="text-xl font-semibold mb-2">No plans found</h3>
+              <p class="text-gray-600 dark:text-gray-400">No ${currentType.toLowerCase()} plans available in ${category}.</p>
+            </div>
+          `;
+          return;
+        }
+
+        // Group plans into rows of 3
+        const planRows = [];
+        for (let i = 0; i < filteredPlans.length; i += 3) {
+          planRows.push(filteredPlans.slice(i, i + 3));
+        }
+
+        plansContainer.innerHTML = planRows
+          .map(
+            (row) => `
+          <section class="mb-12">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              ${row.map((plan) => createPlanCard(plan)).join("")}
+            </div>
+          </section>
+        `
+          )
+          .join("");
+
+        // Add click listeners to plan cards
+        document.querySelectorAll(".plan-card").forEach((card) => {
+          card.addEventListener("click", (e) => {
+            const planId = e.currentTarget.dataset.planId;
+            showPlanModal(planId);
+          });
+        });
+      }
+
+      // Create plan card HTML
+      function createPlanCard(plan) {
+        return `
+          <div class="plan-card card-hover bg-card-light dark:bg-card-dark rounded-xl p-6 cursor-pointer border border-border-light dark:border-border-dark" 
+               data-plan-id="${plan.id}"
+               data-plan-name="${(plan.name || "").toLowerCase()}"
+               data-plan-description="${(plan.description || "").toLowerCase()}"
+               data-plan-benefits="${(plan.benefits || "").toLowerCase()}"
+               data-plan-validity="${(plan.validity || "").toLowerCase()}"
+               data-plan-category="${(plan.category || "").toLowerCase()}">
+            <div class="flex justify-between items-start mb-4">
+              <div class="w-12 h-12 bg-gradient-to-r from-primary to-purple-500 rounded-lg flex items-center justify-center">
+                <span class="material-icons text-white">sim_card</span>
+              </div>
+              <span class="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs font-semibold px-2 py-1 rounded-full">
+                ${plan.validity || "N/A"}
+              </span>
+            </div>
+            <h3 class="font-bold text-lg mb-2">${
+              plan.name || "Unnamed Plan"
+            }</h3>
+            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">${
+              plan.description || "No description available"
+            }</p>
+            <div class="flex justify-between items-center">
+              <div>
+                <span class="text-2xl font-bold text-primary">₹${
+                  plan.price || "0"
+                }</span>
+                <span class="text-gray-500 text-sm ml-1">/${
+                  plan.validity || ""
+                }</span>
+              </div>
+              <button class="bg-primary hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">
+                View Details
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      // Show plan modal
+      function showPlanModal(planId) {
+        const plan = allPlans.find((p) => p.id === planId);
+        if (!plan) return;
+
+        document.getElementById("modal-plan-name").textContent =
+          plan.name || "Unnamed Plan";
+        document.getElementById("modal-plan-category").textContent =
+          plan.category || "Unknown Category";
+        document.getElementById("modal-plan-price").textContent = `₹${
+          plan.price || "0"
+        }`;
+        document.getElementById("modal-plan-validity").textContent =
+          plan.validity || "N/A";
+        document.getElementById("modal-plan-description").textContent =
+          plan.description || "No description available";
+
+        // Parse and display benefits
+        let benefits = [];
+        if (plan.benefits) {
+          if (typeof plan.benefits === "string") {
+            benefits = plan.benefits
+              .split(",")
+              .map((b) => b.trim())
+              .filter((b) => b);
+          } else if (Array.isArray(plan.benefits)) {
+            benefits = plan.benefits.filter((b) => b);
+          }
+        }
+
+        if (benefits.length === 0) {
+          benefits = ["No specific benefits listed"];
+        }
+
+        document.getElementById("modal-plan-benefits").innerHTML = benefits
+          .map(
+            (benefit) => `
+          <li class="flex items-center space-x-2">
+            <span class="material-icons text-green-500 text-sm">check_circle</span>
+            <span>${benefit}</span>
+          </li>
+        `
+          )
+          .join("");
+
+        planModal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+      }
+
+      // Close modal
+      function closeModal() {
+        planModal.classList.add("hidden");
+        document.body.style.overflow = "";
+      }
+
+      // Search functionality using querySelectorAll
+      function searchPlans(query) {
+        if (query.trim() === "") {
+          isSearchActive = false;
+          renderPlans(currentCategory);
+          return;
+        }
+
+        isSearchActive = true;
+        sectionTitle.textContent = `Search Results for "${query}"`;
+
+        // Use querySelectorAll to find matching plan cards
+        const searchTerm = query.toLowerCase();
+        const matchingPlans = [];
+
+        // Get all plans of current type
+        const currentTypePlans = allPlans.filter(
+          (plan) => plan.type === currentType
+        );
+
+        // Search through plans
+        currentTypePlans.forEach((plan) => {
+          const planName = (plan.name || "").toLowerCase();
+          const planDescription = (plan.description || "").toLowerCase();
+          const planBenefits = (plan.benefits || "").toLowerCase();
+          const planValidity = (plan.validity || "").toLowerCase();
+          const planCategory = (plan.category || "").toLowerCase();
+
+          if (
+            planName.includes(searchTerm) ||
+            planDescription.includes(searchTerm) ||
+            planBenefits.includes(searchTerm) ||
+            planValidity.includes(searchTerm) ||
+            planCategory.includes(searchTerm)
+          ) {
+            matchingPlans.push(plan);
+          }
+        });
+
+        console.log("Search results:", matchingPlans);
+
+        if (matchingPlans.length === 0) {
+          plansContainer.innerHTML = `
+            <div class="text-center py-12">
+              <div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="material-icons text-4xl text-gray-400">search_off</span>
+              </div>
+              <h3 class="text-xl font-semibold mb-2">No results found</h3>
+              <p class="text-gray-600 dark:text-gray-400">Try adjusting your search terms.</p>
+            </div>
+          `;
+          return;
+        }
+
+        // Group matching plans into rows of 3
+        const planRows = [];
+        for (let i = 0; i < matchingPlans.length; i += 3) {
+          planRows.push(matchingPlans.slice(i, i + 3));
+        }
+
+        plansContainer.innerHTML = planRows
+          .map(
+            (row) => `
+          <section class="mb-12">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              ${row.map((plan) => createPlanCard(plan)).join("")}
+            </div>
+          </section>
+        `
+          )
+          .join("");
+
+        // Add click listeners to plan cards
+        document.querySelectorAll(".plan-card").forEach((card) => {
+          card.addEventListener("click", (e) => {
+            const planId = e.currentTarget.dataset.planId;
+            showPlanModal(planId);
+          });
+        });
+
+        // Highlight search terms in rendered cards using querySelectorAll
+        setTimeout(() => {
+          highlightSearchTerms(searchTerm);
+        }, 100);
+      }
+
+      // Highlight search terms in the rendered content
+      function highlightSearchTerms(searchTerm) {
+        const planCards = document.querySelectorAll(".plan-card");
+
+        planCards.forEach((card) => {
+          // Get text elements to highlight
+          const titleElement = card.querySelector("h3");
+          const descriptionElement = card.querySelector("p");
+          const validityElement = card.querySelector(
+            ".bg-green-100, .dark\\:bg-green-900"
+          );
+
+          // Highlight text in elements
+          [titleElement, descriptionElement, validityElement].forEach(
+            (element) => {
+              if (element && element.textContent) {
+                const originalText = element.textContent;
+                const regex = new RegExp(`(${searchTerm})`, "gi");
+
+                if (regex.test(originalText)) {
+                  element.innerHTML = originalText.replace(
+                    regex,
+                    '<mark class="bg-yellow-300 dark:bg-yellow-600 px-1 rounded">$1</mark>'
+                  );
+                }
+              }
+            }
+          );
+        });
+      }
+
+      // Event listeners
+      document
+        .getElementById("close-modal")
+        .addEventListener("click", closeModal);
+      planModal.addEventListener("click", (e) => {
+        if (e.target === planModal) closeModal();
+      });
+
+      // Tab switching
+      prepaidTab.addEventListener("click", () => {
+        currentType = "Prepaid";
+        currentCategory = "Popular Plans";
+        isSearchActive = false;
+        clearSearchInputs();
+
+        prepaidTab.className =
+          "px-6 sm:px-8 py-2 rounded-full bg-primary text-white text-base sm:text-lg font-semibold transition-all";
+        postpaidTab.className =
+          "px-6 sm:px-8 py-2 rounded-full text-text-light dark:text-text-dark text-base sm:text-lg font-semibold transition-all hover:bg-gray-100 dark:hover:bg-gray-600";
+
+        loadCategories();
+        renderPlans(currentCategory);
+      });
+
+      postpaidTab.addEventListener("click", () => {
+        currentType = "Postpaid";
+        currentCategory =
+          allPlans.filter((plan) => plan.type === "Postpaid").length > 0
+            ? [
+                ...new Set(
+                  allPlans
+                    .filter((plan) => plan.type === "Postpaid")
+                    .map((plan) => plan.category)
+                ),
+              ][0]
+            : "Popular Plans";
+        isSearchActive = false;
+        clearSearchInputs();
+
+        postpaidTab.className =
+          "px-6 sm:px-8 py-2 rounded-full bg-primary text-white text-base sm:text-lg font-semibold transition-all";
+        prepaidTab.className =
+          "px-6 sm:px-8 py-2 rounded-full text-text-light dark:text-text-dark text-base sm:text-lg font-semibold transition-all hover:bg-gray-100 dark:hover:bg-gray-600";
+
+        loadCategories();
+        renderPlans(currentCategory);
+      });
+
+      // Search functionality with debounce
+      let searchTimeout;
+
+      function setupSearchListener(element) {
+        if (element) {
+          element.addEventListener("input", (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+              searchPlans(e.target.value);
+
+              // Sync search across all inputs
+              const searchValue = e.target.value;
+              if (planSearch !== e.target) planSearch.value = searchValue;
+              if (document.getElementById("search-input") !== e.target)
+                document.getElementById("search-input").value = searchValue;
+              if (document.getElementById("mobile-search-input") !== e.target)
+                document.getElementById("mobile-search-input").value =
+                  searchValue;
+            }, 300);
+          });
+        }
+      }
+
+      // Setup search listeners for all search inputs
+      setupSearchListener(planSearch);
+      setupSearchListener(document.getElementById("search-input"));
+      setupSearchListener(document.getElementById("mobile-search-input"));
+
+      // Hamburger menu functionality
+      const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+      const mobileMenu = document.getElementById("mobile-menu");
+      const hamburgerLines = document.querySelectorAll(
+        ".hamburger-line-1, .hamburger-line-2, .hamburger-line-3"
+      );
+      let isMenuOpen = false;
+
+      function toggleMenu() {
+        isMenuOpen = !isMenuOpen;
+
+        if (isMenuOpen) {
+          mobileMenu.classList.remove(
+            "-translate-y-full",
+            "opacity-0",
+            "invisible"
+          );
+          mobileMenu.classList.add("translate-y-0", "opacity-100", "visible");
+
+          hamburgerLines[0].style.transform =
+            "rotate(45deg) translate(6px, 6px)";
+          hamburgerLines[1].style.opacity = "0";
+          hamburgerLines[2].style.transform =
+            "rotate(-45deg) translate(6px, -6px)";
+
+          document.body.style.overflow = "hidden";
+        } else {
+          mobileMenu.classList.remove(
+            "translate-y-0",
+            "opacity-100",
+            "visible"
+          );
+          mobileMenu.classList.add(
+            "-translate-y-full",
+            "opacity-0",
+            "invisible"
+          );
+
+          hamburgerLines[0].style.transform = "";
+          hamburgerLines[1].style.opacity = "1";
+          hamburgerLines[2].style.transform = "";
+
+          document.body.style.overflow = "";
+        }
+      }
+
+      if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener("click", toggleMenu);
+      }
+
+      const menuLinks = mobileMenu?.querySelectorAll("a");
+      menuLinks?.forEach((link) => {
+        link.addEventListener("click", () => {
+          if (isMenuOpen) {
+            toggleMenu();
+          }
+        });
+      });
+
+      document.addEventListener("click", function (event) {
+        if (
+          isMenuOpen &&
+          mobileMenu &&
+          mobileMenuBtn &&
+          !mobileMenu.contains(event.target) &&
+          !mobileMenuBtn.contains(event.target)
+        ) {
+          toggleMenu();
+        }
+      });
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          if (isMenuOpen) {
+            toggleMenu();
+          }
+          if (!planModal.classList.contains("hidden")) {
+            closeModal();
+          }
+        }
+      });
+
+      window.addEventListener("resize", function () {
+        if (window.innerWidth >= 1024 && isMenuOpen) {
+          toggleMenu();
+        }
+      });
+
+      // Initialize the app
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", fetchData);
+      } else {
+        fetchData();
+      }
+    </script>
+    <script src="./plans.js"></script>
+  </body>
+</html>
