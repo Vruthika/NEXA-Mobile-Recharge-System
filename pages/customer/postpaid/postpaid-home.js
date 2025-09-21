@@ -1,3 +1,15 @@
+function loadComponent(id, filepath) {
+  fetch(filepath)
+    .then((response) => response.text())
+    .then((data) => {
+      document.getElementById(id).innerHTML = data;
+      highlightActiveLink();
+    })
+    .catch((error) => console.error("Error loading navbar:", error));
+}
+loadComponent("navbar", "/components/navbar.html");
+loadComponent("footer", "/components/footer.html");
+
 const TRANSACTIONS_API =
   "https://68ca32f2430c4476c3488311.mockapi.io/Transactions";
 const PLANS_API = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans";
