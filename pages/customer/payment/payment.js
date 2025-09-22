@@ -27,6 +27,51 @@ function getUrlParameter(name) {
     : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
+// Function to check if user is logged in
+function checkUserAuthentication() {
+  const loggedInUser = localStorage.getItem("loggedInUser");
+  if (!loggedInUser) {
+    alert(
+      "You must be logged in to make a payment. Redirecting to login page..."
+    );
+    // Store the current payment page URL to redirect back after login
+    const currentUrl = window.location.href;
+    localStorage.setItem("redirectAfterLogin", currentUrl);
+    // Redirect to login page
+    window.location.href = "/pages/auth/login/login.html";
+    return null;
+  }
+  return JSON.parse(loggedInUser);
+}
+
+// Function to fetch customer data from API
+async function fetchCustomerData(customerId) {
+  try {
+    const response = await fetch(
+      `https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Customers/${customerId}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const customer = await response.json();
+    return customer;
+  } catch (error) {
+    console.error("Error fetching customer data:", error);
+    throw error;
+  }
+}
+
+// Function to format date as YYYY-MM-DD
+function formatDate(date) {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 // Function to fetch plan data
 async function fetchPlanData() {
   console.log("Starting to fetch plan data...");
@@ -123,6 +168,12 @@ function updatePlanDetails(plan) {
 // Payment functionality
 document.addEventListener("DOMContentLoaded", function () {
   console.log("DOM loaded, initializing payment page...");
+
+  // Check if user is logged in
+  const loggedInUser = checkUserAuthentication();
+  if (!loggedInUser) {
+    return; // Exit if user is not logged in
+  }
 
   // Wait a bit for all elements to be properly rendered
   setTimeout(() => {
@@ -249,7 +300,13 @@ document.addEventListener("DOMContentLoaded", function () {
     return true;
   }
 
-  function processPayment(button) {
+  async function processPayment(button) {
+    // Check user authentication again before processing
+    const loggedInUser = checkUserAuthentication();
+    if (!loggedInUser) {
+      return;
+    }
+
     // Show loading state
     const originalHTML = button.innerHTML;
     button.innerHTML =
@@ -261,64 +318,79 @@ document.addEventListener("DOMContentLoaded", function () {
       lastTransactionId++;
       return "TNX" + lastTransactionId;
     }
-    const customers =
-      "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Customers";
-    // Create transaction data
-    const transactionData = {
-      planId: selectedPlan.id,
-      planName: selectedPlan.name,
-      amount: selectedPlan.price,
-      status: "Success",
 
-      transactionDate: new Date().toISOString(),
-      userId: "user_" + Math.random().toString(36).substr(2, 9), // Generate random user ID
-      transactionId: getNextTransactionId(),
-    };
+    try {
+      // Fetch customer data from API to get the most up-to-date information
+      const customerData = await fetchCustomerData(loggedInUser.id);
 
-    console.log("Creating transaction:", transactionData);
+      // Create transaction data with customer details
+      const transactionData = {
+        transactionId: getNextTransactionId(),
+        userId: customerData.id,
+        name: customerData.name,
+        phone: customerData.phone,
+        planId: selectedPlan.id,
+        plan: selectedPlan.name,
+        type: selectedPlan.type,
+        status: "Success",
+        date: formatDate(new Date()), // Format as YYYY-MM-DD
+      };
 
-    // Simulate payment processing and create transaction
-    setTimeout(async function () {
-      try {
-        // Create transaction record
-        const response = await fetch(
-          "https://68ca32f2430c4476c3488311.mockapi.io/Transactions",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(transactionData),
-          }
-        );
+      console.log("Creating transaction:", transactionData);
 
-        if (response.ok) {
-          const createdTransaction = await response.json();
-          console.log("Transaction created successfully:", createdTransaction);
-
-          // Show success animation
-          successAnimation.classList.add("active");
-
-          // Store transaction details for dashboard redirect
-          localStorage.setItem(
-            "lastTransaction",
-            JSON.stringify(createdTransaction)
+      // Simulate payment processing and create transaction
+      setTimeout(async function () {
+        try {
+          // Create transaction record
+          const response = await fetch(
+            "https://68ca32f2430c4476c3488311.mockapi.io/Transactions",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(transactionData),
+            }
           );
-        } else {
-          throw new Error("Failed to create transaction");
+
+          if (response.ok) {
+            const createdTransaction = await response.json();
+            console.log(
+              "Transaction created successfully:",
+              createdTransaction
+            );
+
+            // Show success animation
+            successAnimation.classList.add("active");
+
+            // Store transaction details for dashboard redirect
+            localStorage.setItem(
+              "lastTransaction",
+              JSON.stringify(createdTransaction)
+            );
+          } else {
+            throw new Error("Failed to create transaction");
+          }
+        } catch (error) {
+          console.error("Error creating transaction:", error);
+          alert(
+            "Payment successful, but there was an issue recording the transaction. Please contact support."
+          );
+          successAnimation.classList.add("active");
         }
-      } catch (error) {
-        console.error("Error creating transaction:", error);
-        alert(
-          "Payment successful, but there was an issue recording the transaction. Please contact support."
-        );
-        successAnimation.classList.add("active");
-      }
+
+        // Reset button state
+        button.innerHTML = originalHTML;
+        button.disabled = false;
+      }, 2500);
+    } catch (error) {
+      console.error("Error fetching customer data:", error);
+      alert("Error processing payment. Please try again.");
 
       // Reset button state
       button.innerHTML = originalHTML;
       button.disabled = false;
-    }, 2500);
+    }
   }
 
   // Format card number with spaces
