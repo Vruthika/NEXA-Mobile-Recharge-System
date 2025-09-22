@@ -15,6 +15,51 @@ function togglePassword() {
   }
 }
 
+// Function to handle successful login and redirect
+function handleSuccessfulLogin(userData, userRole) {
+  // Store user role
+  localStorage.setItem("role", userRole);
+
+  if (userRole === "customer") {
+    // Store logged-in user data for payment processing
+    localStorage.setItem(
+      "loggedInUser",
+      JSON.stringify({
+        id: userData.id,
+        name: userData.name,
+        phone: userData.phone,
+        type: userData.type,
+        email: userData.email,
+      })
+    );
+
+    // Also store customerId for backward compatibility
+    localStorage.setItem("customerId", userData.id);
+  }
+
+  // Check if there's a redirect URL stored (from payment page)
+  const redirectUrl = localStorage.getItem("redirectAfterLogin");
+
+  if (redirectUrl) {
+    // Clear the redirect URL from storage
+    localStorage.removeItem("redirectAfterLogin");
+    console.log("Redirecting back to payment page:", redirectUrl);
+    // Redirect back to the payment page
+    setTimeout(() => {
+      window.location.href = redirectUrl;
+    }, 1500);
+  } else {
+    // Default redirect based on role
+    setTimeout(() => {
+      if (userRole === "admin") {
+        window.location.href = "../../admin/dashboard/dashboard.html";
+      } else {
+        window.location.href = "../../customer/dashboard/dashboard.html";
+      }
+    }, 1500);
+  }
+}
+
 // Form handling JavaScript
 document
   .getElementById("loginForm")
@@ -43,7 +88,7 @@ document
     }
 
     if (formData.password.length < 6 && formData.email !== "admin@gmail.com") {
-      // 👆 Skip password length check for admin since it's "admin"
+      // Skip password length check for admin since it's "admin@123"
       showError("Password must be at least 6 characters long");
       return;
     }
@@ -52,24 +97,33 @@ document
     showLoading(true);
 
     try {
-      // 👇 Check for Admin Login first
+      // Check for Admin Login first
       if (
         formData.email === "admin@gmail.com" &&
         formData.password === "admin@123"
       ) {
         showLoading(false);
         showSuccessMessage();
-        localStorage.setItem("role", "admin");
 
-        // Redirect to admin dashboard
-        setTimeout(() => {
-          window.location.href = "../../admin/dashboard/dashboard.html";
-        }, 1500);
+        // Handle admin login
+        const adminData = {
+          id: "admin",
+          name: "Administrator",
+          email: "admin@gmail.com",
+          type: "Admin",
+        };
+
+        handleSuccessfulLogin(adminData, "admin");
         return;
       }
 
       // Fetch customer data from API
       const response = await fetch(customerURL);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const customers = await response.json();
 
       // Check if user exists
@@ -83,13 +137,16 @@ document
       if (matchedCustomer) {
         showLoading(false);
         showSuccessMessage();
-        localStorage.setItem("customerId", matchedCustomer.id);
-        localStorage.setItem("role", "customer");
 
-        // Redirect to customer dashboard
-        setTimeout(() => {
-          window.location.href = "../../customer/dashboard/dashboard.html";
-        }, 1500);
+        console.log("Customer login successful:", {
+          id: matchedCustomer.id,
+          name: matchedCustomer.name,
+          phone: matchedCustomer.phone,
+          type: matchedCustomer.type,
+        });
+
+        // Handle customer login
+        handleSuccessfulLogin(matchedCustomer, "customer");
       } else {
         showLoading(false);
         showError("Invalid credentials. Please try again.");
