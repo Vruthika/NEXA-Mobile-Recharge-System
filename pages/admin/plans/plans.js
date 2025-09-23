@@ -523,27 +523,27 @@ function viewPlan(planId) {
               }
               
               ${
-                plan.benefits
+                plan.benefits &&
+                typeof plan.benefits === "string" &&
+                plan.benefits.trim()
                   ? `
-                <div class="bg-gray-50 p-4 rounded-lg">
-                  <h3 class="text-sm font-medium text-gray-500 mb-2">Benefits</h3>
-                  <div class="text-gray-900">
-                    ${plan.benefits
-                      .split("\n")
-                      .map((benefit) => benefit.trim())
-                      .filter((benefit) => benefit)
-                      .map((benefit) => `<p class="mb-1">• ${benefit}</p>`)
-                      .join("")}
-                  </div>
-                </div>
-              `
+  <div class="bg-gray-50 p-4 rounded-lg">
+    <h3 class="text-sm font-medium text-gray-500 mb-2">Benefits</h3>
+    <div class="text-gray-900">
+      ${plan.benefits
+        .split("\n")
+        .map((benefit) => benefit.trim())
+        .filter((benefit) => benefit)
+        .map((benefit) => `<p class="mb-1">• ${benefit}</p>`)
+        .join("")}
+    </div>
+  </div>
+`
                   : ""
               }
             </div>
             
-            <div class="flex justify-end pt-6">
-              <button onclick="closeModal()" class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">Close</button>
-            </div>
+            
           </div>
         `;
 
