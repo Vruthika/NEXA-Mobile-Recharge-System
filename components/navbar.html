@@ -1,367 +1,186 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NEXA Navbar</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet"
-    />
-    <script>
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              primary: "#3B82F6",
-              "background-light": "#F9FAFB",
-              "background-dark": "#111827",
-              "card-light": "#FFFFFF",
-              "card-dark": "#1F2937",
-              "text-light": "#1F2937",
-              "text-dark": "#F9FAFB",
-              "subtext-light": "#6B7280",
-              "subtext-dark": "#9CA3AF",
-              "border-light": "#E5E7EB",
-              "border-dark": "#374151",
-              footer: "#6366f1",
-            },
-            fontFamily: {
-              display: ["Inter", "sans-serif"],
-            },
-            borderRadius: {
-              DEFAULT: "0.5rem",
-              lg: "0.75rem",
-              xl: "1rem",
-            },
-            animation: {
-              fadeInUp: "fadeInUp 0.6s ease-out",
-              scaleIn: "scaleIn 0.5s ease-out",
-              float: "float 3s ease-in-out infinite",
-            },
-            keyframes: {
-              fadeInUp: {
-                "0%": {
-                  opacity: "0",
-                  transform: "translateY(20px)",
-                },
-                "100%": {
-                  opacity: "1",
-                  transform: "translateY(0)",
-                },
-              },
-              scaleIn: {
-                "0%": {
-                  opacity: "0",
-                  transform: "scale(0.9)",
-                },
-                "100%": {
-                  opacity: "1",
-                  transform: "scale(1)",
-                },
-              },
-              float: {
-                "0%, 100%": {
-                  transform: "translateY(0px)",
-                },
-                "50%": {
-                  transform: "translateY(-10px)",
-                },
-              },
-            },
-          },
-        },
-      };
-    </script>
-  </head>
-  <body
-    class="min-h-screen bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark overflow-x-hidden"
-  >
-    <!-- Full Width Header -->
-    <header
-      class="w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 border-b border-border-light dark:border-border-dark"
-    >
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center py-4">
-          <!-- Logo + Name wrapper (Left side) -->
-          <div class="flex items-center space-x-3">
-            <img
-              src="/assets/images/logo.png"
-              alt="NEXA"
-              class="h-12 w-12 sm:h-16 sm:w-16 rounded-full border border-purple-500"
-            />
-            <div
-              class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
-            >
-              NEXA
-            </div>
-          </div>
-
-          <!-- Desktop Navigation -->
-          <div class="hidden lg:flex items-center space-x-8">
-            <!-- Search -->
-            <div class="relative">
-              <input
-                id="search-input"
-                class="w-80 bg-gray-100 dark:bg-gray-700 border-none rounded-full pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-gray-600 transition-all text-sm"
-                placeholder="Search plans..."
-                type="text"
-              />
-              <span
-                class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
-                >search</span
-              >
-            </div>
-
-            <!-- Navigation Links -->
-            <div class="flex items-center space-x-6">
-              <a
-                class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
-                href="../dashboard/dashboard.html"
-                >Home
-                <span
-                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
-                ></span>
-              </a>
-              <a
-                class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
-                href="/pages/customer/plans/plans.html"
-                >Plans<span
-                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
-                ></span>
-              </a>
-              <a
-                class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
-                href="/pages/info/5G.html#faq"
-                >FAQ
-                <span
-                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
-                ></span>
-              </a>
-              <a
-                class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
-                href="#"
-                >Support
-                <span
-                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
-                ></span>
-              </a>
-              <button
-                class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center hover:shadow-lg transition-all"
-              >
-                <span class="material-icons text-white">person</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Mobile Hamburger Menu -->
-          <div class="lg:hidden">
-            <button
-              id="mobile-menu-btn"
-              class="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 flex flex-col items-center justify-center space-y-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
-            >
-              <span
-                class="w-5 h-0.5 bg-gray-600 dark:bg-gray-300 transition-all duration-300 hamburger-line-1"
-              ></span>
-              <span
-                class="w-5 h-0.5 bg-gray-600 dark:bg-gray-300 transition-all duration-300 hamburger-line-2"
-              ></span>
-              <span
-                class="w-5 h-0.5 bg-gray-600 dark:bg-gray-300 transition-all duration-300 hamburger-line-3"
-              ></span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Mobile Dropdown Menu -->
+<!-- Full Width Header -->
+<header
+  class="w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 border-b border-border-light dark:border-border-dark"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center py-4">
+      <!-- Logo + Name wrapper (Left side) -->
+      <div class="flex items-center space-x-3">
+        <img
+          src="/assets/images/logo.png"
+          alt="NEXA"
+          class="h-12 w-12 sm:h-16 sm:w-16 rounded-full border border-purple-500"
+        />
         <div
-          id="mobile-menu"
-          class="lg:hidden absolute top-full left-0 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-border-light dark:border-border-dark shadow-lg transform -translate-y-full opacity-0 invisible transition-all duration-300 ease-in-out"
+          class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
         >
-          <div class="px-4 py-6 space-y-4">
-            <!-- Mobile Search -->
-            <div class="relative">
-              <input
-                id="mobile-search-input"
-                class="w-full bg-gray-100 dark:bg-gray-700 border-none rounded-full pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-gray-600 transition-all text-sm"
-                placeholder="Search plans..."
-                type="text"
-              />
-              <span
-                class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
-                >search</span
-              >
-            </div>
-
-            <!-- Mobile Navigation Links -->
-            <div class="space-y-2">
-              <a
-                href="../dashboard/dashboard.html"
-                class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
-              >
-                <span
-                  class="material-icons text-gray-500 group-hover:text-primary transition-colors"
-                  >home</span
-                >
-                <span
-                  class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
-                  >Home</span
-                >
-              </a>
-
-              <a
-                href="../pages/customer/plans/plans.html"
-                class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-primary/10 border-l-4 border-primary"
-              >
-                <span class="material-icons text-primary">card_giftcard</span>
-                <span class="text-primary font-medium">Plans</span>
-              </a>
-
-              <a
-                href="/pages/info/5G.html#faq"
-                class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
-              >
-                <span
-                  class="material-icons text-gray-500 group-hover:text-primary transition-colors"
-                  >help</span
-                >
-                <span
-                  class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
-                  >FAQ</span
-                >
-              </a>
-
-              <a
-                href="#"
-                class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
-              >
-                <span
-                  class="material-icons text-gray-500 group-hover:text-primary transition-colors"
-                  >support</span
-                >
-                <span
-                  class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
-                  >Support</span
-                >
-              </a>
-
-              <a
-                href="#"
-                class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
-              >
-                <span
-                  class="material-icons text-gray-500 group-hover:text-primary transition-colors"
-                  >account_circle</span
-                >
-                <span
-                  class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
-                  >My Account</span
-                >
-              </a>
-            </div>
-          </div>
+          NEXA
         </div>
       </div>
-    </header>
 
-    <!-- Hamburger Menu JavaScript -->
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const mobileMenuBtn = document.getElementById("mobile-menu-btn");
-        const mobileMenu = document.getElementById("mobile-menu");
-        const hamburgerLines = document.querySelectorAll(
-          ".hamburger-line-1, .hamburger-line-2, .hamburger-line-3"
-        );
-        let isMenuOpen = false;
+      <!-- Desktop Navigation -->
+      <div class="hidden lg:flex items-center space-x-8">
+        <!-- Search -->
+        <div class="relative">
+          <input
+            id="search-input"
+            class="w-80 bg-gray-100 dark:bg-gray-700 border-none rounded-full pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-gray-600 transition-all text-sm"
+            placeholder="Search plans..."
+            type="text"
+          />
+          <span
+            class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
+            >search</span
+          >
+        </div>
 
-        function toggleMenu() {
-          isMenuOpen = !isMenuOpen;
+        <!-- Navigation Links -->
+        <div class="flex items-center space-x-6">
+          <a
+            class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
+            href="../dashboard/dashboard.html"
+            >Home
+            <span
+              class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
+            ></span>
+          </a>
+          <a
+            class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
+            href="/pages/customer/plans/plans.html"
+            >Plans<span
+              class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
+            ></span>
+          </a>
+          <a
+            class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
+            href="/pages/info/5G.html#faq"
+            >FAQ
+            <span
+              class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
+            ></span>
+          </a>
+          <a
+            class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
+            href="#"
+            >Support
+            <span
+              class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
+            ></span>
+          </a>
+          <button
+            class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center hover:shadow-lg transition-all"
+          >
+            <span class="material-icons text-white">person</span>
+          </button>
+        </div>
+      </div>
 
-          if (isMenuOpen) {
-            // Open menu
-            mobileMenu.classList.remove(
-              "-translate-y-full",
-              "opacity-0",
-              "invisible"
-            );
-            mobileMenu.classList.add("translate-y-0", "opacity-100", "visible");
+      <!-- Mobile Hamburger Menu -->
+      <div class="lg:hidden">
+        <button
+          id="mobile-menu-btn"
+          class="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 flex flex-col items-center justify-center space-y-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+        >
+          <span
+            class="w-5 h-0.5 bg-gray-600 dark:bg-gray-300 transition-all duration-300 hamburger-line-1"
+          ></span>
+          <span
+            class="w-5 h-0.5 bg-gray-600 dark:bg-gray-300 transition-all duration-300 hamburger-line-2"
+          ></span>
+          <span
+            class="w-5 h-0.5 bg-gray-600 dark:bg-gray-300 transition-all duration-300 hamburger-line-3"
+          ></span>
+        </button>
+      </div>
+    </div>
 
-            // Animate hamburger to X
-            hamburgerLines[0].style.transform =
-              "rotate(45deg) translate(6px, 6px)";
-            hamburgerLines[1].style.opacity = "0";
-            hamburgerLines[2].style.transform =
-              "rotate(-45deg) translate(6px, -6px)";
+    <!-- Mobile Dropdown Menu -->
+    <div
+      id="mobile-menu"
+      class="lg:hidden absolute top-full left-0 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-border-light dark:border-border-dark shadow-lg transform -translate-y-full opacity-0 invisible transition-all duration-300 ease-in-out"
+    >
+      <div class="px-4 py-6 space-y-4">
+        <!-- Mobile Search -->
+        <div class="relative">
+          <input
+            id="mobile-search-input"
+            class="w-full bg-gray-100 dark:bg-gray-700 border-none rounded-full pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-gray-600 transition-all text-sm"
+            placeholder="Search plans..."
+            type="text"
+          />
+          <span
+            class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
+            >search</span
+          >
+        </div>
 
-            // Prevent body scroll
-            document.body.style.overflow = "hidden";
-          } else {
-            // Close menu
-            mobileMenu.classList.remove(
-              "translate-y-0",
-              "opacity-100",
-              "visible"
-            );
-            mobileMenu.classList.add(
-              "-translate-y-full",
-              "opacity-0",
-              "invisible"
-            );
+        <!-- Mobile Navigation Links -->
+        <div class="space-y-2">
+          <a
+            href="../dashboard/dashboard.html"
+            class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+          >
+            <span
+              class="material-icons text-gray-500 group-hover:text-primary transition-colors"
+              >home</span
+            >
+            <span
+              class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
+              >Home</span
+            >
+          </a>
 
-            // Reset hamburger
-            hamburgerLines[0].style.transform = "";
-            hamburgerLines[1].style.opacity = "1";
-            hamburgerLines[2].style.transform = "";
+          <a
+            href="/pages/customer/plans/plans.html"
+            class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-primary/10 border-l-4 border-primary"
+          >
+            <span class="material-icons text-primary">card_giftcard</span>
+            <span class="text-primary font-medium">Plans</span>
+          </a>
 
-            // Allow body scroll
-            document.body.style.overflow = "";
-          }
-        }
+          <a
+            href="/pages/info/5G.html#faq"
+            class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+          >
+            <span
+              class="material-icons text-gray-500 group-hover:text-primary transition-colors"
+              >help</span
+            >
+            <span
+              class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
+              >FAQ</span
+            >
+          </a>
 
-        // Toggle menu on button click
-        mobileMenuBtn.addEventListener("click", toggleMenu);
+          <a
+            href="#"
+            class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+          >
+            <span
+              class="material-icons text-gray-500 group-hover:text-primary transition-colors"
+              >support</span
+            >
+            <span
+              class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
+              >Support</span
+            >
+          </a>
 
-        // Close menu when clicking on menu items
-        const menuLinks = mobileMenu.querySelectorAll("a");
-        menuLinks.forEach((link) => {
-          link.addEventListener("click", () => {
-            if (isMenuOpen) {
-              toggleMenu();
-            }
-          });
-        });
-
-        // Close menu when clicking outside
-        document.addEventListener("click", function (event) {
-          if (
-            isMenuOpen &&
-            !mobileMenu.contains(event.target) &&
-            !mobileMenuBtn.contains(event.target)
-          ) {
-            toggleMenu();
-          }
-        });
-
-        // Close menu on escape key
-        document.addEventListener("keydown", function (event) {
-          if (event.key === "Escape" && isMenuOpen) {
-            toggleMenu();
-          }
-        });
-
-        // Handle window resize
-        window.addEventListener("resize", function () {
-          if (window.innerWidth >= 1024 && isMenuOpen) {
-            toggleMenu();
-          }
-        });
-      });
-    </script>
-  </body>
-</html>
+          <a
+            href="#"
+            class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+          >
+            <span
+              class="material-icons text-gray-500 group-hover:text-primary transition-colors"
+              >account_circle</span
+            >
+            <span
+              class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
+              >My Account</span
+            >
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
