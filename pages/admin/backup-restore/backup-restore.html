@@ -5,12 +5,491 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Backup and Restore</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="./backup-restore.js"></script>
+    <style>
+      .toast {
+        transform: translateX(100%);
+        transition: all 0.4s ease-in-out;
+        animation: slideIn 0.4s ease-out forwards;
+      }
+
+      .toast.hide {
+        animation: slideOut 0.4s ease-in forwards;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideOut {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+
+      .backup-progress {
+        animation: pulse 1.5s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .data-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      }
+
+      .data-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .data-card.clickable {
+        cursor: pointer;
+      }
+
+      .expanded-data {
+        max-height: 300px;
+        overflow-y: auto;
+      }
+    </style>
   </head>
-  <body>
-    <!-- Navbar (fixed top) -->
-    <!-- <div id="navbar" class="fixed top-0 left-0 right-0 z-50"></div> -->
-    <!-- Sidebar (fixed left, below navbar) -->
-    <div id="sidebar" class="fixed left-0 w-64 z-40"></div>
+  <body class="bg-gray-100">
+    <!-- Mobile Menu Button -->
+    <button
+      id="mobile-menu-btn"
+      class="lg:hidden fixed top-4 right-4 z-50 bg-white p-2 rounded-lg shadow-md hover:bg-gray-50 transition-colors"
+      aria-label="Toggle sidebar"
+    >
+      <svg
+        class="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16"
+        ></path>
+      </svg>
+    </button>
+
+    <!-- Mobile Overlay -->
+    <div
+      id="mobile-overlay"
+      class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 hidden"
+    ></div>
+
+    <!-- Sidebar -->
+    <div
+      id="sidebar"
+      class="fixed left-0 w-64 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300"
+    ></div>
+
+    <!-- Main Content -->
+    <div class="lg:ml-64 p-6">
+      <div class="space-y-12">
+        <!-- Backup Section -->
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-8">Backup</h1>
+
+          <!-- Backup Schedule -->
+          <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+              Schedule Backup
+            </h2>
+            <div class="flex flex-wrap items-center justify-between gap-6">
+              <div class="flex flex-wrap items-center gap-6">
+                <span class="text-lg font-medium text-gray-700 min-w-[100px]"
+                  >Schedule:</span
+                >
+                <div class="flex gap-6">
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="schedule"
+                      value="daily"
+                      checked
+                      class="w-4 h-4 text-purple-600 focus:ring-purple-500"
+                    />
+                    <span class="text-gray-700">Daily</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="schedule"
+                      value="weekly"
+                      class="w-4 h-4 text-purple-600 focus:ring-purple-500"
+                    />
+                    <span class="text-gray-700">Weekly</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="schedule"
+                      value="monthly"
+                      class="w-4 h-4 text-purple-600 focus:ring-purple-500"
+                    />
+                    <span class="text-gray-700">Monthly</span>
+                  </label>
+                </div>
+              </div>
+              <button
+                id="scheduleBtn"
+                class="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors font-semibold"
+              >
+                Set Schedule
+              </button>
+            </div>
+            <div
+              id="scheduleStatus"
+              class="mt-4 p-3 rounded-md bg-gray-50 text-gray-700 hidden"
+            >
+              <span class="font-medium">Schedule Status:</span>
+              <span id="statusText">Not scheduled</span>
+            </div>
+          </div>
+
+          <!-- Manual Backup -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+              Manual Backup
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Backup Format</label
+                >
+                <select
+                  id="backupFormat"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                >
+                  <option value="">Select Format</option>
+                  <option value="zip">.zip</option>
+                  <option value="tar">.tar</option>
+                  <option value="json">.json</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Backup Location & Start</label
+                >
+                <div class="flex gap-3">
+                  <button
+                    id="browseBtn"
+                    class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    Browse Location
+                  </button>
+                  <button
+                    id="startBackupBtn"
+                    class="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-semibold"
+                  >
+                    Start Backup
+                  </button>
+                </div>
+                <span id="selectedPath" class="text-xs text-gray-500 mt-1 block"
+                  >No location selected</span
+                >
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div id="backupProgress" class="mt-4 hidden">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-gray-700"
+                  >Backup Progress</span
+                >
+                <span id="progressText" class="text-sm text-gray-600">0%</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  id="progressBar"
+                  class="bg-green-600 h-2 rounded-full transition-all duration-300"
+                  style="width: 0%"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Restore Section -->
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-8">Restore</h1>
+
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-xl font-semibold text-gray-800">
+                Backup Versions
+              </h2>
+              <button
+                id="refreshBtn"
+                class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+              >
+                Refresh
+              </button>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto">
+              <table class="border-collapse border border-gray-400 min-w-full">
+                <thead>
+                  <tr class="bg-gray-200 text-center">
+                    <th
+                      class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                    >
+                      S.No
+                    </th>
+                    <th
+                      class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                    >
+                      Version
+                    </th>
+                    <th
+                      class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                    >
+                      Date & Time
+                    </th>
+                    <th
+                      class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                    >
+                      Size
+                    </th>
+                    <th
+                      class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                    >
+                      Type
+                    </th>
+                    <th
+                      class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                    >
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="versionsTable">
+                  <!-- Dynamic content will be inserted here -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            <div
+              id="versionsPagination"
+              class="flex justify-center lg:justify-end space-x-1 lg:space-x-2 mt-4 overflow-x-auto"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div
+      id="toast-container"
+      class="fixed top-6 right-6 space-y-3 z-[9999]"
+    ></div>
+
+    <!-- View Modal -->
+    <div
+      id="viewModal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
+      >
+        <div class="flex justify-between items-center p-6 border-b">
+          <h3 class="text-xl font-semibold">Backup Details</h3>
+          <button
+            id="closeModal"
+            class="text-gray-500 hover:text-gray-700 text-2xl"
+          >
+            &times;
+          </button>
+        </div>
+        <div id="modalContent" class="p-6 overflow-y-auto max-h-[70vh]">
+          <!-- Modal content will be inserted here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Expanded Data Modal -->
+    <div
+      id="expandedModal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+      >
+        <div class="flex justify-between items-center p-6 border-b">
+          <h3 id="expandedModalTitle" class="text-xl font-semibold"></h3>
+          <button
+            id="closeExpandedModal"
+            class="text-gray-500 hover:text-gray-700 text-2xl"
+          >
+            &times;
+          </button>
+        </div>
+        <div id="expandedModalContent" class="p-6 overflow-y-auto max-h-[70vh]">
+          <!-- Expanded content will be inserted here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Folder Path Selection Modal -->
+    <div
+      id="folderPathModal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4"
+    >
+      <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+        <div class="p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">
+            Select Backup Location
+          </h3>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Enter folder path where you want to save the backup:
+            </label>
+            <input
+              type="text"
+              id="folderPathInput"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              placeholder="e.g., C:\Users\Username\Documents\Backups or /home/user/backups"
+            />
+            <div class="mt-2 text-xs text-gray-500">
+              <p class="mb-1">
+                <strong>Windows:</strong> C:\Users\Username\Documents\Backups
+              </p>
+              <p class="mb-1">
+                <strong>Mac:</strong> /Users/username/Documents/Backups
+              </p>
+              <p><strong>Linux:</strong> /home/username/backups</p>
+            </div>
+          </div>
+
+          <!-- Quick Select Options -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Quick Select (Common Locations):
+            </label>
+            <div class="grid grid-cols-1 gap-2">
+              <button
+                type="button"
+                onclick="setQuickPath('C:\\Users\\' + (prompt('Enter your Windows username:') || 'User') + '\\Documents\\Backups')"
+                class="text-left px-3 py-2 text-sm bg-gray-50 hover:bg-gray-100 rounded border"
+              >
+                📁 Windows Documents/Backups
+              </button>
+              <button
+                type="button"
+                onclick="setQuickPath('C:\\Users\\' + (prompt('Enter your Windows username:') || 'User') + '\\Desktop\\Backups')"
+                class="text-left px-3 py-2 text-sm bg-gray-50 hover:bg-gray-100 rounded border"
+              >
+                🖥️ Windows Desktop/Backups
+              </button>
+              <button
+                type="button"
+                onclick="setQuickPath('/Users/' + (prompt('Enter your Mac username:') || 'user') + '/Documents/Backups')"
+                class="text-left px-3 py-2 text-sm bg-gray-50 hover:bg-gray-100 rounded border"
+              >
+                🍎 Mac Documents/Backups
+              </button>
+              <button
+                type="button"
+                onclick="setQuickPath('/home/' + (prompt('Enter your Linux username:') || 'user') + '/backups')"
+                class="text-left px-3 py-2 text-sm bg-gray-50 hover:bg-gray-100 rounded border"
+              >
+                🐧 Linux Home/backups
+              </button>
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-3">
+            <button
+              id="cancelFolderPath"
+              class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              id="confirmFolderPath"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Select Path
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      id="confirmationModal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4"
+    >
+      <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+        <div class="p-6">
+          <div class="flex items-center mb-4">
+            <div
+              id="confirmIcon"
+              class="w-12 h-12 rounded-full flex items-center justify-center mr-4"
+            >
+              <svg
+                class="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L5.082 15.5c-.77.833.192 2.5 1.732 2.5z"
+                ></path>
+              </svg>
+            </div>
+            <div>
+              <h3
+                id="confirmTitle"
+                class="text-lg font-semibold text-gray-900"
+              ></h3>
+              <p id="confirmMessage" class="text-sm text-gray-600 mt-1"></p>
+            </div>
+          </div>
+          <div class="flex justify-end gap-3">
+            <button
+              id="cancelBtn"
+              class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              id="confirmBtn"
+              class="px-4 py-2 rounded-md transition-colors text-white font-semibold"
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="./backup-restore.js"></script>
   </body>
 </html>
