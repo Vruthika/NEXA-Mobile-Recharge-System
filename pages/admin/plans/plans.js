@@ -417,6 +417,14 @@ async function handleAddPlan(e) {
   e.preventDefault();
 
   const formData = new FormData(e.target);
+
+  // Convert benefits string to array
+  const benefitsText = formData.get("planBenefits") || "";
+  const benefitsArray = benefitsText
+    .split("\n")
+    .map((benefit) => benefit.trim())
+    .filter((benefit) => benefit.length > 0);
+
   const planData = {
     id: nextPlanId,
     name: formData.get("planName"),
@@ -425,7 +433,7 @@ async function handleAddPlan(e) {
     validity: formData.get("planValidity"),
     price: parseFloat(formData.get("planPrice")),
     description: formData.get("planDescription") || "",
-    benefits: formData.get("planBenefits") || "",
+    benefits: benefitsArray,
   };
 
   try {
@@ -523,19 +531,25 @@ function viewPlan(planId) {
               }
               
               ${
-                plan.benefits &&
-                typeof plan.benefits === "string" &&
-                plan.benefits.trim()
+                plan.benefits && plan.benefits.length > 0
                   ? `
   <div class="bg-gray-50 p-4 rounded-lg">
     <h3 class="text-sm font-medium text-gray-500 mb-2">Benefits</h3>
     <div class="text-gray-900">
-      ${plan.benefits
-        .split("\n")
-        .map((benefit) => benefit.trim())
-        .filter((benefit) => benefit)
-        .map((benefit) => `<p class="mb-1">• ${benefit}</p>`)
-        .join("")}
+      ${
+        Array.isArray(plan.benefits)
+          ? plan.benefits
+              .map((benefit) => `<p class="mb-1">• ${benefit}</p>`)
+              .join("")
+          : typeof plan.benefits === "string"
+          ? plan.benefits
+              .split("\n")
+              .map((benefit) => benefit.trim())
+              .filter((benefit) => benefit)
+              .map((benefit) => `<p class="mb-1">• ${benefit}</p>`)
+              .join("")
+          : ""
+      }
     </div>
   </div>
 `
@@ -554,6 +568,14 @@ function viewPlan(planId) {
 function editPlan(planId) {
   const plan = totalPlans.find((p) => p.id === planId);
   if (!plan) return;
+
+  // Convert benefits to string format for the textarea
+  let benefitsText = "";
+  if (Array.isArray(plan.benefits)) {
+    benefitsText = plan.benefits.join("\n");
+  } else if (typeof plan.benefits === "string") {
+    benefitsText = plan.benefits;
+  }
 
   const modalContent = `
           <div class="p-6">
@@ -622,9 +644,7 @@ function editPlan(planId) {
               
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Benefits *</label>
-                <textarea name="planBenefits" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="Enter plan benefits (one per line)...">${
-                  plan.benefits || ""
-                }</textarea>
+                <textarea name="planBenefits" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="Enter plan benefits (one per line)...">${benefitsText}</textarea>
               </div>
               
               <div class="flex justify-end space-x-3 pt-4">
@@ -649,12 +669,19 @@ async function handleEditPlan(e) {
   const formData = new FormData(e.target);
   const planId = parseInt(formData.get("planId"));
 
+  // Convert benefits string to array
+  const benefitsText = formData.get("planBenefits") || "";
+  const benefitsArray = benefitsText
+    .split("\n")
+    .map((benefit) => benefit.trim())
+    .filter((benefit) => benefit.length > 0);
+
   const planData = {
     name: formData.get("planName"),
     validity: formData.get("planValidity"),
     price: parseFloat(formData.get("planPrice")),
     description: formData.get("planDescription") || "",
-    benefits: formData.get("planBenefits"),
+    benefits: benefitsArray,
   };
 
   try {
