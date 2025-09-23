@@ -334,6 +334,7 @@ document.addEventListener("DOMContentLoaded", function () {
         type: selectedPlan.type,
         status: "Success",
         date: formatDate(new Date()), // Format as YYYY-MM-DD
+        amount: selectedPlan.price,
       };
 
       console.log("Creating transaction:", transactionData);
