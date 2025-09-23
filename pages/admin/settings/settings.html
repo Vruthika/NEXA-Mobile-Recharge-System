@@ -5,11 +5,473 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Settings</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="./settings.js"></script>
-  </head>
-  <body>
-    <!-- <div id="navbar"></div> -->
+    <style>
+      .toast {
+        transform: translateX(100%);
+        transition: all 0.4s ease-in-out;
+        animation: slideIn 0.4s ease-out forwards;
+      }
 
-    <div id="sidebar" class="fixed left-0 w-64 z-40"></div>
+      .toast.hide {
+        animation: slideOut 0.4s ease-in forwards;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideOut {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+
+      .profile-image-container {
+        position: relative;
+        display: inline-block;
+      }
+
+      .profile-image {
+        width: 128px;
+        height: 128px;
+        object-fit: cover;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: opacity 0.3s ease;
+      }
+
+      .profile-image:hover {
+        opacity: 0.8;
+      }
+
+      .upload-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        cursor: pointer;
+      }
+
+      .profile-image-container:hover .upload-overlay {
+        opacity: 1;
+      }
+
+      .file-input-hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <!-- Sidebar -->
+    <div
+      id="sidebar"
+      class="fixed left-0 w-64 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 h-screen bg-gray-900 text-white"
+    ></div>
+
+    <!-- Main Content -->
+    <div class="lg:ml-64 p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Admin Settings</h1>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Profile Information -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4 text-gray-700">
+            Profile Information
+          </h2>
+          <div class="flex flex-col items-center mb-6">
+            <div class="profile-image-container mb-4">
+              <img
+                id="profileImage"
+                src=""
+                alt="Profile Picture"
+                class="profile-image w-32 h-32 rounded-full bg-gray-400 flex items-center justify-center hidden"
+              />
+              <div
+                id="defaultAvatar"
+                class="w-32 h-32 rounded-full bg-gray-400 flex items-center justify-center cursor-pointer"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-16 h-16 text-gray-600"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                  />
+                </svg>
+              </div>
+              <div class="upload-overlay" id="uploadOverlay">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-8 h-8 text-white"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <input
+              type="file"
+              id="profileImageInput"
+              class="file-input-hidden"
+              accept="image/*"
+            />
+            <div class="flex gap-3 mb-4">
+              <button
+                id="uploadBtn"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                Upload Picture
+              </button>
+              <button
+                id="removeBtn"
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition hidden"
+              >
+                Remove Picture
+              </button>
+            </div>
+            <h3 class="text-lg font-medium">Admin</h3>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-gray-700 text-sm font-bold mb-2"
+                >Name:</label
+              >
+              <input
+                type="text"
+                value="Admin"
+                class="w-full p-2 text-gray-500 border border-gray-300 rounded-md bg-gray-100"
+                disabled
+              />
+            </div>
+
+            <div>
+              <label class="block text-gray-700 text-sm font-bold mb-2"
+                >Email Id:</label
+              >
+              <input
+                type="email"
+                value="admin@gmail.com"
+                class="w-full p-2 text-gray-500 border border-gray-300 rounded-md bg-gray-100"
+                disabled
+              />
+            </div>
+
+            <div>
+              <label class="block text-gray-700 text-sm font-bold mb-2"
+                >Phone Number:</label
+              >
+              <input
+                type="text"
+                value="9876543210"
+                class="w-full p-2 border text-gray-500 border-gray-300 rounded-md bg-gray-100"
+                disabled
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Change Password -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4 text-gray-700">
+            Change Password
+          </h2>
+          <form id="passwordChangeForm" class="space-y-4">
+            <div>
+              <label
+                for="oldPassword"
+                class="block text-gray-700 text-sm font-bold mb-2"
+                >Enter old password:</label
+              >
+              <input
+                type="password"
+                id="oldPassword"
+                class="w-full p-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+
+            <div>
+              <label
+                for="newPassword"
+                class="block text-gray-700 text-sm font-bold mb-2"
+                >Enter new password:</label
+              >
+              <input
+                type="password"
+                id="newPassword"
+                class="w-full p-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+
+            <div>
+              <label
+                for="confirmPassword"
+                class="block text-gray-700 text-sm font-bold mb-2"
+                >Re-enter new password:</label
+              >
+              <input
+                type="password"
+                id="confirmPassword"
+                class="w-full p-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+
+            <button
+              type="button"
+              id="saveBtn"
+              class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition"
+            >
+              Save
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div
+      id="toast-container"
+      class="fixed top-6 right-6 space-y-3 z-[9999]"
+    ></div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Load sidebar
+        fetch("/components/admin-sidebar.html")
+          .then((response) => response.text())
+          .then((data) => {
+            document.getElementById("sidebar").innerHTML = data;
+          });
+
+        // Profile image elements
+        const profileImage = document.getElementById("profileImage");
+        const defaultAvatar = document.getElementById("defaultAvatar");
+        const profileImageInput = document.getElementById("profileImageInput");
+        const uploadBtn = document.getElementById("uploadBtn");
+        const removeBtn = document.getElementById("removeBtn");
+        const uploadOverlay = document.getElementById("uploadOverlay");
+
+        // Password form elements
+        const oldPasswordInput = document.getElementById("oldPassword");
+        const newPasswordInput = document.getElementById("newPassword");
+        const confirmPasswordInput = document.getElementById("confirmPassword");
+        const saveBtn = document.getElementById("saveBtn");
+
+        // Load saved profile image on page load
+        loadSavedProfileImage();
+
+        // Profile image upload functionality
+        uploadBtn.addEventListener("click", function () {
+          profileImageInput.click();
+        });
+
+        // Also allow clicking on the image/avatar area to upload
+        defaultAvatar.addEventListener("click", function () {
+          profileImageInput.click();
+        });
+
+        uploadOverlay.addEventListener("click", function () {
+          profileImageInput.click();
+        });
+
+        profileImageInput.addEventListener("change", function (e) {
+          const file = e.target.files[0];
+          if (file) {
+            handleImageUpload(file);
+          }
+        });
+
+        // Remove profile image
+        removeBtn.addEventListener("click", function () {
+          removeProfileImage();
+        });
+
+        // Password change functionality
+        saveBtn.addEventListener("click", function () {
+          // Validate password fields
+          if (!oldPasswordInput.value) {
+            showToast("Please enter your old password", "error");
+            return;
+          }
+
+          if (!newPasswordInput.value) {
+            showToast("Please enter your new password", "error");
+            return;
+          }
+
+          if (newPasswordInput.value !== confirmPasswordInput.value) {
+            showToast("New passwords do not match", "error");
+            return;
+          }
+
+          if (newPasswordInput.value.length < 6) {
+            showToast("Password must be at least 6 characters long", "error");
+            return;
+          }
+
+          // Simulate password change (no actual database update)
+          // In a real application, you would send an API request to update the password
+          showToast("Password changed successfully!", "success");
+
+          // Reset form after successful change
+          setTimeout(() => {
+            document.getElementById("passwordChangeForm").reset();
+          }, 1000);
+        });
+
+        // Functions for profile image handling
+        function handleImageUpload(file) {
+          // Validate file type
+          if (!file.type.startsWith("image/")) {
+            showToast("Please select a valid image file", "error");
+            return;
+          }
+
+          // Validate file size (max 5MB)
+          if (file.size > 5 * 1024 * 1024) {
+            showToast("Image size should be less than 5MB", "error");
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const imageData = e.target.result;
+
+            // Save to memory (in a real app, you'd upload to server)
+            saveProfileImageToMemory(imageData);
+
+            // Display the image
+            displayProfileImage(imageData);
+
+            showToast("Profile picture updated successfully!", "success");
+          };
+          reader.readAsDataURL(file);
+        }
+
+        function displayProfileImage(imageData) {
+          profileImage.src = imageData;
+          profileImage.classList.remove("hidden");
+          defaultAvatar.style.display = "none";
+          removeBtn.classList.remove("hidden");
+        }
+
+        function removeProfileImage() {
+          profileImage.classList.add("hidden");
+          profileImage.src = "";
+          defaultAvatar.style.display = "flex";
+          removeBtn.classList.add("hidden");
+
+          // Remove from memory storage
+          window.profileImageData = null;
+
+          showToast("Profile picture removed", "success");
+        }
+
+        function saveProfileImageToMemory(imageData) {
+          // Store in window object (in a real app, you'd save to server/database)
+          window.profileImageData = imageData;
+        }
+
+        function loadSavedProfileImage() {
+          // Load from memory (in a real app, you'd fetch from server)
+          if (window.profileImageData) {
+            displayProfileImage(window.profileImageData);
+          }
+        }
+
+        // Enhanced Toast Notifications
+        function showToast(message, type = "success") {
+          const container = document.getElementById("toast-container");
+
+          const toast = document.createElement("div");
+
+          // Determine icon and styling based on type
+          let icon, borderColor, bgColor;
+
+          if (type === "success") {
+            icon = "✅";
+            borderColor = "border-green-500";
+            bgColor = "bg-green-50";
+          } else if (type === "error") {
+            icon = "❌";
+            borderColor = "border-red-500";
+            bgColor = "bg-red-50";
+          } else if (type === "info") {
+            icon = "ℹ️";
+            borderColor = "border-blue-500";
+            bgColor = "bg-blue-50";
+          } else {
+            icon = "✅";
+            borderColor = "border-green-500";
+            bgColor = "bg-green-50";
+          }
+
+          toast.className = `toast flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg ${bgColor} ${borderColor} text-gray-800 border-l-4 min-w-[300px]`;
+          toast.innerHTML = `
+            <span class="text-lg">${icon}</span>
+            <span class="font-medium">${message}</span>
+            <button class="ml-auto text-gray-500 hover:text-gray-700 text-xl leading-none" onclick="this.parentElement.remove()">&times;</button>
+          `;
+
+          container.appendChild(toast);
+
+          // Auto remove after 4 seconds
+          setTimeout(() => {
+            if (toast.parentElement) {
+              toast.classList.add("hide");
+              setTimeout(() => {
+                if (toast.parentElement) {
+                  toast.remove();
+                }
+              }, 400);
+            }
+          }, 4000);
+        }
+      });
+    </script>
+    <script src="./settings.js"></script>
   </body>
 </html>
