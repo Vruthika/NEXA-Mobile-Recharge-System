@@ -218,67 +218,74 @@
 
       <!-- Plans Table -->
       <div class="bg-white p-4 lg:p-6 rounded-lg shadow">
-        <div
-          class="flex flex-col lg:flex-row lg:items-center justify-between mb-4 space-y-3 lg:space-y-0"
-        >
+        <div class="flex flex-col space-y-4 mb-6">
           <h2 class="text-lg lg:text-xl font-semibold">Plans</h2>
 
-          <div class="flex items-center space-x-4">
-            <!-- Filter by Category -->
-            <div class="flex items-center space-x-2 text-sm lg:text-base">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-5 h-5 lg:w-6 lg:h-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
-                />
-              </svg>
-              <span class="whitespace-nowrap">Category:</span>
-              <select
-                id="filterCategory"
-                class="px-2 lg:px-3 py-1 lg:py-2 border rounded-md shadow-sm focus:ring focus:ring-purple-300 text-sm lg:text-base"
-              >
-                <option value="All">All</option>
-              </select>
-            </div>
-            <!-- Filter by Type -->
-            <div class="flex items-center space-x-2 text-sm lg:text-base">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-5 h-5 lg:w-6 lg:h-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
-                />
-              </svg>
-              <span class="whitespace-nowrap">Type:</span>
-              <select
-                id="filterType"
-                class="px-2 lg:px-3 py-1 lg:py-2 border rounded-md shadow-sm focus:ring focus:ring-purple-300 text-sm lg:text-base"
-              >
-                <option value="All">All</option>
-                <option value="Prepaid">Prepaid</option>
-                <option value="Postpaid">Postpaid</option>
-              </select>
+          <!-- Filters and Add Button Container -->
+          <div
+            class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0"
+          >
+            <!-- Filters Container - Stack vertically on mobile -->
+            <div
+              class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4"
+            >
+              <!-- Filter by Category -->
+              <div class="flex items-center space-x-2 text-sm lg:text-base">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-5 h-5 lg:w-6 lg:h-6 flex-shrink-0"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
+                  />
+                </svg>
+                <span class="whitespace-nowrap">Category:</span>
+                <select
+                  id="filterCategory"
+                  class="flex-1 px-2 lg:px-3 py-1 lg:py-2 border rounded-md shadow-sm focus:ring focus:ring-purple-300 text-sm lg:text-base min-w-0"
+                >
+                  <option value="All">All</option>
+                </select>
+              </div>
+
+              <!-- Filter by Type -->
+              <div class="flex items-center space-x-2 text-sm lg:text-base">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-5 h-5 lg:w-6 lg:h-6 flex-shrink-0"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
+                  />
+                </svg>
+                <span class="whitespace-nowrap">Type:</span>
+                <select
+                  id="filterType"
+                  class="flex-1 px-2 lg:px-3 py-1 lg:py-2 border rounded-md shadow-sm focus:ring focus:ring-purple-300 text-sm lg:text-base min-w-0"
+                >
+                  <option value="All">All</option>
+                  <option value="Prepaid">Prepaid</option>
+                  <option value="Postpaid">Postpaid</option>
+                </select>
+              </div>
             </div>
 
             <!-- Add Button -->
             <button
               id="addPlanBtn"
-              class="px-4 py-2 flex items-center space-x-2 bg-purple-500 text-white font-medium rounded-lg shadow hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
+              class="w-full sm:w-auto px-4 py-2 flex items-center justify-center space-x-2 bg-purple-500 text-white font-medium rounded-lg shadow hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -350,11 +357,11 @@
       <!-- Modal Overlay -->
       <div
         id="modalOverlay"
-        class="fixed -top-10 min-h-screen left-0 w-screen bg-black bg-opacity-50 z-50 hidden"
+        class="fixed inset-0 w-full h-full bg-black bg-opacity-50 z-50 hidden"
       >
-        <div class="flex items-center justify-center min-h-screen -mt-2 p-4">
+        <div class="flex items-center justify-center min-h-screen p-4">
           <div
-            class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+            class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
           >
             <!-- Modal content will be dynamically inserted here -->
           </div>
