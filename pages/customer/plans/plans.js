@@ -32,6 +32,14 @@ const PLANS_API_URL = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans";
 const TRANSACTIONS_API_URL =
   "https://68ca32f2430c4476c3488311.mockapi.io/Transactions";
 
+// Helper function to get URL parameters
+function getURLParameters() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    type: params.get("type") || "Prepaid",
+  };
+}
+
 // Helper function to safely convert benefits to searchable string
 function benefitsToString(benefits) {
   if (!benefits) return "";
@@ -223,7 +231,7 @@ function getPopularPlans() {
 
   // Sort plans by transaction count and get top 6
   const sortedPlans = allPlans
-    .filter((plan) => plan.type === "Prepaid")
+    .filter((plan) => plan.type === currentType) // Use currentType instead of hardcoded "Prepaid"
     .map((plan) => ({
       ...plan,
       transactionCount: planTransactionCount[plan.id] || 0,
@@ -237,8 +245,58 @@ function getPopularPlans() {
 
 // Initialize page
 function initializePage() {
+  // Check URL parameters first
+  const urlParams = getURLParameters();
+
+  // Set currentType based on URL parameter
+  if (urlParams.type) {
+    currentType =
+      urlParams.type.charAt(0).toUpperCase() +
+      urlParams.type.slice(1).toLowerCase();
+  }
+
+  // Set appropriate default category based on type
+  if (currentType === "Postpaid") {
+    // For postpaid, get the first available category from the plans
+    const postpaidPlans = allPlans.filter((plan) => plan.type === "Postpaid");
+    if (postpaidPlans.length > 0) {
+      const postpaidCategories = [
+        ...new Set(postpaidPlans.map((plan) => plan.category)),
+      ];
+      currentCategory = postpaidCategories[0] || "Popular Plans";
+    }
+  } else {
+    currentCategory = "Popular Plans";
+  }
+
+  // Update tab UI
+  updateTabUI();
+
   loadCategories();
   renderPlans(currentCategory);
+}
+
+// Update tab UI based on current type
+function updateTabUI() {
+  if (currentType === "Postpaid") {
+    if (postpaidTab) {
+      postpaidTab.className =
+        "px-6 sm:px-8 py-2 rounded-full bg-primary text-white text-base sm:text-lg font-semibold transition-all";
+    }
+    if (prepaidTab) {
+      prepaidTab.className =
+        "px-6 sm:px-8 py-2 rounded-full text-text-light dark:text-text-dark text-base sm:text-lg font-semibold transition-all hover:bg-gray-100 dark:hover:bg-gray-600";
+    }
+  } else {
+    if (prepaidTab) {
+      prepaidTab.className =
+        "px-6 sm:px-8 py-2 rounded-full bg-primary text-white text-base sm:text-lg font-semibold transition-all";
+    }
+    if (postpaidTab) {
+      postpaidTab.className =
+        "px-6 sm:px-8 py-2 rounded-full text-text-light dark:text-text-dark text-base sm:text-lg font-semibold transition-all hover:bg-gray-100 dark:hover:bg-gray-600";
+    }
+  }
 }
 
 // Load categories in sidebar
@@ -256,6 +314,11 @@ function loadCategories() {
           .map((plan) => plan.category)
       ),
     ];
+
+    // If no postpaid categories found, add a default
+    if (categories.length === 0) {
+      categories = ["Popular Plans"];
+    }
   }
 
   if (categoryList) {
@@ -264,7 +327,7 @@ function loadCategories() {
         (category, index) => `
         <button
           class="category-btn block w-full text-left px-4 py-3 rounded-lg font-semibold transition-all ${
-            index === 0
+            category === currentCategory
               ? "bg-accent-light dark:bg-accent-dark text-primary dark:text-white"
               : "bg-card-light dark:bg-card-dark hover:bg-gray-100 dark:hover:bg-gray-700"
           }"
@@ -315,8 +378,8 @@ function renderPlans(category) {
   if (sectionTitle) sectionTitle.textContent = category;
   let filteredPlans = [];
 
-  if (category === "Popular Plans" && currentType === "Prepaid") {
-    // Get top 6 popular plans based on transactions
+  if (category === "Popular Plans") {
+    // Get popular plans for current type (Prepaid or Postpaid)
     filteredPlans = getPopularPlans();
   } else {
     // Filter plans by category and type
@@ -629,13 +692,7 @@ function initializeDOMElements() {
       isSearchActive = false;
       clearSearchInputs();
 
-      prepaidTab.className =
-        "px-6 sm:px-8 py-2 rounded-full bg-primary text-white text-base sm:text-lg font-semibold transition-all";
-      if (postpaidTab) {
-        postpaidTab.className =
-          "px-6 sm:px-8 py-2 rounded-full text-text-light dark:text-text-dark text-base sm:text-lg font-semibold transition-all hover:bg-gray-100 dark:hover:bg-gray-600";
-      }
-
+      updateTabUI();
       loadCategories();
       renderPlans(currentCategory);
     });
@@ -644,28 +701,20 @@ function initializeDOMElements() {
   if (postpaidTab) {
     postpaidTab.addEventListener("click", () => {
       currentType = "Postpaid";
-      currentCategory =
-        allPlans.filter((plan) => plan.type === "Postpaid").length > 0
-          ? [
-              ...new Set(
-                allPlans
-                  .filter((plan) => plan.type === "Postpaid")
-                  .map((plan) => plan.category)
-              ),
-            ][0]
-          : "Popular Plans";
+      // Set default category for postpaid
+      const postpaidPlans = allPlans.filter((plan) => plan.type === "Postpaid");
+      if (postpaidPlans.length > 0) {
+        const postpaidCategories = [
+          ...new Set(postpaidPlans.map((plan) => plan.category)),
+        ];
+        currentCategory = postpaidCategories[0] || "Popular Plans";
+      } else {
+        currentCategory = "Popular Plans";
+      }
       isSearchActive = false;
       clearSearchInputs();
 
-      if (postpaidTab) {
-        postpaidTab.className =
-          "px-6 sm:px-8 py-2 rounded-full bg-primary text-white text-base sm:text-lg font-semibold transition-all";
-      }
-      if (prepaidTab) {
-        prepaidTab.className =
-          "px-6 sm:px-8 py-2 rounded-full text-text-light dark:text-text-dark text-base sm:text-lg font-semibold transition-all hover:bg-gray-100 dark:hover:bg-gray-600";
-      }
-
+      updateTabUI();
       loadCategories();
       renderPlans(currentCategory);
     });
