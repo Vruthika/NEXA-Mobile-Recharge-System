@@ -375,7 +375,7 @@ function createPlanCard(plan, index) {
     "from-blue-500 to-purple-600",
     "from-indigo-500 to-purple-600",
     "from-purple-500 to-pink-600",
-    "from-green-500 to-blue-600",
+    "from-pink-500 to-violet-600",
   ];
 
   const badges = [
@@ -432,7 +432,9 @@ function createPlanCard(plan, index) {
               <button onclick="showPlanModal(${JSON.stringify(plan).replace(
                 /"/g,
                 "&quot;"
-              )})" class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
+              )})" class="w-full bg-gradient-to-r ${
+    gradients[index % gradients.length]
+  } text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
                 Choose Plan
               </button>
             </div>
