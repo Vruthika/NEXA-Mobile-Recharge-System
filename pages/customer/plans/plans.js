@@ -32,6 +32,14 @@ const PLANS_API_URL = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans";
 const TRANSACTIONS_API_URL =
   "https://68ca32f2430c4476c3488311.mockapi.io/Transactions";
 
+// Helper function to safely convert benefits to searchable string
+function benefitsToString(benefits) {
+  if (!benefits) return "";
+  if (typeof benefits === "string") return benefits;
+  if (Array.isArray(benefits)) return benefits.join(" ");
+  return String(benefits);
+}
+
 // Navbar functionality
 function initializeNavbar() {
   const mobileMenuBtn = document.getElementById("mobile-menu-btn");
@@ -363,12 +371,15 @@ function renderPlans(category) {
 
 // Create plan card HTML
 function createPlanCard(plan) {
+  // Safely convert benefits to lowercase string for search attributes
+  const benefitsString = benefitsToString(plan.benefits).toLowerCase();
+
   return `
     <div class="plan-card card-hover bg-card-light dark:bg-card-dark rounded-xl p-6 cursor-pointer border border-border-light dark:border-border-dark" 
          data-plan-id="${plan.id}"
          data-plan-name="${(plan.name || "").toLowerCase()}"
          data-plan-description="${(plan.description || "").toLowerCase()}"
-         data-plan-benefits="${(plan.benefits || "").toLowerCase()}"
+         data-plan-benefits="${benefitsString}"
          data-plan-validity="${(plan.validity || "").toLowerCase()}"
          data-plan-category="${(plan.category || "").toLowerCase()}">
       <div class="flex justify-between items-start mb-4">
@@ -425,7 +436,7 @@ function showPlanModal(planId) {
     modalPlanDescription.textContent =
       plan.description || "No description available";
 
-  // Parse and display benefits
+  // Parse and display benefits - handle both string and array formats
   let benefits = [];
   if (plan.benefits) {
     if (typeof plan.benefits === "string") {
@@ -434,7 +445,7 @@ function showPlanModal(planId) {
         .map((b) => b.trim())
         .filter((b) => b);
     } else if (Array.isArray(plan.benefits)) {
-      benefits = plan.benefits.filter((b) => b);
+      benefits = plan.benefits.filter((b) => b && b.trim());
     }
   }
 
@@ -489,7 +500,7 @@ function searchPlans(query) {
   currentTypePlans.forEach((plan) => {
     const planName = (plan.name || "").toLowerCase();
     const planDescription = (plan.description || "").toLowerCase();
-    const planBenefits = (plan.benefits || "").toLowerCase();
+    const planBenefits = benefitsToString(plan.benefits).toLowerCase();
     const planValidity = (plan.validity || "").toLowerCase();
     const planCategory = (plan.category || "").toLowerCase();
 
