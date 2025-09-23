@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Recharge History</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#4F46E5",
+              "primary-light": "#6366F1",
+              secondary: "#8B5CF6",
+              accent: "#A855F7",
+              "background-light": "#F8FAFF",
+              "background-dark": "#0F0B1F",
+              "card-light": "#FFFFFF",
+              "card-dark": "#1A1625",
+              "text-light": "#1E1B31",
+              "text-dark": "#F1F0FF",
+              "subtext-light": "#64748B",
+              "subtext-dark": "#94A3B8",
+              "border-light": "#E2E8F0",
+              "border-dark": "#2A2437",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+            animation: {
+              "fade-in": "fadeIn 0.5s ease-in-out",
+              "slide-up": "slideUp 0.3s ease-out",
+              "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+            },
+            keyframes: {
+              fadeIn: {
+                "0%": { opacity: "0" },
+                "100%": { opacity: "1" },
+              },
+              slideUp: {
+                "0%": { transform: "translateY(10px)", opacity: "0" },
+                "100%": { transform: "translateY(0)", opacity: "1" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background: linear-gradient(135deg, #f8faff 0%, #eef2ff 100%);
+      }
+      .dark body {
+        background: linear-gradient(135deg, #0f0b1f 0%, #1a0f2e 100%);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      .gradient-bg {
+        background: linear-gradient(
+          135deg,
+          #4f46e5 0%,
+          #8b5cf6 50%,
+          #a855f7 100%
+        );
+      }
+      .loading-skeleton {
+        background: linear-gradient(
+          90deg,
+          #f0f0f0 25%,
+          transparent 37%,
+          #f0f0f0 63%
+        );
+        background-size: 400% 100%;
+        animation: skeleton-loading 1.4s ease-in-out infinite;
+      }
+      .dark .loading-skeleton {
+        background: linear-gradient(
+          90deg,
+          #374151 25%,
+          transparent 37%,
+          #374151 63%
+        );
+        background-size: 400% 100%;
+      }
+      @keyframes skeleton-loading {
+        0% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: -100% 50%;
+        }
+      }
+      .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .status-success {
+        background: linear-gradient(135deg, #10b981, #34d399);
+        color: white;
+      }
+      .status-pending {
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        color: white;
+      }
+      .status-failed {
+        background: linear-gradient(135deg, #ef4444, #f87171);
+        color: white;
+      }
+      .navbar-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen">
+    <div id="navbar"></div>
+    <div class="min-h-screen flex flex-col">
+      <!-- Enhanced Header matching navbar gradient -->
+      <div class="relative navbar-gradient text-white py-16 overflow-hidden">
+        <!-- Decorative geometric elements -->
+        <div class="absolute inset-0">
+          <!-- Floating geometric shapes -->
+          <div
+            class="absolute top-20 left-20 w-12 h-12 bg-white bg-opacity-10 rounded-lg transform rotate-45 animate-pulse-slow"
+          ></div>
+          <div
+            class="absolute bottom-20 right-32 w-8 h-8 bg-white bg-opacity-15 rounded-full animate-pulse-slow"
+            style="animation-delay: 1s"
+          ></div>
+          <div
+            class="absolute top-32 right-20 w-16 h-16 border-2 border-white border-opacity-20 rounded-full animate-pulse-slow"
+            style="animation-delay: 2s"
+          ></div>
+          <div
+            class="absolute bottom-32 left-32 w-6 h-6 bg-white bg-opacity-10 rounded-full animate-pulse-slow"
+            style="animation-delay: 0.5s"
+          ></div>
+
+          <!-- Grid pattern overlay -->
+          <div class="absolute inset-0 opacity-5">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern
+                  id="grid"
+                  width="40"
+                  height="40"
+                  patternUnits="userSpaceOnUse"
+                >
+                  <path
+                    d="M 40 0 L 0 0 0 40"
+                    fill="none"
+                    stroke="white"
+                    stroke-width="1"
+                  />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div class="text-center animate-fade-in">
+            <div
+              class="inline-flex items-center justify-center w-20 h-20 bg-white bg-opacity-20 rounded-2xl mb-6 backdrop-blur-sm"
+            >
+              <span class="material-icons text-4xl">receipt_long</span>
+            </div>
+            <h1 class="text-6xl md:text-7xl font-bold mb-6 leading-tight">
+              Recharge History
+            </h1>
+            <p
+              class="text-xl text-white text-opacity-90 max-w-2xl mx-auto leading-relaxed"
+            >
+              Track your mobile recharge transactions and manage your account
+              with ease
+            </p>
+
+            <!-- Subtle accent line -->
+            <div
+              class="mt-8 w-24 h-1 bg-white bg-opacity-30 mx-auto rounded-full"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Wave separator -->
+        <div class="absolute bottom-0 left-0 right-0">
+          <svg
+            viewBox="0 0 1440 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,58.7C960,64,1056,64,1152,58.7C1248,53,1344,43,1392,37.3L1440,32V120H1392C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120H0V64Z"
+              fill="#f8faff"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <main
+        class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12 -mt-16 relative z-20"
+      >
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- User Profile Card -->
+          <div class="lg:col-span-1">
+            <div
+              class="bg-card-light rounded-2xl shadow-lg p-8 card-hover animate-slide-up"
+            >
+              <div id="user-profile" class="text-center">
+                <!-- Loading skeleton -->
+                <div
+                  class="loading-skeleton w-24 h-24 rounded-full mx-auto mb-4"
+                ></div>
+                <div
+                  class="loading-skeleton w-32 h-6 rounded mx-auto mb-2"
+                ></div>
+                <div
+                  class="loading-skeleton w-40 h-4 rounded mx-auto mb-4"
+                ></div>
+                <div class="loading-skeleton w-full h-16 rounded"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transaction History -->
+          <div class="lg:col-span-2 space-y-6">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+            >
+              <h2 class="text-2xl font-bold text-text-light">
+                Recent Transactions
+              </h2>
+              <div class="flex items-center gap-3">
+                <label
+                  for="filter-select"
+                  class="font-semibold text-text-light whitespace-nowrap"
+                  >Filter by Status:</label
+                >
+                <select
+                  id="filter-select"
+                  class="w-48 px-4 py-2 rounded-lg border border-border-light bg-card-light text-text-light focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                >
+                  <option value="all">All</option>
+                  <option value="success">Success</option>
+                  <option value="failed">Failed</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="transaction-list" class="space-y-4">
+              <!-- Loading skeletons -->
+              <div class="bg-card-light p-6 rounded-2xl shadow-lg">
+                <div class="loading-skeleton w-full h-32 rounded"></div>
+              </div>
+              <div class="bg-card-light p-6 rounded-2xl shadow-lg">
+                <div class="loading-skeleton w-full h-32 rounded"></div>
+              </div>
+              <div class="bg-card-light p-6 rounded-2xl shadow-lg">
+                <div class="loading-skeleton w-full h-32 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Plan Details Modal -->
+    <div id="plan-modal" class="fixed inset-0 z-50 hidden">
+      <div
+        class="modal-overlay absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4"
+      >
+        <div
+          class="bg-card-light rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto relative shadow-2xl animate-slide-up"
+        >
+          <button
+            id="close-modal"
+            class="absolute top-4 right-4 w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors z-10"
+          >
+            <span class="material-icons">close</span>
+          </button>
+
+          <div class="p-8">
+            <div class="text-center mb-6">
+              <div
+                class="w-20 h-20 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-4"
+              >
+                <span class="material-icons text-white text-3xl">sim_card</span>
+              </div>
+              <h3
+                class="text-2xl font-bold mb-2 text-text-light"
+                id="modal-plan-name"
+              >
+                Plan Name
+              </h3>
+              <p class="text-subtext-light" id="modal-plan-category">
+                Category
+              </p>
+            </div>
+
+            <div class="space-y-6">
+              <div class="text-center">
+                <div
+                  class="text-4xl font-bold text-primary mb-2"
+                  id="modal-plan-price"
+                >
+                  ₹0
+                </div>
+                <p class="text-subtext-light" id="modal-plan-validity">
+                  Validity
+                </p>
+              </div>
+
+              <div>
+                <h4 class="font-semibold mb-3 text-text-light">Description</h4>
+                <p class="text-subtext-light" id="modal-plan-description">
+                  Plan description
+                </p>
+              </div>
+
+              <div>
+                <h4 class="font-semibold mb-3 text-text-light">Benefits</h4>
+                <ul class="space-y-2" id="modal-plan-benefits">
+                  <!-- Benefits will be loaded dynamically -->
+                </ul>
+              </div>
+
+              <div class="flex space-x-3">
+                <button
+                  id="download-invoice-modal"
+                  class="flex-1 bg-gradient-to-r from-secondary to-accent text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center space-x-2"
+                >
+                  <span class="material-icons">download</span>
+                  <span>Download Invoice</span>
+                </button>
+                <button
+                  id="close-modal-btn"
+                  class="px-6 py-3 border-2 border-primary text-primary rounded-xl font-semibold hover:bg-primary hover:text-white transition-all"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="footer"></div>
+
+    <script src="./history.js"></script>
+  </body>
+</html>
