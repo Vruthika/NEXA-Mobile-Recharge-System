@@ -1,4 +1,3 @@
-// Global variables
 function loadComponent(id, filepath) {
   fetch(filepath)
     .then((response) => response.text())
@@ -11,6 +10,7 @@ function loadComponent(id, filepath) {
 // Initialize components
 loadComponent("navbar", "/components/navbar.html");
 loadComponent("footer", "/components/footer.html");
+// Global variables
 let currentUser = null;
 let transactions = [];
 let plans = [];
@@ -33,12 +33,10 @@ document.addEventListener("DOMContentLoaded", function () {
 // Setup event listeners
 function setupEventListeners() {
   const closeModalBtn = document.getElementById("close-modal");
-  const closeModalBtn2 = document.getElementById("close-modal-btn");
   const filterSelect = document.getElementById("filter-select");
   const modal = document.getElementById("plan-modal");
 
   if (closeModalBtn) closeModalBtn.addEventListener("click", closeModal);
-  if (closeModalBtn2) closeModalBtn2.addEventListener("click", closeModal);
 
   if (filterSelect) filterSelect.addEventListener("change", filterTransactions);
 
