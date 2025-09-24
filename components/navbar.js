@@ -3,7 +3,7 @@ document.addEventListener("navloaded", function () {
     // Clear user details
     localStorage.removeItem("loggedInUser");
     // Redirect to login page (adjust path if needed)
-    window.location.href = "/pages/auth/login/login.html";
+    window.location.href = "/pages/customer/landing/landing.html";
   }
 
   // Attach listeners safely
