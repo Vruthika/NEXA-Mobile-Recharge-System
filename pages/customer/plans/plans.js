@@ -740,6 +740,7 @@ async function initializeApp() {
 
     // Fetch data and initialize page
     await fetchData();
+    document.dispatchEvent(new Event("navloaded"));
 
     console.log("App initialized successfully");
   } catch (error) {
