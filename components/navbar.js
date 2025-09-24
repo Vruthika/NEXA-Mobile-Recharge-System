@@ -1,7 +1,6 @@
 document.addEventListener("navloaded", function () {
   function handleLogout() {
     // Clear user details
-    localStorage.removeItem("loggedInPhone");
     localStorage.removeItem("loggedInUser");
     // Redirect to login page (adjust path if needed)
     window.location.href = "/pages/auth/login/login.html";
