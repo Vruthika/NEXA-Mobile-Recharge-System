@@ -1,15 +1,33 @@
 function loadComponent(id, filepath) {
-  fetch(filepath)
-    .then((response) => response.text())
-    .then((data) => {
-      document.getElementById(id).innerHTML = data;
+  return fetch(filepath)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.text();
     })
-    .catch((error) => console.error("Error loading navbar:", error));
+    .then((data) => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.innerHTML = data;
+      }
+    })
+    .catch((error) => console.error(`Error loading ${id}:`, error));
 }
 
 // Initialize components
-loadComponent("navbar", "/components/navbar.html");
-loadComponent("footer", "/components/footer.html");
+async function initializeComponents() {
+  try {
+    await Promise.allSettled([
+      loadComponent("navbar", "/components/navbar.html"),
+      loadComponent("footer", "/components/footer.html"),
+    ]);
+    document.dispatchEvent(new Event("navloaded"));
+  } catch (error) {
+    console.warn("Some components failed to load:", error);
+  }
+}
+
 // Global variables
 let currentUser = null;
 let transactions = [];
@@ -24,11 +42,100 @@ const API_URLS = {
   customers: "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Customers",
 };
 
-// Initialize the application
-document.addEventListener("DOMContentLoaded", function () {
+// Get logged-in user from localStorage or session
+function getLoggedInUser() {
+  try {
+    // Check for user in localStorage with different possible keys
+    const userData =
+      localStorage.getItem("loggedInUser") ||
+      localStorage.getItem("currentUser") ||
+      sessionStorage.getItem("loggedInUser") ||
+      sessionStorage.getItem("currentUser");
+
+    if (userData) {
+      const user = JSON.parse(userData);
+      console.log("Found logged-in user:", user);
+      return user;
+    }
+
+    // Check URL parameters (if user ID is passed via URL)
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get("userId");
+    if (userId) {
+      return { id: userId };
+    }
+
+    console.log("No logged-in user found in storage or URL");
+    return null;
+  } catch (error) {
+    console.error("Error getting logged-in user:", error);
+    return null;
+  }
+}
+
+// Main initialization function
+async function initializeApp() {
+  try {
+    showToast("Loading data...", "info");
+
+    // Initialize components first
+    await initializeComponents();
+
+    // Get the actual logged-in user
+    currentUser = getLoggedInUser();
+
+    if (!currentUser) {
+      // If no user is logged in, show error and redirect to login
+      showToast("Please log in to view your transaction history", "error");
+      // Redirect to login page after a delay
+      setTimeout(() => {
+        window.location.href = "/pages/customer/login/login.html";
+      }, 2000);
+      return;
+    }
+
+    console.log("Logged-in user:", currentUser);
+
+    // Load all data
+    await Promise.all([loadCustomers(), loadPlans(), loadTransactions()]);
+
+    // Verify the logged-in user exists in customers data and get full user info
+    const userExists = customers.find(
+      (customer) =>
+        String(customer.id) === String(currentUser.id) ||
+        (currentUser.email && customer.email === currentUser.email) ||
+        (currentUser.phone && customer.phone === currentUser.phone)
+    );
+
+    if (userExists) {
+      // Update currentUser with full data from API
+      currentUser = { ...currentUser, ...userExists };
+      console.log("Updated user with full data:", currentUser);
+    } else {
+      console.warn(
+        "Logged-in user not found in customers data, using stored data"
+      );
+    }
+
+    renderUserProfile();
+    renderTransactions();
+    showToast("Data loaded successfully!", "success");
+  } catch (error) {
+    console.error("Failed to initialize app:", error);
+    showToast("Failed to load data. Please try again.", "error");
+  }
+}
+
+// Initialize when DOM is ready
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", function () {
+    initializeApp();
+    setupEventListeners();
+  });
+} else {
   initializeApp();
   setupEventListeners();
-});
+}
 
 // Setup event listeners
 function setupEventListeners() {
@@ -85,8 +192,6 @@ function setupSearchFunctionality() {
         'button[aria-label*="search" i]',
         'button[title*="search" i]',
         ".navbar button",
-        'button .material-icons:contains("search")',
-        "button:has(.material-icons)",
       ].join(",")
     );
 
@@ -95,16 +200,24 @@ function setupSearchFunctionality() {
 
     // Setup search input listeners
     searchInputs.forEach((input) => {
-      // Real-time search on input
-      input.addEventListener("input", (e) => {
-        performSearch(e.target.value);
-      });
-
-      // Search on Enter key
+      // Search only on Enter key
       input.addEventListener("keypress", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
-          performSearch(e.target.value);
+          const searchValue = e.target.value.trim();
+          if (searchValue) {
+            performSearch(searchValue);
+          } else {
+            renderTransactions();
+            showToast("Showing all transactions", "info");
+          }
+        }
+      });
+
+      // Clear search when input is emptied by user
+      input.addEventListener("input", (e) => {
+        if (e.target.value.trim() === "") {
+          renderTransactions();
         }
       });
     });
@@ -122,16 +235,21 @@ function setupSearchFunctionality() {
           const input = form.querySelector(
             'input[type="search"], input[type="text"]'
           );
-          searchValue = input ? input.value : "";
+          searchValue = input ? input.value.trim() : "";
         } else {
           // Look for nearby input field
           const nearbyInput =
             button.parentElement.querySelector("input") ||
             document.querySelector('input[type="search"], .search-input');
-          searchValue = nearbyInput ? nearbyInput.value : "";
+          searchValue = nearbyInput ? nearbyInput.value.trim() : "";
         }
 
-        performSearch(searchValue);
+        if (searchValue) {
+          performSearch(searchValue);
+        } else {
+          renderTransactions();
+          showToast("Showing all transactions", "info");
+        }
       });
     });
 
@@ -139,31 +257,35 @@ function setupSearchFunctionality() {
     const materialSearchButtons = document.querySelectorAll("button");
     materialSearchButtons.forEach((button) => {
       const icon = button.querySelector(".material-icons");
-      if (
-        icon &&
-        (icon.textContent.includes("search") ||
-          icon.textContent.includes("Search"))
-      ) {
-        button.addEventListener("click", (e) => {
-          e.preventDefault();
-          const form = button.closest("form");
-          let searchValue = "";
+      if (icon) {
+        const iconText = icon.textContent || "";
+        if (iconText.includes("search") || iconText.includes("Search")) {
+          button.addEventListener("click", (e) => {
+            e.preventDefault();
+            const form = button.closest("form");
+            let searchValue = "";
 
-          if (form) {
-            const input = form.querySelector("input");
-            searchValue = input ? input.value : "";
-          } else {
-            const nearbyInput = document.querySelector(
-              'input[type="search"], input[type="text"]'
-            );
-            searchValue = nearbyInput ? nearbyInput.value : "";
-          }
+            if (form) {
+              const input = form.querySelector("input");
+              searchValue = input ? input.value.trim() : "";
+            } else {
+              const nearbyInput = document.querySelector(
+                'input[type="search"], input[type="text"]'
+              );
+              searchValue = nearbyInput ? nearbyInput.value.trim() : "";
+            }
 
-          performSearch(searchValue);
-        });
+            if (searchValue) {
+              performSearch(searchValue);
+            } else {
+              renderTransactions();
+              showToast("Showing all transactions", "info");
+            }
+          });
+        }
       }
     });
-  }, 1000); // Wait 1 second for navbar to load
+  }, 1000);
 }
 
 // Perform search functionality
@@ -185,10 +307,8 @@ function performSearch(searchTerm) {
   const searchTermLower = searchTerm.toLowerCase().trim();
 
   // Filter user transactions based on search term
-  let userTransactions = transactions.filter(
-    (t) =>
-      String(t.customerId) === String(currentUser.id) ||
-      String(t.userId) === String(currentUser.id)
+  let userTransactions = transactions.filter((transaction) =>
+    isUserTransaction(transaction, currentUser)
   );
 
   const filteredTransactions = userTransactions.filter((transaction) => {
@@ -211,7 +331,7 @@ function performSearch(searchTerm) {
       new Date(transaction.date || transaction.createdAt).toLocaleDateString(
         "en-IN"
       ),
-    ].filter((field) => field); // Remove undefined/null values
+    ].filter((field) => field);
 
     // Check if search term matches any field
     return searchableFields.some((field) =>
@@ -224,7 +344,6 @@ function performSearch(searchTerm) {
   // Render filtered results
   renderTransactions(filteredTransactions);
 
-  // Show toast with results count
   if (filteredTransactions.length === 0) {
     showToast(`No transactions found for "${searchTerm}"`, "info");
   } else {
@@ -235,25 +354,19 @@ function performSearch(searchTerm) {
   }
 }
 
-// Initialize application
-async function initializeApp() {
-  try {
-    showToast("Loading data...", "info");
+// Helper function to check if transaction belongs to user
+function isUserTransaction(transaction, user) {
+  if (!transaction || !user) return false;
 
-    await Promise.all([loadCustomers(), loadPlans(), loadTransactions()]);
-
-    // Simulate logged-in user (first customer)
-    if (customers.length > 0) {
-      currentUser = customers[0];
-      renderUserProfile();
-    }
-
-    renderTransactions();
-    showToast("Data loaded successfully!", "success");
-  } catch (error) {
-    console.error("Failed to initialize app:", error);
-    showToast("Failed to load data. Please try again.", "error");
-  }
+  // Check multiple possible user identifier fields
+  return (
+    (transaction.customerId &&
+      String(transaction.customerId) === String(user.id)) ||
+    (transaction.userId && String(transaction.userId) === String(user.id)) ||
+    (transaction.customerEmail && transaction.customerEmail === user.email) ||
+    (transaction.userEmail && transaction.userEmail === user.email) ||
+    (transaction.phoneNumber && transaction.phoneNumber === user.phone)
+  );
 }
 
 // API call functions
@@ -379,8 +492,7 @@ function renderUserProfile() {
   const recentTransaction = transactions
     .filter(
       (t) =>
-        (String(t.customerId) === String(currentUser.id) ||
-          String(t.userId) === String(currentUser.id)) &&
+        isUserTransaction(t, currentUser) &&
         (t.status || "success").toLowerCase() === "success"
     )
     .sort(
@@ -505,19 +617,15 @@ function renderTransactions(filteredTransactions = null) {
   const transactionList = document.getElementById("transaction-list");
   if (!transactionList || !currentUser) return;
 
-  // Filter transactions for current user only
-  let userTransactions = transactions.filter(
-    (t) =>
-      String(t.customerId) === String(currentUser.id) ||
-      String(t.userId) === String(currentUser.id)
+  // Filter transactions for current user only using the helper function
+  let userTransactions = transactions.filter((transaction) =>
+    isUserTransaction(transaction, currentUser)
   );
 
   // Apply additional filter if provided
   if (filteredTransactions) {
-    userTransactions = filteredTransactions.filter(
-      (t) =>
-        String(t.customerId) === String(currentUser.id) ||
-        String(t.userId) === String(currentUser.id)
+    userTransactions = filteredTransactions.filter((transaction) =>
+      isUserTransaction(transaction, currentUser)
     );
   }
 
@@ -536,11 +644,6 @@ function renderTransactions(filteredTransactions = null) {
     .map((transaction) => {
       const plan = plans.find(
         (p) => String(p.id) === String(transaction.planId)
-      );
-      const customer = customers.find(
-        (c) =>
-          String(c.id) === String(transaction.customerId) ||
-          String(c.id) === String(transaction.userId)
       );
 
       const status = transaction.status || "success";
@@ -745,10 +848,8 @@ function filterTransactions() {
   const filterValue = filterSelect?.value || "all";
 
   // Get user transactions first
-  let userTransactions = transactions.filter(
-    (t) =>
-      String(t.customerId) === String(currentUser.id) ||
-      String(t.userId) === String(currentUser.id)
+  let userTransactions = transactions.filter((transaction) =>
+    isUserTransaction(transaction, currentUser)
   );
 
   if (filterValue !== "all") {
@@ -770,7 +871,7 @@ function downloadInvoice(transactionId, transactionData = null) {
     // Use the passed transaction data directly
     transaction =
       typeof transactionData === "string"
-        ? JSON.parse(transactionData.replace(/&quot;/g, '"'))
+        ? JSON.parse(transactionData.replace(/"/g, '"'))
         : transactionData;
   } else {
     // Fallback to finding in transactions array
@@ -832,7 +933,7 @@ function downloadInvoice(transactionId, transactionData = null) {
     doc.setDrawColor(226, 232, 240);
     doc.rect(15, 65, 180, 25, "S");
 
-    const invoiceDate = new Date(); // Use current date for invoice generation
+    const invoiceDate = new Date();
     const transactionDate = new Date(
       transaction.date || transaction.createdAt || Date.now()
     );
