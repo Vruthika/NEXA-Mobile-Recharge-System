@@ -25,7 +25,9 @@ let categoryList,
   planModal,
   prepaidTab,
   postpaidTab,
-  planSearch;
+  planSearch,
+  activationAnimation,
+  doneButton;
 
 // API URLs
 const PLANS_API_URL = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans";
@@ -489,6 +491,7 @@ function showPlanModal(planId) {
     "modal-plan-description"
   );
   const modalPlanBenefits = document.getElementById("modal-plan-benefits");
+  const buyNowButton = document.getElementById("buy-now-button");
 
   if (modalPlanName) modalPlanName.textContent = plan.name || "Unnamed Plan";
   if (modalPlanCategory)
@@ -498,6 +501,27 @@ function showPlanModal(planId) {
   if (modalPlanDescription)
     modalPlanDescription.textContent =
       plan.description || "No description available";
+
+  // Update button text and style based on plan type
+  if (buyNowButton) {
+    if (plan.type === "Postpaid") {
+      buyNowButton.textContent = "Activate Now";
+      buyNowButton.classList.remove(
+        "bg-gradient-to-r",
+        "from-primary",
+        "to-purple-600"
+      );
+      buyNowButton.classList.add("bg-blue-600", "hover:bg-blue-700");
+    } else {
+      buyNowButton.textContent = "Buy Now";
+      buyNowButton.classList.remove("bg-blue-600", "hover:bg-blue-700");
+      buyNowButton.classList.add(
+        "bg-gradient-to-r",
+        "from-primary",
+        "to-purple-600"
+      );
+    }
+  }
 
   // Parse and display benefits - handle both string and array formats
   let benefits = [];
@@ -539,6 +563,25 @@ function closeModal() {
     planModal.classList.add("hidden");
     document.body.style.overflow = "";
     currentSelectedPlanId = null;
+  }
+}
+
+// Show activation animation for postpaid plans
+function showActivationAnimation() {
+  if (activationAnimation) {
+    activationAnimation.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  }
+}
+
+// Close activation animation
+function closeActivationAnimation() {
+  if (activationAnimation) {
+    activationAnimation.classList.add("hidden");
+    document.body.style.overflow = "";
+
+    // Redirect to dashboard
+    window.location.href = "/pages/customer/dashboard/dashboard.html";
   }
 }
 
@@ -659,6 +702,8 @@ function initializeDOMElements() {
   prepaidTab = document.getElementById("prepaid-tab");
   postpaidTab = document.getElementById("postpaid-tab");
   planSearch = document.getElementById("plan-search");
+  activationAnimation = document.getElementById("activation-animation");
+  doneButton = document.getElementById("done-button");
 
   // Setup event listeners
   if (planModal) {
@@ -672,14 +717,38 @@ function initializeDOMElements() {
     });
   }
 
-  // Buy Now button click handler
+  // Buy Now/Activate Now button click handler
   const buyNowButton = document.getElementById("buy-now-button");
   if (buyNowButton) {
     buyNowButton.addEventListener("click", function () {
       if (currentSelectedPlanId) {
-        window.location.href = `/pages/customer/payment/payment.html?planId=${currentSelectedPlanId}`;
+        const plan = allPlans.find((p) => p.id === currentSelectedPlanId);
+        const isPostpaid = plan && plan.type === "Postpaid";
+
+        if (isPostpaid) {
+          // Show activation animation for postpaid
+          closeModal();
+          showActivationAnimation();
+        } else {
+          // Redirect to payment for prepaid
+          window.location.href = `/pages/customer/payment/payment.html?planId=${currentSelectedPlanId}`;
+        }
       } else {
         alert("Please select a plan first");
+      }
+    });
+  }
+
+  // Done button click handler for activation animation
+  if (doneButton) {
+    doneButton.addEventListener("click", closeActivationAnimation);
+  }
+
+  // Close activation animation when clicking outside
+  if (activationAnimation) {
+    activationAnimation.addEventListener("click", function (e) {
+      if (e.target === activationAnimation) {
+        closeActivationAnimation();
       }
     });
   }

@@ -224,6 +224,46 @@
       </div>
     </div>
 
+    <!-- Activation Success Animation -->
+    <div id="activation-animation" class="fixed inset-0 z-50 hidden">
+      <div
+        class="absolute inset-0 bg-white dark:bg-gray-900 flex items-center justify-center"
+      >
+        <div class="text-center p-8">
+          <div
+            class="w-24 h-24 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6"
+          >
+            <svg
+              class="w-12 h-12 text-green-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">
+            Plan Activated Successfully!
+          </h3>
+          <p class="text-gray-600 dark:text-gray-400 mb-6">
+            Your postpaid plan has been activated and will be effective
+            immediately.
+          </p>
+          <button
+            id="done-button"
+            class="bg-primary hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-medium text-lg transition-colors"
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div id="footer"></div>
 
     <script src="./plans.js"></script>
