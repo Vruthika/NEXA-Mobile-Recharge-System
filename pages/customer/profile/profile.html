@@ -230,7 +230,7 @@
 
               <div class="flex flex-col lg:flex-row items-start gap-8">
                 <!-- Profile Image Section -->
-                <div class="flex flex-col items-center space-y-4">
+                <div class="flex flex-col justify-center space-y-4">
                   <div class="profile-image-container">
                     <img
                       id="profileImage"
@@ -527,7 +527,7 @@
         if (!loggedInPhone) {
           showToast("Please log in to view your profile", "error");
           setTimeout(() => {
-            window.location.href = "/login.html";
+            window.location.href = "/pages/auth/login/login.html";
           }, 2000);
           return;
         }
