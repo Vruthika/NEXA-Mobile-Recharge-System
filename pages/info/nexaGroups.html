@@ -1286,164 +1286,20 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-16">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div>
-            <h3 class="text-lg font-semibold mb-4 text-purple-400">
-              Our Offerings
-            </h3>
-            <ul class="space-y-2">
-              <li>
-                <a
-                  href="#"
-                  class="text-gray-300 hover:text-white transition-colors"
-                  >Mobile Services</a
-                >
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="text-gray-300 hover:text-white transition-colors"
-                  >Broadband</a
-                >
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="text-gray-300 hover:text-white transition-colors"
-                  >Enterprise Solutions</a
-                >
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="text-gray-300 hover:text-white transition-colors"
-                  >Cloud Services</a
-                >
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold mb-4 text-blue-400">Support</h3>
-            <ul class="space-y-2">
-              <li>
-                <a
-                  href="#"
-                  class="text-gray-300 hover:text-white transition-colors"
-                  >Help Center</a
-                >
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="text-gray-300 hover:text-white transition-colors"
-                  >Contact Us</a
-                >
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="text-gray-300 hover:text-white transition-colors"
-                  >Technical Support</a
-                >
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="text-gray-300 hover:text-white transition-colors"
-                  >Community</a
-                >
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold mb-4 text-violet-400">
-              Our Company
-            </h3>
-            <ul class="space-y-2">
-              <li>
-                <a
-                  href="#"
-                  class="text-gray-300 hover:text-white transition-colors"
-                  >About Nexa</a
-                >
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="text-gray-300 hover:text-white transition-colors"
-                  >Careers</a
-                >
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="text-gray-300 hover:text-white transition-colors"
-                  >Investor Relations</a
-                >
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="text-gray-300 hover:text-white transition-colors"
-                  >Press Releases</a
-                >
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold mb-4 text-purple-400">
-              Connect with Us
-            </h3>
-            <div class="flex space-x-4 mb-4">
-              <a
-                href="#"
-                class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition-colors"
-              >
-                <span class="text-sm">f</span>
-              </a>
-              <a
-                href="#"
-                class="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors"
-              >
-                <span class="text-sm">t</span>
-              </a>
-              <a
-                href="#"
-                class="w-10 h-10 bg-violet-600 rounded-full flex items-center justify-center hover:bg-violet-700 transition-colors"
-              >
-                <span class="text-sm">in</span>
-              </a>
-              <a
-                href="#"
-                class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center hover:bg-purple-600 transition-colors"
-              >
-                <span class="text-sm">ig</span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div class="border-t border-gray-800 pt-8 mt-8 text-center">
-          <p class="text-gray-300">
-            © 2025 Nexa. All rights reserved. |
-            <a href="#" class="hover:text-white transition-colors"
-              >Privacy Policy</a
-            >
-            |
-            <a href="#" class="hover:text-white transition-colors"
-              >Terms of Service</a
-            >
-          </p>
-        </div>
-      </div>
-    </footer>
+    <div id="footer"></div>
 
     <script>
+      function loadComponent(id, filepath) {
+        fetch(filepath)
+          .then((response) => response.text())
+          .then((data) => {
+            document.getElementById(id).innerHTML = data;
+          })
+          .catch((error) => console.error("Error loading navbar:", error));
+      }
+
+      // Initialize components
+      loadComponent("footer", "/components/footer.html");
       document.addEventListener("DOMContentLoaded", () => {
         // Mobile menu toggle
         const mobileMenuButton = document.getElementById("mobile-menu-button");
