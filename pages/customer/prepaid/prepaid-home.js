@@ -153,6 +153,7 @@ async function initializeComponents() {
       loadComponent("navbar", "/components/navbar.html"),
       loadComponent("footer", "/components/footer.html"),
     ]);
+    document.dispatchEvent(new Event("navloaded"));
   } catch (error) {
     console.warn("Some components failed to load:", error);
   }
