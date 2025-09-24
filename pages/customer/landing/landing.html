@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Nexa - Mobile Recharge Management</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#4F46E5",
+              "background-light": "#FFFFFF",
+              "background-dark": "#111827",
+              "card-light": "#F9FAFB",
+              "card-dark": "#1F2937",
+              "text-light": "#111827",
+              "text-dark": "#F9FAFB",
+              "muted-light": "#6B7280",
+              "muted-dark": "#9CA3AF",
+            },
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .carousel-item {
+        scroll-snap-align: center;
+        flex: 0 0 100%;
+        transition: transform 0.5s ease-in-out;
+      }
+      
+      .carousel-item:hover {
+        transform: translateY(-5px);
+      }
+      
+      @media (min-width: 768px) {
+        .carousel-item {
+          flex: 0 0 50%;
+        }
+      }
+      @media (min-width: 1024px) {
+        .carousel-item {
+          flex: 0 0 33.333333%;
+        }
+      }
+
+      /* Banner styling */
+      .banner-container {
+        background: linear-gradient(135deg, #4f46e5 0%, #7e22ce 100%);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .banner-content {
+        position: relative;
+        z-index: 2;
+      }
+
+      .banner-image {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        opacity: 0.7;
+      }
+
+      /* Image carousel styling */
+      .image-carousel-item {
+        position: relative;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        height: 300px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+      }
+      
+      .image-carousel-item:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+
+      .image-carousel-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+      }
+      
+      .image-carousel-item:hover img {
+        transform: scale(1.05);
+      }
+
+      .plan-text-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 1.5rem;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+        color: white;
+        z-index: 2;
+      }
+
+      .plan-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+
+      .plan-details {
+        font-size: 1rem;
+        opacity: 0.9;
+      }
+
+      .plan-price {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #ffd700;
+        margin-top: 0.5rem;
+      }
+
+      /* FAQ accordion styling */
+      .faq-item {
+        transition: all 0.3s ease;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        margin-bottom: 1rem;
+        background: linear-gradient(145deg, #ffffff, #f0f0f0);
+        border-left: 4px solid #4F46E5;
+      }
+      
+      .dark .faq-item {
+        background: linear-gradient(145deg, #1F2937, #111827);
+        border-left: 4px solid #7c3aed;
+      }
+
+      .faq-question {
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        padding: 1.5rem;
+      }
+      
+      .faq-question:hover {
+        background-color: rgba(79, 70, 229, 0.05);
+      }
+      
+      .dark .faq-question:hover {
+        background-color: rgba(124, 58, 237, 0.1);
+      }
+
+      .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease, padding 0.3s ease;
+        padding: 0 1.5rem;
+      }
+
+      .faq-item.active .faq-answer {
+        max-height: 300px;
+        padding-bottom: 1.5rem;
+      }
+
+      .faq-item.active .material-icons {
+        transform: rotate(180deg);
+        color: #4F46E5;
+      }
+      
+      .dark .faq-item.active .material-icons {
+        color: #7c3aed;
+      }
+
+      .faq-question h3 {
+        font-weight: 600;
+        font-size: 1.1rem;
+        flex: 1;
+      }
+      
+      .faq-question .material-icons {
+        transition: all 0.3s ease;
+        color: #6B7280;
+      }
+      
+      .dark .faq-question .material-icons {
+        color: #9CA3AF;
+      }
+
+      /* FAQ image styling */
+      .faq-image-container {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 0.5rem;
+      }
+
+      .faq-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 0.5rem;
+      }
+      
+      /* Hide scrollbar for carousel */
+      #carousel {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      
+      #carousel::-webkit-scrollbar {
+        display: none;
+      }
+      
+      /* Plan button styling */
+      .plan-button {
+        position: absolute;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        background: rgba(255, 255, 255, 0.9);
+        color: #4f46e5;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        font-weight: bold;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        z-index: 3;
+      }
+      
+      .plan-button:hover {
+        background: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      
+      /* Carousel navigation buttons */
+      .carousel-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.8);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      
+      .carousel-nav:hover {
+        background: white;
+        transform: translateY(-50%) scale(1.1);
+      }
+      
+      .carousel-nav.prev {
+        left: 10px;
+      }
+      
+      .carousel-nav.next {
+        right: 10px;
+      }
+      
+      .carousel-nav:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      
+      .carousel-nav:disabled:hover {
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.8);
+      }
+      
+      /* Toast container */
+      #toastContainer {
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        z-index: 1000;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark"
+  >
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Toast Container -->
+      <div id="toastContainer"></div>
+
+      <!-- Navbar -->
+      <nav
+  class="w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 border-b border-border-light dark:border-border-dark"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center py-4">
+      <!-- Logo + Name wrapper (Left side) -->
+      <div class="flex items-center space-x-3">
+        <img
+          src="/assets/images/logo.png"
+          alt="NEXA"
+          class="h-12 w-12 sm:h-16 sm:w-16 rounded-full border border-purple-500"
+        />
+        <div
+          class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+        >
+          NEXA
+        </div>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <div class="hidden lg:flex items-center space-x-8">
+        <!-- Search -->
+        <div class="relative">
+          <input
+            id="search-input"
+            class="w-80 bg-gray-100 dark:bg-gray-700 border-none rounded-full pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-gray-600 transition-all text-sm"
+            placeholder="Search plans..."
+            type="text"
+          />
+          <span
+            class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
+            >search</span
+          >
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="flex items-center space-x-6">
+          <a
+            class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
+            href="/pages/customer/dashboard/dashboard.html"
+            >Home
+            <span
+              class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
+            ></span>
+          </a>
+          <a
+            class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
+            href="/pages/customer/plans/plans.html"
+            >Plans<span
+              class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
+            ></span>
+          </a>
+          <a
+            class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
+            href="/pages/customer/landing/landing.html#faq"
+            >FAQ
+            <span
+              class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
+            ></span>
+          </a>
+          <a
+            class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
+            href="/pages/customer/profile/profile.html"
+            >My Account
+            <span
+              class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
+            ></span>
+          </a>
+
+          <button
+            id="login-btn"
+            class="px-5 py-2 rounded-md bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-medium hover:shadow-lg transition-all"
+            onclick="window.location.href='/pages/auth/login/login.html'"
+          >
+            Login
+          </button>
+        </div>
+      </div>
+      </nav>
+
+      <!-- Banner Section -->
+      <section class="my-12">
+        <div
+          class="banner-container rounded-lg h-80 flex items-center justify-center text-white"
+        >
+          <div class="banner-content text-center px-4">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">
+              Experience Next-Gen Mobile Connectivity
+            </h1>
+            <p class="text-xl mb-8">
+              Fast, reliable, and affordable mobile plans for everyone
+            </p>
+            <button
+              class="bg-white text-primary font-semibold py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors"
+              onclick="window.location.href='/pages/customer/prepaid/prepaid-home.html'"
+            >
+              Explore Plans
+            </button>
+          </div>
+          <div class="banner-image hidden md:block">
+            <img
+              src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+              alt="Mobile connectivity"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Popular Plans Image Carousel -->
+      <section class="my-24">
+        <h2
+          class="text-3xl font-bold text-center mb-12 text-text-light dark:text-text-dark"
+        >
+          Popular Plans
+        </h2>
+        <div class="relative">
+          <button class="carousel-nav prev" id="carousel-prev" disabled>
+            <span class="material-icons">chevron_left</span>
+          </button>
+          <div
+            class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth -mx-4"
+            id="carousel"
+          >
+            <!-- Plan 1: 2 GB/Day -->
+            <div class="carousel-item px-4">
+              <div class="image-carousel-item">
+                <div class="plan-text-overlay">
+                  <div class="plan-title">2 GB/Day Plan</div>
+                  <div class="plan-details">Daily high-speed data with unlimited calls</div>
+                  <div class="plan-price">Starts @ ₹299/month</div>
+                </div>
+                <img
+                  src="https://www.informalnewz.com/wp-content/uploads/2024/12/3300GB-data-plan.jpg"
+                  alt="2 GB/Day Plan"
+                />
+                <a href="/pages/customer/plans/plans.html" class="plan-button">GET NOW ></a>
+              </div>
+            </div>
+
+            <!-- Plan 2: 2.5 GB/Day -->
+            <div class="carousel-item px-4">
+              <div class="image-carousel-item">
+                <div class="plan-text-overlay">
+                  <div class="plan-title">2.5 GB/Day Plan</div>
+                  <div class="plan-details">Extra data for heavy users</div>
+                  <div class="plan-price">Starts @ ₹349/month</div>
+                </div>
+                <img
+                  src="https://images.unsplash.com/photo-1556656793-08538906a9f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                  alt="2.5 GB/Day Plan"
+                />
+                <a href="/pages/customer/plans/plans.html" class="plan-button">GET NOW ></a>
+              </div>
+            </div>
+
+            <!-- Plan 3: 3 GB/Day -->
+            <div class="carousel-item px-4">
+              <div class="image-carousel-item">
+                <div class="plan-text-overlay">
+                  <div class="plan-title">3 GB/Day Plan</div>
+                  <div class="plan-details">Maximum daily data allowance</div>
+                  <div class="plan-price">Starts @ ₹399/month</div>
+                </div>
+                <img
+                  src="https://www.informalnewz.com/wp-content/webp-express/webp-images/uploads/2023/09/Jio-brings-amazing-offer-2.jpg.webp"
+                  alt="3 GB/Day Plan"
+                />
+                <a href="/pages/customer/plans/plans.html" class="plan-button">GET NOW ></a>
+              </div>
+            </div>
+
+            <!-- Plan 4: Annual Plans -->
+            <div class="carousel-item px-4">
+              <div class="image-carousel-item">
+                <div class="plan-text-overlay">
+                  <div class="plan-title">Annual Plans</div>
+                  <div class="plan-details">Save big with yearly subscription</div>
+                  <div class="plan-price">From ₹2599/year</div>
+                </div>
+                <img
+                  src="https://cloudinary.hbs.edu/hbsit/image/upload/s--gDL4YzuO--/f_auto,c_fill,h_375,w_750,/v20200101/4698FDC0B92A17E34F0155D15C423FEC.jpg"
+                  alt="Annual Plans"
+                />
+                <a href="/pages/customer/plans/plans.html" class="plan-button">GET NOW ></a>
+              </div>
+            </div>
+
+            <!-- Plan 5: True Unlimited 5G -->
+            <div class="carousel-item px-4">
+              <div class="image-carousel-item">
+                <div class="plan-text-overlay">
+                  <div class="plan-title">True Unlimited 5G</div>
+                  <div class="plan-details">Next-gen connectivity without limits</div>
+                  <div class="plan-price">Starts @ ₹799/month</div>
+                </div>
+                <img
+                  src="https://myjiostatic.cdn.jio.com/cms/assets/true5g/true-5g-mobile.webp"
+                  alt="True Unlimited 5G Plan"
+                />
+                <a href="/pages/customer/plans/plans.html" class="plan-button">GET NOW ></a>
+              </div>
+            </div>
+
+            <!-- Plan 6: Individual Plans -->
+            <div class="carousel-item px-4">
+              <div class="image-carousel-item">
+                <div class="plan-text-overlay">
+                  <div class="plan-title">Individual Plans</div>
+                  <div class="plan-details">Tailored for single users</div>
+                  <div class="plan-price">From ₹399/month</div>
+                </div>
+                <img
+                  src="https://bharatnet.in/wp-content/uploads/2025/02/Cheapest-Postpaid-Plans-of-Airtel-Jio-and-Vodafone-Idea.jpg"
+                  alt="Individual Plans"
+                />
+                <a href="/pages/customer/plans/plans.html?type=postpaid" class="plan-button">GET NOW ></a>
+              </div>
+            </div>
+
+            <!-- Plan 7: Family Pack -->
+            <div class="carousel-item px-4">
+              <div class="image-carousel-item">
+                <div class="plan-text-overlay">
+                  <div class="plan-title">Family Pack</div>
+                  <div class="plan-details">Connect your entire family</div>
+                  <div class="plan-price">₹999/month for 3 SIMs</div>
+                </div>
+                <img
+                  src="https://www.myvi.in/content/dam/vodafoneideadigital/StaticPages/consumerimages/blog/family-plans/family-plans-mobile.webp"
+                  alt="Family Pack"
+                />
+                <a href="/pages/customer/plans/plans.html?type=postpaid" class="plan-button">GET NOW ></a>
+              </div>
+            </div>
+
+            <!-- Plan 8: JioHotstar Plans -->
+            <div class="carousel-item px-4">
+              <div class="image-carousel-item">
+                <div class="plan-text-overlay">
+                  <div class="plan-title">JioHotstar Plans</div>
+                  <div class="plan-details">Data + Hotstar Premium included</div>
+                  <div class="plan-price">Starts @ ₹799/month</div>
+                </div>
+                <img
+                  src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh-Oshq9HvmCEeWL9dsqceRihCgvLA-UgNJiAWyQ7mRUefN0GeG5HeZXeiWNIkAbEZ_Ky6MjTzlIKmUHAX5cOeWvF34ZAD9gCLF0N7YWCoiRGaqbCdY_NPGBzIZG_mVSsMF0qMNK35a-3TqxeAYUACIv_liy9Hr9J3ReuPtxrFkf4qbb-nLPc62O4XBZeBn/s1792/DALL%C2%B7E%202025-03-13%2019.15.47%20-%20A%20vibrant%20digital%20illustration%20showcasing%20JioHotstar,%20the%20newly%20merged%20streaming%20platform%20in%20India.%20The%20image%20features%20a%20sleek%20smart%20TV%20screen%20display.webp"
+                  alt="JioHotstar Plans"
+                />
+                <a href="/pages/customer/plans/plans.html?type=postpaid" class="plan-button">GET NOW ></a>
+              </div>
+            </div>
+
+            <!-- Plan 9: Netflix Plans -->
+            <div class="carousel-item px-4">
+              <div class="image-carousel-item">
+                <div class="plan-text-overlay">
+                  <div class="plan-title">Netflix Plans</div>
+                  <div class="plan-details">Data + Netflix subscription included</div>
+                  <div class="plan-price">Starts @ ₹1099/month</div>
+                </div>
+                <img
+                  src="https://cdn.mos.cms.futurecdn.net/rqzeqosQ6SVMZELTBuAaDk.jpg"
+                  alt="Netflix Plans"
+                />
+                <a href="/pages/customer/plans/plans.html?type=postpaid" class="plan-button">GET NOW ></a>
+              </div>
+            </div>
+          </div>
+          <button class="carousel-nav next" id="carousel-next">
+            <span class="material-icons">chevron_right</span>
+          </button>
+        </div>
+        <div
+          class="flex justify-center mt-8 space-x-2"
+          id="carousel-dots"
+        ></div>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="my-24" id="faq">
+        <h2
+          class="text-3xl font-bold text-center mb-12 text-text-light dark:text-text-dark"
+        >
+          Frequently Asked Questions
+        </h2>
+        <div class="grid md:grid-cols-2 gap-16 items-start">
+          <div class="space-y-4">
+            <!-- FAQ 1 -->
+            <div class="faq-item">
+              <div class="faq-question">
+                <h3>How do I switch to Nexa?</h3>
+                <span class="material-icons">expand_more</span>
+              </div>
+              <div class="faq-answer">
+                <p class="text-muted-light dark:text-muted-dark">
+                  Switching to Nexa is simple! Just choose a plan that fits your
+                  needs, and we'll help you transfer your number from your
+                  current provider. The process typically takes 1-2 business
+                  days to complete.
+                </p>
+              </div>
+            </div>
+
+            <!-- FAQ 2 -->
+            <div class="faq-item">
+              <div class="faq-question">
+                <h3>Can I keep my current phone number?</h3>
+                <span class="material-icons">expand_more</span>
+              </div>
+              <div class="faq-answer">
+                <p class="text-muted-light dark:text-muted-dark">
+                  Yes, absolutely! We make it easy to bring your current phone
+                  number to Nexa. During the signup process, you'll have the
+                  option to port your existing number. There's no additional
+                  cost for this service.
+                </p>
+              </div>
+            </div>
+
+            <!-- FAQ 3 -->
+            <div class="faq-item">
+              <div class="faq-question">
+                <h3>What is 5G coverage like?</h3>
+                <span class="material-icons">expand_more</span>
+              </div>
+              <div class="faq-answer">
+                <p class="text-muted-light dark:text-muted-dark">
+                  Nexa offers extensive 5G coverage across the country, with
+                  continuous expansion. Our 5G network provides faster speeds
+                  and lower latency. Check our coverage map for specific details
+                  about your area.
+                </p>
+              </div>
+            </div>
+
+            <!-- FAQ 4 -->
+            <div class="faq-item">
+              <div class="faq-question">
+                <h3>How can I track my data usage?</h3>
+                <span class="material-icons">expand_more</span>
+              </div>
+              <div class="faq-answer">
+                <p class="text-muted-light dark:text-muted-dark">
+                  You can easily track your data usage through our mobile app or
+                  customer portal. We also send notifications when you're
+                  approaching your data limit to help you avoid overage charges.
+                </p>
+              </div>
+            </div>
+
+            <!-- FAQ 5 -->
+            <div class="faq-item">
+              <div class="faq-question">
+                <h3>What payment methods do you accept?</h3>
+                <span class="material-icons">expand_more</span>
+              </div>
+              <div class="faq-answer">
+                <p class="text-muted-light dark:text-muted-dark">
+                  We accept all major credit cards, debit cards, PayPal, and
+                  bank transfers. You can also set up automatic payments for
+                  convenience and never worry about missing a payment.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- FAQ Image Section -->
+          <div class="faq-image-container">
+            <img
+              src="https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+              alt="Customer Support"
+              class="faq-image"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Support Section -->
+        <section class="mt-16 text-center">
+          <h2 class="text-3xl font-bold mb-4">Need Help?</h2>
+          <p class="text-muted-light dark:text-muted-dark mb-8">
+            Our support team is here to assist you 24/7
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div
+              class="bg-card-light dark:bg-card-dark p-8 rounded-2xl shadow-lg border border-border-light dark:border-border-dark cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+            >
+              <div
+                class="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              >
+                <span class="material-icons text-blue-600 text-3xl">call</span>
+              </div>
+              <h3 class="font-bold text-lg mb-2">Call Support</h3>
+              <p class="text-muted-light dark:text-muted-dark text-sm mb-3">
+                Speak with our experts
+              </p>
+              <p class="text-primary font-semibold">9998887766</p>
+            </div>
+
+            <div
+              onclick="startLiveChat()"
+              class="bg-card-light dark:bg-card-dark p-8 rounded-2xl shadow-lg border border-border-light dark:border-border-dark cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+            >
+              <div
+                class="w-20 h-20 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              >
+                <span class="material-icons text-purple-600 text-3xl">chat</span>
+              </div>
+              <h3 class="font-bold text-lg mb-2">Live Chat</h3>
+              <p class="text-muted-light dark:text-muted-dark text-sm mb-3">
+                Get instant responses
+              </p>
+              <span
+                class="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium"
+              >
+                <span
+                  class="w-2 h-2 bg-green-500 rounded-full inline-block mr-1 animate-pulse"
+                ></span>
+                Online Now
+              </span>
+            </div>
+
+            <div
+              onclick="emailSupport()"
+              class="bg-card-light dark:bg-card-dark p-8 rounded-2xl shadow-lg border border-border-light dark:border-border-dark cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+            >
+              <div
+                class="w-20 h-20 bg-gradient-to-br from-violet-100 to-violet-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              >
+                <span class="material-icons text-violet-600 text-3xl">email</span>
+              </div>
+              <h3 class="font-bold text-lg mb-2">Email Support</h3>
+              <p class="text-muted-light dark:text-muted-dark text-sm mb-3">Detailed assistance</p>
+              <p class="text-primary font-semibold text-sm">support@nexa.com</p>
+            </div>
+          </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer
+      class="bg-gray-900 text-white py-12 sm:py-16 w-screen relative left-1/2 right-1/2 -mx-[50vw] mt-16 sm:mt-20"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8"
+        >
+          <!-- Logo -->
+          <div
+            class="col-span-2 md:col-span-1 flex items-start justify-center md:justify-start"
+          >
+            <img
+              src="/assets/images/logo-footer.jpg"
+              alt="NEXA"
+              class="h-24 w-28 sm:h-32 sm:w-36 lg:h-40 lg:w-48 rounded-lg object-contain"
+            />
+          </div>
+
+          <!-- About -->
+          <div>
+            <h3
+              class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-purple-400"
+            >
+              About the Company
+            </h3>
+            <ul class="space-y-2 sm:space-y-3">
+              <li>
+                <a
+                  class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                  href="/pages/info/about.html"
+                >
+                  About Us
+                </a>
+              </li>
+              <li>
+                <a
+                  class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                  href="/pages/info/nexaGroups.html"
+                >
+                  Nexa Group
+                </a>
+              </li>
+              <li>
+                <a
+                  class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                  href="/pages/info/5G.html"
+                >
+                  5G
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Prepaid -->
+          <div>
+            <h3
+              class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-blue-400"
+            >
+              Prepaid Plans
+            </h3>
+            <ul class="space-y-2 sm:space-y-3">
+              <li>
+                <a
+                  class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                  href="/pages/customer/prepaid/prepaid-home.html"
+                >
+                  Popular Prepaid Plans
+                </a>
+              </li>
+              <li>
+                <a
+                  class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                  href="/pages/customer/plans/plans.html"
+                >
+                  Unlimited 5G
+                </a>
+              </li>
+              <li>
+                <a
+                  class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                  href="/pages/customer/plans/plans.html"
+                >
+                  Top Up Data Packs
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Postpaid -->
+          <div>
+            <h3
+              class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-violet-400"
+            >
+              Postpaid Plans
+            </h3>
+            <ul class="space-y-2 sm:space-y-3">
+              <li>
+                <a
+                  class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                  href="/pages/customer/postpaid/postpaid-home.html"
+                >
+                  <span class="hidden sm:inline">Trending Postpaid Plans</span>
+                  <span class="sm:hidden">Top Postpaid Plans</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                  href="/pages/customer/plans/plans.html?type=postpaid"
+                >
+                  <span class="hidden sm:inline">Postpaid Individual Plans</span>
+                  <span class="sm:hidden">Individual Plans</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                  href="/pages/customer/plans/plans.html?type=postpaid"
+                >
+                  <span class="hidden sm:inline">Postpaid Family Plans</span>
+                  <span class="sm:hidden">Family Plans</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Support -->
+          <div>
+            <h3
+              class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-purple-400"
+            >
+              Support
+            </h3>
+            <ul class="space-y-2 sm:space-y-3">
+              <li>
+                <a
+                  class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                  href="/pages/info/5G.html#faq"
+                >
+                  FAQ
+                </a>
+              </li>
+              <li>
+                <a
+                  class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                  href="#"
+                >
+                  Contact Us
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div
+          class="border-t border-gray-800 pt-6 sm:pt-8 mt-6 sm:mt-8 text-center"
+        >
+          <p class="text-sm sm:text-base text-gray-300">
+            ©2025 Nexa. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="./landing.js"></script>
+  </body>
+</html>
