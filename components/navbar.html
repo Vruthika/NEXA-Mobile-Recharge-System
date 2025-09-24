@@ -61,16 +61,18 @@
           </a>
           <a
             class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
-            href="#"
-            >Support
+            href="/pages/customer/profile/profile.html"
+            >My Account
             <span
               class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
             ></span>
           </a>
+
           <button
-            class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center hover:shadow-lg transition-all"
+            id="logout-btn"
+            class="px-5 py-2 rounded-md bg-gradient-to-r from-red-500 to-red-600 text-white font-medium hover:shadow-lg transition-all"
           >
-            <span class="material-icons text-white">person</span>
+            Logout
           </button>
         </div>
       </div>
@@ -153,32 +155,27 @@
           </a>
 
           <a
-            href="#"
+            href="/pages/customer/profile/profile.html"
             class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
           >
             <span
               class="material-icons text-gray-500 group-hover:text-primary transition-colors"
-              >support</span
-            >
-            <span
-              class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
-              >Support</span
-            >
-          </a>
-
-          <a
-            href="#"
-            class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
-          >
-            <span
-              class="material-icons text-gray-500 group-hover:text-primary transition-colors"
-              >account_circle</span
+              >help</span
             >
             <span
               class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
               >My Account</span
             >
           </a>
+          <button
+            id="mobile-logout-btn"
+            class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-red-100 dark:hover:bg-red-800 transition-colors w-full text-left"
+          >
+            <span class="material-icons text-red-500">logout</span>
+            <span class="text-red-600 dark:text-red-300 font-medium"
+              >Logout</span
+            >
+          </button>
         </div>
       </div>
     </div>
