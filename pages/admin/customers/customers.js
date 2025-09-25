@@ -37,35 +37,185 @@ function highlightActiveLink() {
   });
 }
 
-// Customer Data Fetch
+// API URLs
 const customersURL = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Customers";
+const transactionsURL =
+  "https://68ca32f2430c4476c3488311.mockapi.io/Transactions";
+const plansURL = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans";
 
 let inactiveCustomers = [];
 let activeCustomers = [];
 let filteredActive = [];
+let transactions = [];
 
 let inactiveCurrentPage = 1;
 let activeCurrentPage = 1;
 const inactiveRowsPerPage = 5;
 const activeRowsPerPage = 10;
 
-async function fetchCustomers() {
-  try {
-    const res = await fetch(customersURL);
-    const cust = await res.json();
+// Utility function to calculate days difference
+function daysDifference(date1, date2) {
+  const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+  const firstDate = new Date(date1);
+  const secondDate = new Date(date2);
 
-    inactiveCustomers = cust.filter((s) => s.status === "Inactive");
-    activeCustomers = cust.filter((s) => s.status === "Active");
+  return Math.round(Math.abs((firstDate - secondDate) / oneDay));
+}
+
+// Function to extract validity days from plan name
+function extractValidityDays(planName) {
+  if (!planName) return 0;
+
+  // Common patterns in plan names
+  const patterns = [
+    /(\d+)\s*days?/i, // "28 Days", "84 days"
+    /(\d+)\s*day/i, // "28 day"
+    /annual/i, // "Annual" plans
+    /yearly/i, // "Yearly" plans
+  ];
+
+  // Check for annual/yearly plans first
+  if (/annual|yearly/i.test(planName)) {
+    return 365;
+  }
+
+  // Extract numeric days
+  for (let pattern of patterns) {
+    const match = planName.match(pattern);
+    if (match) {
+      return parseInt(match[1]);
+    }
+  }
+
+  // Default validity based on plan type
+  if (/top-up|topup/i.test(planName)) {
+    return 30; // Top-up plans typically 30 days
+  }
+
+  if (/family|premium|postpaid/i.test(planName)) {
+    return 30; // Monthly plans
+  }
+
+  // Default fallback
+  return 28;
+}
+
+// Function to get active plan for a customer
+function getActivePlan(customerPhone) {
+  const currentDate = new Date();
+
+  // Get all successful transactions for this customer phone
+  const customerTransactions = transactions.filter(
+    (t) => t.phone === customerPhone && t.status === "Success"
+  );
+
+  if (customerTransactions.length === 0) {
+    return "-";
+  }
+
+  // Find the most recent active plan
+  let activePlan = null;
+  let latestValidDate = null;
+
+  customerTransactions.forEach((transaction) => {
+    const rechargeDate = new Date(transaction.date);
+    const validityDays = extractValidityDays(transaction.plan);
+
+    // Calculate expiry date
+    const expiryDate = new Date(rechargeDate);
+    expiryDate.setDate(expiryDate.getDate() + validityDays);
+
+    // Check if plan is still active (current date <= expiry date)
+    if (currentDate <= expiryDate) {
+      // If this is the first active plan or if this plan expires later
+      if (!latestValidDate || expiryDate > latestValidDate) {
+        activePlan = transaction.plan;
+        latestValidDate = expiryDate;
+      }
+    }
+  });
+
+  return activePlan || "-";
+}
+
+// Function to determine customer type based on plan
+function determineCustomerType(planName) {
+  if (!planName || planName === "-") {
+    return "Prepaid"; // Default
+  }
+
+  const planLower = planName.toLowerCase();
+
+  // Check for postpaid indicators in plan name
+  if (
+    planLower.includes("postpaid") ||
+    planLower.includes("monthly") ||
+    planLower.includes("unlimited") ||
+    planLower.includes("family") ||
+    planLower.includes("business")
+  ) {
+    return "Postpaid";
+  }
+
+  // Check for prepaid indicators
+  if (
+    planLower.includes("prepaid") ||
+    planLower.includes("top-up") ||
+    planLower.includes("topup") ||
+    planLower.includes("recharge")
+  ) {
+    return "Prepaid";
+  }
+
+  // Default to Prepaid if unclear
+  return "Prepaid";
+}
+
+async function fetchData() {
+  try {
+    // Fetch customers, transactions, and plans
+    const [customersRes, transactionsRes, plansRes] = await Promise.all([
+      fetch(customersURL),
+      fetch(transactionsURL),
+      fetch(plansURL),
+    ]);
+
+    const customers = await customersRes.json();
+    transactions = await transactionsRes.json();
+    plans = await plansRes.json();
+
+    inactiveCustomers = customers.filter((s) => s.status === "Inactive");
+    activeCustomers = customers.filter((s) => s.status === "Active");
+
+    // Add active plan information and ensure type is set correctly for active customers
+    activeCustomers.forEach((customer) => {
+      customer.activePlan = getActivePlan(customer.phone);
+
+      // If customer has an active plan, assign a type based on plan
+      if (customer.activePlan !== "-") {
+        // Customer has active plan - determine type if missing
+        if (!customer.type || customer.type === "-" || customer.type === null) {
+          customer.type = determineCustomerType(customer.activePlan);
+        }
+      } else {
+        // Customer has no active plan - set type to "-"
+        customer.type = "-";
+      }
+    });
+
     filteredActive = [...activeCustomers];
 
     // Render tables after data fetch
     renderInactive();
     renderActive();
   } catch (e) {
-    console.error("Error fetching customers:", e);
+    console.error("Error fetching data:", e);
+    showToast("❌ Failed to load customer data. Please try again.");
   }
 }
-fetchCustomers();
+
+// Initialize data fetch
+fetchData();
 
 // Deactivate Inactive Customers
 let deleteIndex = null; // Store the customer index temporarily
@@ -168,8 +318,8 @@ function renderInactive() {
         <td class="p-3 border">${c.phone}</td>
         <td class="p-3 border">${c.days}</td>
         <td class="p-3 border">
-          <button class="px-3 py-1 bg-red-500 text-white rounded-md"
-            onclick="showDeleteModal(${index})">Deactivate</button>
+          <button class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+            onclick="showDeleteModal(${start + index})">Deactivate</button>
         </td>
       </tr>`;
   });
@@ -259,13 +409,18 @@ function renderActive() {
   let paginated = filteredActive.slice(start, end);
 
   paginated.forEach((c, index) => {
+    // Get active plan for this customer (refresh to get real-time data)
+    const activePlan = getActivePlan(c.phone);
+
     tbody.innerHTML += `
       <tr class="text-center border">
         <td class="p-3 border">${start + index + 1}</td>
         <td class="p-3 border">${c.name}</td>
         <td class="p-3 border">${c.phone}</td>
-        <td class="p-3 border">${c.type ? c.type : "-"}</td>
-      <td class="p-3 border">${c.plan ? c.plan : "-"}</td>
+        <td class="p-3 border">${c.type}</td>
+        <td class="p-3 border ${
+          activePlan !== "-" ? "text-green-600 font-medium" : "text-gray-500"
+        }">${activePlan}</td>
       </tr>`;
   });
 
