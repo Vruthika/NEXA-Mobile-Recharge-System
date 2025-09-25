@@ -33,6 +33,8 @@ let categoryList,
 const PLANS_API_URL = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans";
 const TRANSACTIONS_API_URL =
   "https://68ca32f2430c4476c3488311.mockapi.io/Transactions";
+const CUSTOMERS_API_URL =
+  "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Customers";
 
 // Helper function to get URL parameters
 function getURLParameters() {
@@ -567,8 +569,16 @@ function closeModal() {
 }
 
 // Show activation animation for postpaid plans
-function showActivationAnimation() {
+function showActivationAnimation(plan) {
   if (activationAnimation) {
+    // Update activation animation content
+    const planNameElement = activationAnimation.querySelector(
+      "#activation-plan-name"
+    );
+    if (planNameElement && plan) {
+      planNameElement.textContent = plan.name || "Postpaid Plan";
+    }
+
     activationAnimation.classList.remove("hidden");
     document.body.style.overflow = "hidden";
   }
@@ -582,6 +592,93 @@ function closeActivationAnimation() {
 
     // Redirect to dashboard
     window.location.href = "/pages/customer/dashboard/dashboard.html";
+  }
+}
+
+// Create transaction for postpaid plan activation
+async function createPostpaidTransaction(plan) {
+  try {
+    // Get current user
+    const loggedInUser = localStorage.getItem("loggedInUser");
+    if (!loggedInUser) {
+      throw new Error("User not logged in");
+    }
+
+    const user = JSON.parse(loggedInUser);
+
+    // Calculate dates for billing cycle (1 month from now)
+    const transactionDate = new Date();
+    const expiryDate = new Date();
+    expiryDate.setMonth(expiryDate.getMonth() + 1);
+
+    // Create transaction object
+    const transaction = {
+      planId: plan.id,
+      planName: plan.name,
+      phone: user.phone,
+      amount: plan.price,
+      date: transactionDate.toISOString(),
+      expiryDate: expiryDate.toISOString(),
+      status: "Success",
+      type: "Postpaid Activation",
+      category: plan.category,
+      benefits: plan.benefits,
+      validity: plan.validity || "Monthly",
+      limit: plan.limit || plan.data || "Unlimited",
+    };
+
+    // Save to mock API
+    const response = await fetch(TRANSACTIONS_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(transaction),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create transaction");
+    }
+
+    const savedTransaction = await response.json();
+    console.log("Postpaid transaction created:", savedTransaction);
+
+    // Update user type to Postpaid
+    await updateUserType(user.id, "Postpaid");
+
+    return savedTransaction;
+  } catch (error) {
+    console.error("Error creating postpaid transaction:", error);
+    throw error;
+  }
+}
+
+// Update user type in localStorage and API
+async function updateUserType(userId, type) {
+  try {
+    // Update in localStorage
+    const loggedInUser = localStorage.getItem("loggedInUser");
+    if (loggedInUser) {
+      const user = JSON.parse(loggedInUser);
+      user.type = type;
+      localStorage.setItem("loggedInUser", JSON.stringify(user));
+    }
+
+    // Update in API (if needed)
+    const response = await fetch(`${CUSTOMERS_API_URL}/${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ type: type }),
+    });
+
+    if (!response.ok) {
+      console.warn("Failed to update user type in API, but continuing...");
+    }
+  } catch (error) {
+    console.error("Error updating user type:", error);
+    // Don't throw error as localStorage update is most important
   }
 }
 
@@ -720,15 +817,23 @@ function initializeDOMElements() {
   // Buy Now/Activate Now button click handler
   const buyNowButton = document.getElementById("buy-now-button");
   if (buyNowButton) {
-    buyNowButton.addEventListener("click", function () {
+    buyNowButton.addEventListener("click", async function () {
       if (currentSelectedPlanId) {
         const plan = allPlans.find((p) => p.id === currentSelectedPlanId);
         const isPostpaid = plan && plan.type === "Postpaid";
 
         if (isPostpaid) {
-          // Show activation animation for postpaid
-          closeModal();
-          showActivationAnimation();
+          try {
+            // Create postpaid transaction
+            await createPostpaidTransaction(plan);
+
+            // Show activation animation for postpaid
+            closeModal();
+            showActivationAnimation(plan);
+          } catch (error) {
+            console.error("Error activating postpaid plan:", error);
+            alert("Failed to activate plan. Please try again.");
+          }
         } else {
           // Redirect to payment for prepaid
           window.location.href = `/pages/customer/payment/payment.html?planId=${currentSelectedPlanId}`;
