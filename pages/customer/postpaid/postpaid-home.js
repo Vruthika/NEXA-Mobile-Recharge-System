@@ -163,6 +163,8 @@ async function initializeComponents() {
 const TRANSACTIONS_API =
   "https://68ca32f2430c4476c3488311.mockapi.io/Transactions";
 const PLANS_API = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans";
+const CUSTOMERS_API =
+  "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Customers";
 
 // Global variables - CHANGED: Default category is now "Most Trending Plans"
 let allPlans = [];
@@ -209,6 +211,93 @@ async function fetchAllPlans() {
     console.error("Error fetching plans:", error);
     allPlans = [];
     return [];
+  }
+}
+
+// Function to create postpaid transaction
+async function createPostpaidTransaction(plan) {
+  try {
+    // Get current user
+    const loggedInUser = localStorage.getItem("loggedInUser");
+    if (!loggedInUser) {
+      throw new Error("User not logged in");
+    }
+
+    const user = JSON.parse(loggedInUser);
+
+    // Calculate dates for billing cycle (1 month from now)
+    const transactionDate = new Date();
+    const expiryDate = new Date();
+    expiryDate.setMonth(expiryDate.getMonth() + 1);
+
+    // Create transaction object
+    const transaction = {
+      planId: plan.id,
+      planName: plan.name,
+      phone: user.phone,
+      amount: plan.price,
+      date: transactionDate.toISOString(),
+      expiryDate: expiryDate.toISOString(),
+      status: "Success",
+      type: "Postpaid Activation",
+      category: plan.category,
+      benefits: plan.benefits,
+      validity: plan.validity || "Monthly",
+      limit: plan.limit || plan.data || "Unlimited",
+    };
+
+    // Save to mock API
+    const response = await fetch(TRANSACTIONS_API, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(transaction),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create transaction");
+    }
+
+    const savedTransaction = await response.json();
+    console.log("Postpaid transaction created:", savedTransaction);
+
+    // Update user type to Postpaid
+    await updateUserType(user.id, "Postpaid");
+
+    return savedTransaction;
+  } catch (error) {
+    console.error("Error creating postpaid transaction:", error);
+    throw error;
+  }
+}
+
+// Update user type in localStorage and API
+async function updateUserType(userId, type) {
+  try {
+    // Update in localStorage
+    const loggedInUser = localStorage.getItem("loggedInUser");
+    if (loggedInUser) {
+      const user = JSON.parse(loggedInUser);
+      user.type = type;
+      localStorage.setItem("loggedInUser", JSON.stringify(user));
+    }
+
+    // Update in API (if needed)
+    const response = await fetch(`${CUSTOMERS_API}/${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ type: type }),
+    });
+
+    if (!response.ok) {
+      console.warn("Failed to update user type in API, but continuing...");
+    }
+  } catch (error) {
+    console.error("Error updating user type:", error);
+    // Don't throw error as localStorage update is most important
   }
 }
 
@@ -438,10 +527,22 @@ function showPlanModal(planId) {
 
     const activateNowButton = document.getElementById("activate-now-button");
     if (activateNowButton) {
-      activateNowButton.addEventListener("click", function () {
+      activateNowButton.addEventListener("click", async function () {
         if (currentSelectedPlanId) {
-          closeModal();
-          showActivationSuccess(plan.name || "Postpaid Plan");
+          const plan = allPlans.find((p) => p.id === currentSelectedPlanId);
+          if (plan) {
+            try {
+              // Create postpaid transaction
+              await createPostpaidTransaction(plan);
+
+              // Show success animation
+              closeModal();
+              showActivationSuccess(plan.name || "Postpaid Plan");
+            } catch (error) {
+              console.error("Error activating postpaid plan:", error);
+              alert("Failed to activate plan. Please try again.");
+            }
+          }
         } else {
           alert("Please select a plan first");
         }
