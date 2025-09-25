@@ -53,6 +53,13 @@ async function initializeApp() {
     }
     document.dispatchEvent(new Event("navloaded"));
 
+    // Check if we need to show bill payment success alert
+    if (localStorage.getItem("showBillPaymentSuccess") === "true") {
+      setTimeout(() => {
+        showBillPaymentSuccessAlert();
+      }, 1000);
+    }
+
     startPeriodicUpdates();
     showLoadingOverlay(false);
   } catch (error) {
@@ -410,6 +417,13 @@ function updatePlanInfo() {
   if (currentActivePlan) {
     updateElementText("planStatus", "Active");
 
+    // Check if it's a postpaid plan
+    const isPostpaid =
+      currentActivePlan.type &&
+      currentActivePlan.type.toLowerCase() === "postpaid";
+    const buttonText = isPostpaid ? "Pay Bill" : "Recharge Now";
+    const buttonOnClick = isPostpaid ? "payBill()" : "rechargePlan()";
+
     // Update active plan content
     const activePlanHTML = `
             <div class="flex items-center justify-between mb-4">
@@ -418,7 +432,9 @@ function updatePlanInfo() {
                   ₹${currentActivePlan.price}
                 </span>
                 <div class="text-right">
-                  <p class="flex text-subtext-light text-sm">Expires on</p>
+                  <p class="flex text-subtext-light text-sm">${
+                    isPostpaid ? "Billing Cycle" : "Expires on"
+                  }</p>
                   <p class="flex font-bold text-lg">${formatDateExpiry(
                     currentActivePlan.expiryDate
                   )}</p>
@@ -453,6 +469,40 @@ function updatePlanInfo() {
             </div>
           `;
     updateElementHTML("activePlanContent", activePlanHTML);
+
+    // Update the button section
+    const buttonHTML = `
+            <div class="grid grid-cols-2 gap-3 mt-6">
+              <button
+                onclick="showPlanDetailsModal()"
+                class="bg-background-light hover:bg-gray-100 text-text-light font-semibold py-3 px-4 rounded-xl transition-all duration-200"
+              >
+                View Details
+              </button>
+              <button
+                onclick="${buttonOnClick}"
+                class="bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105"
+              >
+                ${buttonText}
+              </button>
+            </div>
+          `;
+
+    // Find and update the button container
+    const planCard = document.querySelector(
+      ".lg\\:col-span-2.space-y-6 > .bg-card-light.p-6.rounded-2xl.shadow-lg.border.border-border-light.hover\\:shadow-xl.transition-all.duration-300.animate-fade-in:nth-child(3)"
+    );
+    if (planCard) {
+      const existingButtonContainer = planCard.querySelector(
+        ".grid.grid-cols-2.gap-3.mt-6"
+      );
+      if (existingButtonContainer) {
+        existingButtonContainer.outerHTML = buttonHTML;
+      } else {
+        // If button container doesn't exist, append it
+        planCard.innerHTML += buttonHTML;
+      }
+    }
   } else {
     updateElementText("planStatus", "No Active Plan");
 
@@ -577,6 +627,78 @@ function startPeriodicUpdates() {
   }, 60000);
 }
 
+// Bill Payment Functions
+function payBill() {
+  if (!currentActivePlan) return;
+
+  // Redirect to payment page with plan ID and bill type
+  window.location.href = `/pages/customer/payment/payment.html?planId=${currentActivePlan.id}&type=bill`;
+}
+
+function showBillPaymentSuccessAlert() {
+  const alertModalHTML = `
+    <div id="billPaymentSuccessModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300 scale-95 animate-scale-in">
+        <div class="p-6">
+          <!-- Header -->
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-3">
+              <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                <span class="material-icons text-green-500 text-2xl">check_circle</span>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold text-gray-900">Bill Payment Successful!</h3>
+                <p class="text-sm text-gray-600">Your payment has been processed</p>
+              </div>
+            </div>
+            <button onclick="closeBillPaymentSuccessAlert()" class="text-gray-400 hover:text-gray-600 transition-colors">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+
+          <!-- Content -->
+          <div class="mb-6">
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div class="flex items-center space-x-2">
+                <span class="material-icons text-green-500 text-lg">verified</span>
+                <span class="text-green-800 font-semibold">Payment Confirmed</span>
+              </div>
+              <p class="text-green-700 text-sm mt-2">Your bill has been paid successfully. Thank you for your payment!</p>
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <button onclick="closeBillPaymentSuccessAlert()" class="w-full bg-green-500 text-white font-semibold py-3 px-4 rounded-xl hover:bg-green-600 transition-colors">
+            Continue to Dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Remove existing modal if any
+  const existingModal = document.getElementById("billPaymentSuccessModal");
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  // Add new modal to the page
+  document.body.insertAdjacentHTML("beforeend", alertModalHTML);
+}
+
+function closeBillPaymentSuccessAlert() {
+  const modal = document.getElementById("billPaymentSuccessModal");
+  if (modal) {
+    modal.style.opacity = "0";
+    modal.style.transform = "scale(0.9)";
+    setTimeout(() => {
+      modal.remove();
+      // Clear the flag
+      localStorage.removeItem("showBillPaymentSuccess");
+    }, 300);
+  }
+}
+
 // Modal Functions
 function showDataUsageAlert() {
   if (!currentActivePlan || !dailyDataUsage) return;
@@ -693,6 +815,10 @@ function showPlanDetailsModal() {
   const content = document.getElementById("planDetailsContent");
 
   if (currentActivePlan && content) {
+    const isPostpaid =
+      currentActivePlan.type &&
+      currentActivePlan.type.toLowerCase() === "postpaid";
+
     const planDetailsHTML = `
             <div class="space-y-6">
               <div class="text-center">
@@ -702,8 +828,10 @@ function showPlanDetailsModal() {
                 <div class="text-lg font-semibold">${
                   currentActivePlan.name
                 }</div>
-                <div class="text-sm text-subtext-light">Valid for ${
-                  currentActivePlan.validity
+                <div class="text-sm text-subtext-light">${
+                  isPostpaid
+                    ? "Monthly Bill"
+                    : "Valid for " + currentActivePlan.validity
                 }</div>
               </div>
               
@@ -745,13 +873,13 @@ function showPlanDetailsModal() {
                 <h4 class="font-semibold mb-2">Plan Status</h4>
                 <div class="space-y-2 text-sm">
                   <div class="flex items-center justify-between">
-                    <span>Activated:</span>
+                    <span>${isPostpaid ? "Billing Cycle:" : "Activated:"}</span>
                     <span class="font-medium">${formatDateExpiry(
                       currentActivePlan.transactionDate
                     )}</span>
                   </div>
                   <div class="flex items-center justify-between">
-                    <span>Expires:</span>
+                    <span>${isPostpaid ? "Due Date:" : "Expires:"}</span>
                     <span class="font-medium">${formatDateExpiry(
                       currentActivePlan.expiryDate
                     )}</span>
@@ -925,8 +1053,10 @@ function logout() {
   }
 }
 
-// Make logout function globally available
+// Make functions globally available
 window.logout = logout;
+window.payBill = payBill;
+window.closeBillPaymentSuccessAlert = closeBillPaymentSuccessAlert;
 
 function refreshAccount() {
   showToast("Refreshing account data...", "info");
@@ -935,27 +1065,22 @@ function refreshAccount() {
 
 // Feature Functions
 function showRechargeModal() {
-  // showToast("Recharge modal would open here", "info");
   window.location.href = "/pages/customer/plans/plans.html";
 }
 
 function showHistory() {
-  // showToast("History page would load here", "info");
   window.location.href = "/pages/customer/history/history.html";
 }
 
 function addDataBooster() {
-  // showToast("Add data booster page would load here", "info");
   window.location.href = "/pages/customer/plans/plans.html";
 }
 
 function rechargePlan() {
-  // showToast("Recharge plan page would load here", "info");
   window.location.href = "/pages/customer/plans/plans.html";
 }
 
 function browsePlans() {
-  // showToast("Browse plans page would load here", "info");
   window.location.href = "/pages/customer/prepaid/prepaid-home.html";
 }
 
@@ -973,6 +1098,7 @@ document.addEventListener("keydown", function (e) {
     closeDataAlert();
     closePlanDetailsModal();
     closeUsageDetailsModal();
+    closeBillPaymentSuccessAlert();
   }
 });
 
