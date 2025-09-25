@@ -440,7 +440,7 @@ function elementHasHrefAndIncludes(element, text) {
   return (href && href.includes(text)) || elementText.includes(text);
 }
 
-// Comprehensive function to force light theme
+// Simple function to force light theme (like other pages)
 function forceLightTheme() {
   try {
     // Remove dark class from html and body
@@ -449,90 +449,6 @@ function forceLightTheme() {
 
     // Set light mode in localStorage
     localStorage.setItem("darkMode", "false");
-
-    // Find and fix navbar elements
-    const navbar = document.getElementById("navbar");
-    if (navbar) {
-      navbar.classList.remove("dark");
-
-      // Remove dark classes from all elements in navbar
-      const allNavbarElements = navbar.querySelectorAll("*");
-      allNavbarElements.forEach((el) => {
-        if (el && el.classList) {
-          el.classList.remove(
-            "dark:bg-gray-800",
-            "dark:bg-gray-900",
-            "dark:text-white",
-            "dark:text-gray-100",
-            "dark:border-gray-700",
-            "dark"
-          );
-
-          // Force light background colors but keep white text for mobile menu
-          if (
-            el.classList.contains("bg-gray-800") ||
-            el.classList.contains("bg-gray-900")
-          ) {
-            el.classList.remove("bg-gray-800", "bg-gray-900");
-            el.classList.add("bg-white");
-          }
-        }
-      });
-
-      // Specifically fix mobile menu - ensure it has white background but proper text colors
-      const mobileMenu = document.getElementById("mobile-menu");
-      if (mobileMenu && mobileMenu.classList) {
-        mobileMenu.classList.remove(
-          "dark:bg-gray-800",
-          "bg-gray-800",
-          "dark:bg-gray-900"
-        );
-        mobileMenu.classList.add("bg-white");
-
-        const mobileLinks = mobileMenu.querySelectorAll("a, span, div");
-        mobileLinks.forEach((link) => {
-          if (link && link.classList) {
-            link.classList.remove(
-              "dark:text-white",
-              "text-gray-200",
-              "text-white"
-            );
-
-            // Remove active highlighting from Plans link by default
-            if (
-              elementHasHrefAndIncludes(link, "Plans") ||
-              elementHasHrefAndIncludes(link, "plans")
-            ) {
-              link.classList.remove(
-                "bg-purple-600",
-                "text-white",
-                "rounded-lg"
-              );
-              link.classList.add("text-gray-800", "hover:text-purple-600");
-            }
-
-            // Ensure Profile link is highlighted if we're on profile page
-            if (
-              elementHasHrefAndIncludes(link, "Profile") ||
-              elementHasHrefAndIncludes(link, "profile")
-            ) {
-              link.classList.add("bg-purple-600", "text-white", "rounded-lg");
-              link.classList.remove("text-gray-800", "hover:text-purple-600");
-            } else {
-              // For non-active links, use gray-800 text
-              link.classList.add("text-gray-800");
-            }
-          }
-        });
-      }
-
-      // Fix hamburger icon - make it dark for light background
-      const hamburgerBtn = document.getElementById("mobile-menu-btn");
-      if (hamburgerBtn && hamburgerBtn.classList) {
-        hamburgerBtn.classList.remove("dark:text-white", "text-white");
-        hamburgerBtn.classList.add("text-gray-800");
-      }
-    }
   } catch (error) {
     console.warn("Error in forceLightTheme:", error);
   }
@@ -723,19 +639,14 @@ async function initializeApp() {
     initializePasswordChange();
     initializeProfileEdit();
 
-    // Force light theme and fix mobile menu with error handling
+    // Simple initialization like other pages - no dark mode interference
     setTimeout(() => {
       try {
+        // Just ensure light mode for the page content, let navbar handle its own styling
         forceLightTheme();
-        highlightActiveLink();
-        fixMobileMenuActiveStates();
-        ensureMobileMenuLightTheme();
       } catch (error) {
         console.warn("Error during theme initialization:", error);
       }
-
-      // Re-initialize navbar after theme is forced
-      setTimeout(initializeNavbarWithRetry, 100);
     }, 200);
 
     console.log("Profile application initialized successfully");
