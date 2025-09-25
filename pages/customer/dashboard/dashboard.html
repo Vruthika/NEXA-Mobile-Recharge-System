@@ -1,11 +1,539 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Customer Dashboard</title>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Nexa Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3b82f6",
+              "primary-dark": "#2563eb",
+              secondary: "#8b5cf6",
+              "secondary-dark": "#7c3aed",
+              tertiary: "#a855f7",
+              "background-light": "#f8fafc",
+              "background-dark": "#0f172a",
+              "card-light": "#ffffff",
+              "card-dark": "#1e293b",
+              "text-light": "#0f172a",
+              "text-dark": "#f1f5f9",
+              "subtext-light": "#64748b",
+              "subtext-dark": "#94a3b8",
+              "border-light": "#e2e8f0",
+              "border-dark": "#334155",
+            },
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+            },
+            animation: {
+              "fade-in": "fadeIn 0.5s ease-in-out",
+              "slide-up": "slideUp 0.3s ease-out",
+              "pulse-slow": "pulse 3s infinite",
+              "bounce-subtle": "bounceSubtle 2s infinite",
+            },
+            keyframes: {
+              fadeIn: {
+                "0%": { opacity: "0", transform: "translateY(10px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              },
+              slideUp: {
+                "0%": { opacity: "0", transform: "translateY(20px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              },
+              bounceSubtle: {
+                "0%, 100%": { transform: "translateY(0)" },
+                "50%": { transform: "translateY(-2px)" },
+              },
+            },
+          },
+        },
+      };
+    </script>
   </head>
-  <body>
-    Customer Dashboard
+  <body
+    class="min-h-screen bg-background-light text-text-light transition-colors duration-300"
+  >
+    <!-- Loading Overlay -->
+    <div
+      id="loadingOverlay"
+      class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-40 hidden"
+    >
+      <div class="bg-card-light p-8 rounded-2xl shadow-2xl">
+        <div class="flex items-center space-x-3">
+          <div
+            class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"
+          ></div>
+          <span class="text-lg font-medium">Loading your account...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Usage Alert Modal -->
+    <div
+      id="dataAlertModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+    >
+      <div
+        class="bg-card-light p-8 rounded-2xl shadow-2xl max-w-md w-full mx-4 animate-slide-up"
+      >
+        <div class="text-center">
+          <div
+            class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <span class="material-icons text-red-500 text-2xl">warning</span>
+          </div>
+          <h3 class="text-xl font-bold mb-2 text-red-600">Data Usage Alert</h3>
+          <p class="text-subtext-light mb-6">
+            You have used <span id="alertUsagePercent">90%</span> of your daily
+            data limit!
+          </p>
+          <button
+            onclick="closeDataAlert()"
+            class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-xl transition-colors duration-200"
+          >
+            Got it
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan Details Modal -->
+    <div
+      id="planDetailsModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+    >
+      <div
+        class="bg-card-light p-8 rounded-2xl shadow-2xl max-w-lg w-full mx-4 animate-slide-up"
+      >
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-2xl font-bold">Plan Details</h3>
+          <button
+            onclick="closePlanDetailsModal()"
+            class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+          >
+            <span class="material-icons text-gray-600">close</span>
+          </button>
+        </div>
+        <div id="planDetailsContent">
+          <!-- Plan details will be populated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Usage Details Modal -->
+    <div
+      id="usageDetailsModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+    >
+      <div
+        class="bg-card-light p-8 rounded-2xl shadow-2xl max-w-lg w-full mx-4 animate-slide-up"
+      >
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-2xl font-bold">Usage Details</h3>
+          <button
+            onclick="closeUsageDetailsModal()"
+            class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+          >
+            <span class="material-icons text-gray-600">close</span>
+          </button>
+        </div>
+        <div id="usageDetailsContent">
+          <!-- Usage details will be populated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div id="navbar"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <main class="py-8">
+        <!-- Welcome Section -->
+        <div class="mb-8 animate-fade-in">
+          <h2 class="text-3xl font-bold mb-2">
+            Welcome back, <span id="welcomeName">User</span>! 👋
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Left Column -->
+          <div class="lg:col-span-1 space-y-6">
+            <!-- Primary Account Card -->
+            <div
+              class="bg-card-light p-6 rounded-2xl shadow-lg border border-border-light hover:shadow-xl transition-all duration-300 animate-fade-in"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                  <div
+                    class="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg"
+                  >
+                    <span class="material-icons text-white text-xl"
+                      >phone_android</span
+                    >
+                  </div>
+                  <div>
+                    <p id="phoneNumber" class="font-bold text-lg">9876543210</p>
+                    <p id="customerName" class="text-subtext-light text-sm">
+                      John Doe
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span
+                    class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold animate-pulse-slow"
+                  >
+                    TRUE 5G
+                  </span>
+                  <button
+                    onclick="refreshAccount()"
+                    class="w-8 h-8 rounded-full bg-primary hover:bg-primary-dark flex items-center justify-center transition-colors duration-200 hover:animate-bounce-subtle"
+                  >
+                    <span class="material-icons text-white text-sm"
+                      >refresh</span
+                    >
+                  </button>
+                </div>
+              </div>
+              <div class="text-xs text-subtext-light">
+                <p id="accountType">Prepaid Account</p>
+              </div>
+            </div>
+
+            <!-- Add Friends Section - Commented Out -->
+            <!-- <div
+              class="bg-card-light p-6 rounded-2xl shadow-lg border border-border-light hover:shadow-xl transition-all duration-300 animate-fade-in"
+            >
+              <div class="text-center">
+                <div
+                  class="w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                >
+                  <span
+                    class="material-icons text-purple-600 text-2xl"
+                    >group_add</span
+                  >
+                </div>
+                <h3 class="font-bold text-lg mb-2">Add friends & family</h3>
+                <p
+                  class="text-subtext-light text-sm mb-6 leading-relaxed"
+                >
+                  Link numbers to recharge, pay bills, check data balance and
+                  more
+                </p>
+                <button
+                  onclick="showLinkAccountModal()"
+                  class="w-full bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105"
+                >
+                  Link new account
+                </button>
+              </div>
+            </div> -->
+
+            <!-- Quick Actions -->
+            <div
+              class="bg-card-light p-6 rounded-2xl shadow-lg border border-border-light animate-fade-in"
+            >
+              <h3 class="font-bold text-lg mb-4">Quick Actions</h3>
+              <div class="grid grid-cols-2 gap-3">
+                <button
+                  onclick="showRechargeModal()"
+                  class="p-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors duration-200 text-center"
+                >
+                  <span class="material-icons text-blue-600 text-xl mb-1"
+                    >payment</span
+                  >
+                  <p class="text-xs font-medium">Recharge</p>
+                </button>
+                <button
+                  onclick="showUsageDetailsModal()"
+                  class="p-3 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors duration-200 text-center"
+                >
+                  <span class="material-icons text-purple-600 text-xl mb-1"
+                    >data_usage</span
+                  >
+                  <p class="text-xs font-medium">Usage</p>
+                </button>
+                <button
+                  onclick="showPlanDetailsModal()"
+                  class="p-3 bg-violet-50 hover:bg-violet-100 rounded-xl transition-colors duration-200 text-center"
+                >
+                  <span class="material-icons text-violet-600 text-xl mb-1"
+                    >sim_card</span
+                  >
+                  <p class="text-xs font-medium">Plans</p>
+                </button>
+                <button
+                  onclick="showHistory()"
+                  class="p-3 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors duration-200 text-center"
+                >
+                  <span class="material-icons text-indigo-600 text-xl mb-1"
+                    >history</span
+                  >
+                  <p class="text-xs font-medium">History</p>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div class="lg:col-span-2 space-y-6">
+            <!-- User Profile Card -->
+            <div
+              class="bg-card-light p-6 rounded-2xl shadow-lg border border-border-light hover:shadow-xl transition-all duration-300 animate-fade-in"
+            >
+              <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center space-x-4">
+                  <div
+                    class="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg"
+                  >
+                    <span id="userInitial">J</span>
+                  </div>
+                  <div>
+                    <h2 id="userDisplayName" class="text-2xl font-bold">
+                      John Doe
+                    </h2>
+                    <div class="flex items-center space-x-3 mt-1">
+                      <div class="flex items-center space-x-2">
+                        <span
+                          id="serviceType"
+                          class="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium"
+                        >
+                          Prepaid 5G
+                        </span>
+                      </div>
+                      <span
+                        id="connectionStatus"
+                        class="w-2 h-2 bg-green-500 rounded-full animate-pulse"
+                      ></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p class="text-subtext-light">Phone Number</p>
+                  <p id="fullPhoneNumber" class="font-semibold">9876543210</p>
+                </div>
+                <div>
+                  <p class="text-subtext-light">Account Type</p>
+                  <p id="displayAccountType" class="font-semibold">Prepaid</p>
+                </div>
+                <div>
+                  <p class="text-subtext-light">Plan Status</p>
+                  <p id="planStatus" class="font-semibold text-green-600">
+                    Active
+                  </p>
+                </div>
+                <div>
+                  <p class="text-subtext-light">Last Active</p>
+                  <p id="lastActive" class="font-semibold text-green-600">
+                    Now
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Data Usage Card -->
+            <div
+              class="bg-card-light p-6 rounded-2xl shadow-lg border border-border-light hover:shadow-xl transition-all duration-300 animate-fade-in"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <h3 id="planName" class="text-xl font-bold">Current Plan</h3>
+                <span class="text-subtext-light text-sm" id="currentPlanStatus"
+                  >Loading...</span
+                >
+              </div>
+
+              <div class="mb-6">
+                <div class="flex items-baseline space-x-2 mb-3">
+                  <span
+                    id="remainingData"
+                    class="text-4xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent"
+                    >Loading...</span
+                  >
+                  <span id="totalData" class="text-subtext-light font-medium"
+                    >Loading...</span
+                  >
+                </div>
+
+                <!-- Enhanced Progress Bar -->
+                <div class="relative">
+                  <div
+                    class="w-full bg-gray-200 rounded-full h-3 mb-2 overflow-hidden"
+                  >
+                    <div
+                      id="dataProgressBar"
+                      class="bg-gradient-to-r from-primary to-purple-500 h-3 rounded-full transition-all duration-1000 ease-out shadow-lg"
+                      style="width: 0%"
+                    >
+                      <div
+                        class="w-full h-full bg-white opacity-30 animate-pulse"
+                      ></div>
+                    </div>
+                  </div>
+                  <div class="flex justify-between text-xs text-subtext-light">
+                    <span>Used</span>
+                    <span id="dataPercentage">0%</span>
+                    <span>Available</span>
+                  </div>
+                </div>
+
+                <div class="mt-4 flex items-center justify-between">
+                  <p
+                    id="renewalInfo"
+                    class="text-subtext-light text-sm flex items-center"
+                  >
+                    <span class="material-icons text-sm mr-1">schedule</span>
+                    Calculating...
+                  </p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 mb-4">
+                <button
+                  onclick="showUsageDetailsModal()"
+                  class="bg-background-light hover:bg-gray-100 text-text-light font-semibold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2"
+                >
+                  <span class="material-icons text-lg">analytics</span>
+                  <span>Check Usage</span>
+                </button>
+                <button
+                  onclick="addDataBooster()"
+                  class="bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 transform hover:scale-105"
+                >
+                  <span class="material-icons text-lg">add</span>
+                  <span>Add Data</span>
+                </button>
+              </div>
+
+              <p class="text-xs text-subtext-light text-center">
+                <span class="material-icons text-xs mr-1">info</span>
+                Balance updates within 60 minutes of usage
+              </p>
+            </div>
+
+            <!-- Plan Details Card -->
+            <div
+              class="bg-card-light p-6 rounded-2xl shadow-lg border border-border-light hover:shadow-xl transition-all duration-300 animate-fade-in"
+            >
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold">Active Plan</h3>
+                <button
+                  onclick="browsePlans()"
+                  class="text-primary hover:text-primary-dark text-sm font-medium"
+                >
+                  Browse Plans
+                </button>
+              </div>
+
+              <div id="activePlanContent">
+                <!-- Active plan content will be populated here -->
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 mt-6">
+                <button
+                  onclick="showPlanDetailsModal()"
+                  class="bg-background-light hover:bg-gray-100 text-text-light font-semibold py-3 px-4 rounded-xl transition-all duration-200"
+                >
+                  View Details
+                </button>
+                <button
+                  onclick="rechargePlan()"
+                  class="bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105"
+                >
+                  Recharge Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support Section -->
+        <section class="mt-16 text-center animate-fade-in">
+          <h2 class="text-3xl font-bold mb-4">Need Help?</h2>
+          <p class="text-subtext-light mb-8">
+            Our support team is here to assist you 24/7
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div
+              class="bg-card-light p-8 rounded-2xl shadow-lg border border-border-light cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+            >
+              <div
+                class="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              >
+                <span class="material-icons text-blue-600 text-3xl">call</span>
+              </div>
+              <h3 class="font-bold text-lg mb-2">Call Support</h3>
+              <p class="text-subtext-light text-sm mb-3">
+                Speak with our experts
+              </p>
+              <p class="text-primary font-semibold">9998887766</p>
+            </div>
+
+            <div
+              onclick="startLiveChat()"
+              class="bg-card-light p-8 rounded-2xl shadow-lg border border-border-light cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+            >
+              <div
+                class="w-20 h-20 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              >
+                <span class="material-icons text-purple-600 text-3xl"
+                  >chat</span
+                >
+              </div>
+              <h3 class="font-bold text-lg mb-2">Live Chat</h3>
+              <p class="text-subtext-light text-sm mb-3">
+                Get instant responses
+              </p>
+              <span
+                class="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium"
+              >
+                <span
+                  class="w-2 h-2 bg-green-500 rounded-full inline-block mr-1 animate-pulse"
+                ></span>
+                Online Now
+              </span>
+            </div>
+
+            <div
+              onclick="emailSupport()"
+              class="bg-card-light p-8 rounded-2xl shadow-lg border border-border-light cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+            >
+              <div
+                class="w-20 h-20 bg-gradient-to-br from-violet-100 to-violet-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              >
+                <span class="material-icons text-violet-600 text-3xl"
+                  >email</span
+                >
+              </div>
+              <h3 class="font-bold text-lg mb-2">Email Support</h3>
+              <p class="text-subtext-light text-sm mb-3">Detailed assistance</p>
+              <p class="text-primary font-semibold text-sm">support@nexa.com</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="fixed top-20 right-4 z-50 space-y-2"></div>
+
+    <!-- Footer -->
+    <div id="footer"></div>
+    <script src="./dashboard.js"></script>
+    <script src="/components/navbar.js"></script>
   </body>
 </html>
