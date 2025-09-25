@@ -45,11 +45,11 @@
         flex: 0 0 100%;
         transition: transform 0.5s ease-in-out;
       }
-      
+
       .carousel-item:hover {
         transform: translateY(-5px);
       }
-      
+
       @media (min-width: 768px) {
         .carousel-item {
           flex: 0 0 50%;
@@ -87,12 +87,14 @@
         border-radius: 0.5rem;
         overflow: hidden;
         height: 300px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
         transition: all 0.3s ease;
       }
-      
+
       .image-carousel-item:hover {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05);
       }
 
       .image-carousel-item img {
@@ -101,7 +103,7 @@
         object-fit: cover;
         transition: transform 0.5s ease;
       }
-      
+
       .image-carousel-item:hover img {
         transform: scale(1.05);
       }
@@ -112,7 +114,11 @@
         left: 0;
         right: 0;
         padding: 1.5rem;
-        background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.7) 0%,
+          rgba(0, 0, 0, 0) 100%
+        );
         color: white;
         z-index: 2;
       }
@@ -140,14 +146,15 @@
         transition: all 0.3s ease;
         border-radius: 0.75rem;
         overflow: hidden;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
+          0 1px 2px 0 rgba(0, 0, 0, 0.06);
         margin-bottom: 1rem;
         background: linear-gradient(145deg, #ffffff, #f0f0f0);
-        border-left: 4px solid #4F46E5;
+        border-left: 4px solid #4f46e5;
       }
-      
+
       .dark .faq-item {
-        background: linear-gradient(145deg, #1F2937, #111827);
+        background: linear-gradient(145deg, #1f2937, #111827);
         border-left: 4px solid #7c3aed;
       }
 
@@ -159,11 +166,11 @@
         align-items: center;
         padding: 1.5rem;
       }
-      
+
       .faq-question:hover {
         background-color: rgba(79, 70, 229, 0.05);
       }
-      
+
       .dark .faq-question:hover {
         background-color: rgba(124, 58, 237, 0.1);
       }
@@ -182,9 +189,9 @@
 
       .faq-item.active .material-icons {
         transform: rotate(180deg);
-        color: #4F46E5;
+        color: #4f46e5;
       }
-      
+
       .dark .faq-item.active .material-icons {
         color: #7c3aed;
       }
@@ -194,14 +201,14 @@
         font-size: 1.1rem;
         flex: 1;
       }
-      
+
       .faq-question .material-icons {
         transition: all 0.3s ease;
-        color: #6B7280;
+        color: #6b7280;
       }
-      
+
       .dark .faq-question .material-icons {
-        color: #9CA3AF;
+        color: #9ca3af;
       }
 
       /* FAQ image styling */
@@ -220,17 +227,17 @@
         object-fit: cover;
         border-radius: 0.5rem;
       }
-      
+
       /* Hide scrollbar for carousel */
       #carousel {
         scrollbar-width: none;
         -ms-overflow-style: none;
       }
-      
+
       #carousel::-webkit-scrollbar {
         display: none;
       }
-      
+
       /* Plan button styling */
       .plan-button {
         position: absolute;
@@ -245,13 +252,13 @@
         transition: all 0.3s ease;
         z-index: 3;
       }
-      
+
       .plan-button:hover {
         background: white;
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
-      
+
       /* Carousel navigation buttons */
       .carousel-nav {
         position: absolute;
@@ -270,36 +277,66 @@
         transition: all 0.3s ease;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
       }
-      
+
       .carousel-nav:hover {
         background: white;
         transform: translateY(-50%) scale(1.1);
       }
-      
+
       .carousel-nav.prev {
         left: 10px;
       }
-      
+
       .carousel-nav.next {
         right: 10px;
       }
-      
+
       .carousel-nav:disabled {
         opacity: 0.5;
         cursor: not-allowed;
       }
-      
+
       .carousel-nav:disabled:hover {
         transform: translateY(-50%);
         background: rgba(255, 255, 255, 0.8);
       }
-      
+
       /* Toast container */
       #toastContainer {
         position: fixed;
         top: 100px;
         right: 20px;
         z-index: 1000;
+      }
+
+      /* Mobile menu styles */
+      #mobile-menu {
+        transition: all 0.3s ease-in-out;
+      }
+
+      #mobile-menu.hidden {
+        opacity: 0;
+        transform: translateY(-10px);
+        visibility: hidden;
+      }
+
+      #mobile-menu:not(.hidden) {
+        opacity: 1;
+        transform: translateY(0);
+        visibility: visible;
+      }
+
+      /* Hamburger animation */
+      .hamburger-line-1.active {
+        transform: rotate(45deg) translate(5px, 5px);
+      }
+
+      .hamburger-line-2.active {
+        opacity: 0;
+      }
+
+      .hamburger-line-3.active {
+        transform: rotate(-45deg) translate(7px, -6px);
       }
     </style>
   </head>
@@ -312,83 +349,193 @@
 
       <!-- Navbar -->
       <nav
-  class="w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 border-b border-border-light dark:border-border-dark"
->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between items-center py-4">
-      <!-- Logo + Name wrapper (Left side) -->
-      <div class="flex items-center space-x-3">
-        <img
-          src="/assets/images/logo.png"
-          alt="NEXA"
-          class="h-12 w-12 sm:h-16 sm:w-16 rounded-full border border-purple-500"
-        />
-        <div
-          class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
-        >
-          NEXA
-        </div>
-      </div>
+        class="w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 border-b border-border-light dark:border-border-dark"
+      >
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center py-4">
+            <!-- Logo + Name wrapper (Left side) -->
+            <div class="flex items-center space-x-3">
+              <img
+                src="/assets/images/logo.png"
+                alt="NEXA"
+                class="h-12 w-12 sm:h-16 sm:w-16 rounded-full border border-purple-500"
+              />
+              <div
+                class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+              >
+                NEXA
+              </div>
+            </div>
 
-      <!-- Desktop Navigation -->
-      <div class="hidden lg:flex items-center space-x-8">
-        <!-- Search -->
-        <div class="relative">
-          <input
-            id="search-input"
-            class="w-80 bg-gray-100 dark:bg-gray-700 border-none rounded-full pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-gray-600 transition-all text-sm"
-            placeholder="Search plans..."
-            type="text"
-          />
-          <span
-            class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
-            >search</span
+            <!-- Desktop Navigation -->
+            <div class="hidden lg:flex items-center space-x-8">
+              <!-- Search -->
+              <div class="relative">
+                <input
+                  id="search-input"
+                  class="w-80 bg-gray-100 dark:bg-gray-700 border-none rounded-full pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-gray-600 transition-all text-sm"
+                  placeholder="Search plans..."
+                  type="text"
+                />
+                <span
+                  class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
+                  >search</span
+                >
+              </div>
+
+              <!-- Navigation Links -->
+              <div class="flex items-center space-x-6">
+                <a
+                  class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
+                  href="/pages/customer/dashboard/dashboard.html"
+                  >Home
+                  <span
+                    class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
+                  ></span>
+                </a>
+                <a
+                  class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
+                  href="/pages/customer/plans/plans.html"
+                  >Plans<span
+                    class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
+                  ></span>
+                </a>
+                <a
+                  class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
+                  href="/pages/customer/landing/landing.html#faq"
+                  >FAQ
+                  <span
+                    class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
+                  ></span>
+                </a>
+                <a
+                  class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
+                  href="/pages/customer/profile/profile.html"
+                  >My Account
+                  <span
+                    class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
+                  ></span>
+                </a>
+
+                <button
+                  id="login-btn"
+                  class="px-5 py-2 rounded-md bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-medium hover:shadow-lg transition-all"
+                  onclick="window.location.href='/pages/auth/login/login.html'"
+                >
+                  Login
+                </button>
+              </div>
+            </div>
+
+            <!-- Mobile Hamburger Menu -->
+            <div class="lg:hidden flex items-center">
+              <button
+                id="mobile-menu-btn"
+                class="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 flex flex-col items-center justify-center space-y-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+              >
+                <span
+                  class="w-5 h-0.5 bg-gray-600 dark:bg-gray-300 transition-all duration-300 hamburger-line-1"
+                ></span>
+                <span
+                  class="w-5 h-0.5 bg-gray-600 dark:bg-gray-300 transition-all duration-300 hamburger-line-2"
+                ></span>
+                <span
+                  class="w-5 h-0.5 bg-gray-600 dark:bg-gray-300 transition-all duration-300 hamburger-line-3"
+                ></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Mobile Dropdown Menu -->
+          <div
+            id="mobile-menu"
+            class="lg:hidden hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-border-light dark:border-border-dark shadow-lg"
           >
-        </div>
+            <div class="px-4 py-6 space-y-4">
+              <!-- Mobile Search -->
+              <div class="relative">
+                <input
+                  id="mobile-search-input"
+                  class="w-full bg-gray-100 dark:bg-gray-700 border-none rounded-full pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-gray-600 transition-all text-sm"
+                  placeholder="Search plans..."
+                  type="text"
+                />
+                <span
+                  class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
+                  >search</span
+                >
+              </div>
 
-        <!-- Navigation Links -->
-        <div class="flex items-center space-x-6">
-          <a
-            class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
-            href="/pages/customer/dashboard/dashboard.html"
-            >Home
-            <span
-              class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
-            ></span>
-          </a>
-          <a
-            class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
-            href="/pages/customer/plans/plans.html"
-            >Plans<span
-              class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
-            ></span>
-          </a>
-          <a
-            class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
-            href="/pages/customer/landing/landing.html#faq"
-            >FAQ
-            <span
-              class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
-            ></span>
-          </a>
-          <a
-            class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
-            href="/pages/customer/profile/profile.html"
-            >My Account
-            <span
-              class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
-            ></span>
-          </a>
+              <!-- Mobile Navigation Links -->
+              <div class="space-y-2">
+                <a
+                  href="/pages/customer/dashboard/dashboard.html"
+                  class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+                >
+                  <span
+                    class="material-icons text-gray-500 group-hover:text-primary transition-colors"
+                    >home</span
+                  >
+                  <span
+                    class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
+                    >Home</span
+                  >
+                </a>
 
-          <button
-            id="login-btn"
-            class="px-5 py-2 rounded-md bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-medium hover:shadow-lg transition-all"
-            onclick="window.location.href='/pages/auth/login/login.html'"
-          >
-            Login
-          </button>
+                <a
+                  href="/pages/customer/plans/plans.html"
+                  class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+                >
+                  <span
+                    class="material-icons text-gray-500 group-hover:text-primary transition-colors"
+                    >card_giftcard</span
+                  >
+                  <span
+                    class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
+                    >Plans</span
+                  >
+                </a>
+
+                <a
+                  href="/pages/customer/landing/landing.html#faq"
+                  class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+                >
+                  <span
+                    class="material-icons text-gray-500 group-hover:text-primary transition-colors"
+                    >help</span
+                  >
+                  <span
+                    class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
+                    >FAQ</span
+                  >
+                </a>
+
+                <a
+                  href="/pages/customer/profile/profile.html"
+                  class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+                >
+                  <span
+                    class="material-icons text-gray-500 group-hover:text-primary transition-colors"
+                    >person</span
+                  >
+                  <span
+                    class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
+                    >My Account</span
+                  >
+                </a>
+
+                <button
+                  id="mobile-login-btn"
+                  class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-medium w-full text-left"
+                  onclick="window.location.href='/pages/auth/login/login.html'"
+                >
+                  <span class="material-icons">login</span>
+                  <span>Login</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
       </nav>
 
       <!-- Banner Section -->
@@ -439,14 +586,18 @@
               <div class="image-carousel-item">
                 <div class="plan-text-overlay">
                   <div class="plan-title">2 GB/Day Plan</div>
-                  <div class="plan-details">Daily high-speed data with unlimited calls</div>
+                  <div class="plan-details">
+                    Daily high-speed data with unlimited calls
+                  </div>
                   <div class="plan-price">Starts @ ₹299/month</div>
                 </div>
                 <img
                   src="https://www.informalnewz.com/wp-content/uploads/2024/12/3300GB-data-plan.jpg"
                   alt="2 GB/Day Plan"
                 />
-                <a href="/pages/customer/plans/plans.html" class="plan-button">GET NOW ></a>
+                <a href="/pages/customer/plans/plans.html" class="plan-button"
+                  >GET NOW ></a
+                >
               </div>
             </div>
 
@@ -462,7 +613,9 @@
                   src="https://images.unsplash.com/photo-1556656793-08538906a9f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
                   alt="2.5 GB/Day Plan"
                 />
-                <a href="/pages/customer/plans/plans.html" class="plan-button">GET NOW ></a>
+                <a href="/pages/customer/plans/plans.html" class="plan-button"
+                  >GET NOW ></a
+                >
               </div>
             </div>
 
@@ -478,7 +631,9 @@
                   src="https://www.informalnewz.com/wp-content/webp-express/webp-images/uploads/2023/09/Jio-brings-amazing-offer-2.jpg.webp"
                   alt="3 GB/Day Plan"
                 />
-                <a href="/pages/customer/plans/plans.html" class="plan-button">GET NOW ></a>
+                <a href="/pages/customer/plans/plans.html" class="plan-button"
+                  >GET NOW ></a
+                >
               </div>
             </div>
 
@@ -487,14 +642,18 @@
               <div class="image-carousel-item">
                 <div class="plan-text-overlay">
                   <div class="plan-title">Annual Plans</div>
-                  <div class="plan-details">Save big with yearly subscription</div>
+                  <div class="plan-details">
+                    Save big with yearly subscription
+                  </div>
                   <div class="plan-price">From ₹2599/year</div>
                 </div>
                 <img
                   src="https://cloudinary.hbs.edu/hbsit/image/upload/s--gDL4YzuO--/f_auto,c_fill,h_375,w_750,/v20200101/4698FDC0B92A17E34F0155D15C423FEC.jpg"
                   alt="Annual Plans"
                 />
-                <a href="/pages/customer/plans/plans.html" class="plan-button">GET NOW ></a>
+                <a href="/pages/customer/plans/plans.html" class="plan-button"
+                  >GET NOW ></a
+                >
               </div>
             </div>
 
@@ -503,14 +662,18 @@
               <div class="image-carousel-item">
                 <div class="plan-text-overlay">
                   <div class="plan-title">True Unlimited 5G</div>
-                  <div class="plan-details">Next-gen connectivity without limits</div>
+                  <div class="plan-details">
+                    Next-gen connectivity without limits
+                  </div>
                   <div class="plan-price">Starts @ ₹799/month</div>
                 </div>
                 <img
                   src="https://myjiostatic.cdn.jio.com/cms/assets/true5g/true-5g-mobile.webp"
                   alt="True Unlimited 5G Plan"
                 />
-                <a href="/pages/customer/plans/plans.html" class="plan-button">GET NOW ></a>
+                <a href="/pages/customer/plans/plans.html" class="plan-button"
+                  >GET NOW ></a
+                >
               </div>
             </div>
 
@@ -526,7 +689,11 @@
                   src="https://bharatnet.in/wp-content/uploads/2025/02/Cheapest-Postpaid-Plans-of-Airtel-Jio-and-Vodafone-Idea.jpg"
                   alt="Individual Plans"
                 />
-                <a href="/pages/customer/plans/plans.html?type=postpaid" class="plan-button">GET NOW ></a>
+                <a
+                  href="/pages/customer/plans/plans.html?type=postpaid"
+                  class="plan-button"
+                  >GET NOW ></a
+                >
               </div>
             </div>
 
@@ -542,7 +709,11 @@
                   src="https://www.myvi.in/content/dam/vodafoneideadigital/StaticPages/consumerimages/blog/family-plans/family-plans-mobile.webp"
                   alt="Family Pack"
                 />
-                <a href="/pages/customer/plans/plans.html?type=postpaid" class="plan-button">GET NOW ></a>
+                <a
+                  href="/pages/customer/plans/plans.html?type=postpaid"
+                  class="plan-button"
+                  >GET NOW ></a
+                >
               </div>
             </div>
 
@@ -551,14 +722,20 @@
               <div class="image-carousel-item">
                 <div class="plan-text-overlay">
                   <div class="plan-title">JioHotstar Plans</div>
-                  <div class="plan-details">Data + Hotstar Premium included</div>
+                  <div class="plan-details">
+                    Data + Hotstar Premium included
+                  </div>
                   <div class="plan-price">Starts @ ₹799/month</div>
                 </div>
                 <img
                   src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh-Oshq9HvmCEeWL9dsqceRihCgvLA-UgNJiAWyQ7mRUefN0GeG5HeZXeiWNIkAbEZ_Ky6MjTzlIKmUHAX5cOeWvF34ZAD9gCLF0N7YWCoiRGaqbCdY_NPGBzIZG_mVSsMF0qMNK35a-3TqxeAYUACIv_liy9Hr9J3ReuPtxrFkf4qbb-nLPc62O4XBZeBn/s1792/DALL%C2%B7E%202025-03-13%2019.15.47%20-%20A%20vibrant%20digital%20illustration%20showcasing%20JioHotstar,%20the%20newly%20merged%20streaming%20platform%20in%20India.%20The%20image%20features%20a%20sleek%20smart%20TV%20screen%20display.webp"
                   alt="JioHotstar Plans"
                 />
-                <a href="/pages/customer/plans/plans.html?type=postpaid" class="plan-button">GET NOW ></a>
+                <a
+                  href="/pages/customer/plans/plans.html?type=postpaid"
+                  class="plan-button"
+                  >GET NOW ></a
+                >
               </div>
             </div>
 
@@ -567,14 +744,20 @@
               <div class="image-carousel-item">
                 <div class="plan-text-overlay">
                   <div class="plan-title">Netflix Plans</div>
-                  <div class="plan-details">Data + Netflix subscription included</div>
+                  <div class="plan-details">
+                    Data + Netflix subscription included
+                  </div>
                   <div class="plan-price">Starts @ ₹1099/month</div>
                 </div>
                 <img
                   src="https://cdn.mos.cms.futurecdn.net/rqzeqosQ6SVMZELTBuAaDk.jpg"
                   alt="Netflix Plans"
                 />
-                <a href="/pages/customer/plans/plans.html?type=postpaid" class="plan-button">GET NOW ></a>
+                <a
+                  href="/pages/customer/plans/plans.html?type=postpaid"
+                  class="plan-button"
+                  >GET NOW ></a
+                >
               </div>
             </div>
           </div>
@@ -688,66 +871,68 @@
       </section>
 
       <!-- Support Section -->
-        <section class="mt-16 text-center">
-          <h2 class="text-3xl font-bold mb-4">Need Help?</h2>
-          <p class="text-muted-light dark:text-muted-dark mb-8">
-            Our support team is here to assist you 24/7
-          </p>
+      <section class="mt-16 text-center">
+        <h2 class="text-3xl font-bold mb-4">Need Help?</h2>
+        <p class="text-muted-light dark:text-muted-dark mb-8">
+          Our support team is here to assist you 24/7
+        </p>
 
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div
+            class="bg-card-light dark:bg-card-dark p-8 rounded-2xl shadow-lg border border-border-light dark:border-border-dark cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+          >
             <div
-              class="bg-card-light dark:bg-card-dark p-8 rounded-2xl shadow-lg border border-border-light dark:border-border-dark cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+              class="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
             >
-              <div
-                class="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
-              >
-                <span class="material-icons text-blue-600 text-3xl">call</span>
-              </div>
-              <h3 class="font-bold text-lg mb-2">Call Support</h3>
-              <p class="text-muted-light dark:text-muted-dark text-sm mb-3">
-                Speak with our experts
-              </p>
-              <p class="text-primary font-semibold">9998887766</p>
+              <span class="material-icons text-blue-600 text-3xl">call</span>
             </div>
-
-            <div
-              onclick="startLiveChat()"
-              class="bg-card-light dark:bg-card-dark p-8 rounded-2xl shadow-lg border border-border-light dark:border-border-dark cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
-            >
-              <div
-                class="w-20 h-20 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
-              >
-                <span class="material-icons text-purple-600 text-3xl">chat</span>
-              </div>
-              <h3 class="font-bold text-lg mb-2">Live Chat</h3>
-              <p class="text-muted-light dark:text-muted-dark text-sm mb-3">
-                Get instant responses
-              </p>
-              <span
-                class="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium"
-              >
-                <span
-                  class="w-2 h-2 bg-green-500 rounded-full inline-block mr-1 animate-pulse"
-                ></span>
-                Online Now
-              </span>
-            </div>
-
-            <div
-              onclick="emailSupport()"
-              class="bg-card-light dark:bg-card-dark p-8 rounded-2xl shadow-lg border border-border-light dark:border-border-dark cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
-            >
-              <div
-                class="w-20 h-20 bg-gradient-to-br from-violet-100 to-violet-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
-              >
-                <span class="material-icons text-violet-600 text-3xl">email</span>
-              </div>
-              <h3 class="font-bold text-lg mb-2">Email Support</h3>
-              <p class="text-muted-light dark:text-muted-dark text-sm mb-3">Detailed assistance</p>
-              <p class="text-primary font-semibold text-sm">support@nexa.com</p>
-            </div>
+            <h3 class="font-bold text-lg mb-2">Call Support</h3>
+            <p class="text-muted-light dark:text-muted-dark text-sm mb-3">
+              Speak with our experts
+            </p>
+            <p class="text-primary font-semibold">9998887766</p>
           </div>
-        </section>
+
+          <div
+            onclick="startLiveChat()"
+            class="bg-card-light dark:bg-card-dark p-8 rounded-2xl shadow-lg border border-border-light dark:border-border-dark cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+          >
+            <div
+              class="w-20 h-20 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
+            >
+              <span class="material-icons text-purple-600 text-3xl">chat</span>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Live Chat</h3>
+            <p class="text-muted-light dark:text-muted-dark text-sm mb-3">
+              Get instant responses
+            </p>
+            <span
+              class="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium"
+            >
+              <span
+                class="w-2 h-2 bg-green-500 rounded-full inline-block mr-1 animate-pulse"
+              ></span>
+              Online Now
+            </span>
+          </div>
+
+          <div
+            onclick="emailSupport()"
+            class="bg-card-light dark:bg-card-dark p-8 rounded-2xl shadow-lg border border-border-light dark:border-border-dark cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+          >
+            <div
+              class="w-20 h-20 bg-gradient-to-br from-violet-100 to-violet-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
+            >
+              <span class="material-icons text-violet-600 text-3xl">email</span>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Email Support</h3>
+            <p class="text-muted-light dark:text-muted-dark text-sm mb-3">
+              Detailed assistance
+            </p>
+            <p class="text-primary font-semibold text-sm">support@nexa.com</p>
+          </div>
+        </div>
+      </section>
     </div>
 
     <!-- Footer -->
@@ -861,7 +1046,9 @@
                   class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
                   href="/pages/customer/plans/plans.html?type=postpaid"
                 >
-                  <span class="hidden sm:inline">Postpaid Individual Plans</span>
+                  <span class="hidden sm:inline"
+                    >Postpaid Individual Plans</span
+                  >
                   <span class="sm:hidden">Individual Plans</span>
                 </a>
               </li>
@@ -914,7 +1101,6 @@
         </div>
       </div>
     </footer>
-
     <script src="./landing.js"></script>
   </body>
 </html>

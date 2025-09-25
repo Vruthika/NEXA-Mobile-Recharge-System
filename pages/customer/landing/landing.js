@@ -1,7 +1,58 @@
-function startLiveChat() {
-  showToast("Live chat feature coming soon!", "info");
+// Mobile menu functionality
+const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+const mobileMenu = document.getElementById("mobile-menu");
+const hamburgerLines = document.querySelectorAll(
+  ".hamburger-line-1, .hamburger-line-2, .hamburger-line-3"
+);
+
+function toggleMobileMenu() {
+  const isHidden = mobileMenu.classList.contains("hidden");
+
+  if (isHidden) {
+    // Show menu
+    mobileMenu.classList.remove("hidden");
+    // Animate hamburger to X
+    hamburgerLines[0].classList.add("active");
+    hamburgerLines[1].classList.add("active");
+    hamburgerLines[2].classList.add("active");
+  } else {
+    // Hide menu
+    mobileMenu.classList.add("hidden");
+    // Animate X back to hamburger
+    hamburgerLines[0].classList.remove("active");
+    hamburgerLines[1].classList.remove("active");
+    hamburgerLines[2].classList.remove("active");
+  }
 }
 
+mobileMenuBtn.addEventListener("click", toggleMobileMenu);
+
+// Close mobile menu when clicking outside
+document.addEventListener("click", (e) => {
+  if (
+    !mobileMenuBtn.contains(e.target) &&
+    !mobileMenu.contains(e.target) &&
+    !mobileMenu.classList.contains("hidden")
+  ) {
+    toggleMobileMenu();
+  }
+});
+
+// Close mobile menu on escape key
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !mobileMenu.classList.contains("hidden")) {
+    toggleMobileMenu();
+  }
+});
+
+// Close mobile menu when screen size changes to desktop
+window.addEventListener("resize", () => {
+  if (window.innerWidth >= 1024 && !mobileMenu.classList.contains("hidden")) {
+    toggleMobileMenu();
+  }
+});
+
+// Toast notification function
 function showToast(message, type = "info") {
   const toast = document.createElement("div");
   const bgColor =
@@ -25,6 +76,10 @@ function showToast(message, type = "info") {
       setTimeout(() => toast.remove(), 300);
     }, 3000);
   }
+}
+
+function startLiveChat() {
+  showToast("Live chat feature coming soon!", "info");
 }
 
 function emailSupport() {
