@@ -1,26 +1,75 @@
-// Get logged in customer phone from localStorage
-const loggedInPhone = localStorage.getItem("loggedInPhone");
+// Global variables
+let loggedInUser = null;
 let currentCustomer = null;
 
-document.addEventListener("DOMContentLoaded", function () {
-  // Check if customer is logged in
-  if (!loggedInPhone) {
-    showToast("Please log in to view your profile", "error");
-    setTimeout(() => {
-      window.location.href = "/pages/auth/login/login.html";
-    }, 2000);
-    return;
+// Toast notification function
+function showToast(message, type = "success") {
+  const container = document.getElementById("toast-container");
+  const toast = document.createElement("div");
+
+  let icon, borderColor, bgColor, textColor;
+
+  if (type === "success") {
+    icon = `
+      <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+    `;
+    borderColor = "border-green-200";
+    bgColor = "bg-green-50";
+    textColor = "text-green-800";
+  } else if (type === "error") {
+    icon = `
+      <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+      </svg>
+    `;
+    borderColor = "border-red-200";
+    bgColor = "bg-red-50";
+    textColor = "text-red-800";
   }
 
-  // Load customer data
-  loadCustomerData();
-  loadSavedProfileImage();
+  toast.className = `toast flex items-center gap-3 px-6 py-4 rounded-xl shadow-lg ${bgColor} ${borderColor} ${textColor} border min-w-[350px] backdrop-blur-lg`;
+  toast.innerHTML = `
+    <div class="flex-shrink-0">${icon}</div>
+    <span class="font-medium flex-1">${message}</span>
+    <button class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors" onclick="this.parentElement.remove()">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  `;
 
-  // Initialize components
-  initializeProfileImageUpload();
-  initializePasswordChange();
-  initializeProfileEdit();
-});
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    if (toast.parentElement) {
+      toast.classList.add("hide");
+      setTimeout(() => {
+        if (toast.parentElement) {
+          toast.remove();
+        }
+      }, 400);
+    }
+  }, 5000);
+}
+
+function showLoadingState(isLoading) {
+  const inputs = ["customerName", "customerPhone", "customerPlan"];
+  inputs.forEach((id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      if (isLoading) {
+        element.classList.add("loading-skeleton");
+        element.value = "";
+        element.placeholder = "Loading...";
+      } else {
+        element.classList.remove("loading-skeleton");
+        element.placeholder = "";
+      }
+    }
+  });
+}
 
 // Load customer data from API
 async function loadCustomerData() {
@@ -32,9 +81,10 @@ async function loadCustomerData() {
     );
     const customers = await response.json();
 
-    // Find the logged in customer
+    // Find the logged in customer using the phone from loggedInUser
+    const userPhone = loggedInUser ? loggedInUser.phone : null;
     currentCustomer = customers.find(
-      (customer) => customer.phone === loggedInPhone
+      (customer) => customer.phone === userPhone
     );
 
     if (!currentCustomer) {
@@ -50,12 +100,13 @@ async function loadCustomerData() {
 
     // Update status badge
     const statusBadge = document.getElementById("statusBadge");
-
-    statusBadge.textContent = currentCustomer.status;
-    statusBadge.className =
-      currentCustomer.status === "Active"
-        ? "px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full"
-        : "px-3 py-1 bg-red-100 text-red-800 text-sm font-medium rounded-full";
+    if (statusBadge) {
+      statusBadge.textContent = currentCustomer.status;
+      statusBadge.className =
+        currentCustomer.status === "Active"
+          ? "px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full"
+          : "px-3 py-1 bg-red-100 text-red-800 text-sm font-medium rounded-full";
+    }
 
     showLoadingState(false);
   } catch (error) {
@@ -65,39 +116,86 @@ async function loadCustomerData() {
   }
 }
 
-function showLoadingState(isLoading) {
-  const inputs = ["customerName", "customerPhone", "customerPlan"];
-  inputs.forEach((id) => {
-    const element = document.getElementById(id);
-    if (isLoading) {
-      element.classList.add("loading-skeleton");
-      element.value = "";
-      element.placeholder = "Loading...";
-    } else {
-      element.classList.remove("loading-skeleton");
-      element.placeholder = "";
-    }
-  });
+// Profile image functions
+function handleImageUpload(file) {
+  if (!file.type.startsWith("image/")) {
+    showToast("Please select a valid image file", "error");
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    showToast("Image size should be less than 5MB", "error");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const imageData = e.target.result;
+    window.profileImageData = imageData;
+    displayProfileImage(imageData);
+    showToast("Profile picture updated successfully!", "success");
+  };
+  reader.readAsDataURL(file);
+}
+
+function displayProfileImage(imageData) {
+  const profileImage = document.getElementById("profileImage");
+  const defaultAvatar = document.getElementById("defaultAvatar");
+  const removeBtn = document.getElementById("removeBtn");
+
+  if (profileImage && defaultAvatar && removeBtn) {
+    profileImage.src = imageData;
+    profileImage.classList.remove("hidden");
+    defaultAvatar.style.display = "none";
+    removeBtn.classList.remove("hidden");
+  }
+}
+
+function removeProfileImage() {
+  const profileImage = document.getElementById("profileImage");
+  const defaultAvatar = document.getElementById("defaultAvatar");
+  const removeBtn = document.getElementById("removeBtn");
+
+  if (profileImage && defaultAvatar && removeBtn) {
+    profileImage.classList.add("hidden");
+    profileImage.src = "";
+    defaultAvatar.style.display = "flex";
+    removeBtn.classList.add("hidden");
+    window.profileImageData = null;
+    showToast("Profile picture removed", "success");
+  }
+}
+
+function loadSavedProfileImage() {
+  if (window.profileImageData) {
+    displayProfileImage(window.profileImageData);
+  }
 }
 
 function initializeProfileImageUpload() {
-  const profileImage = document.getElementById("profileImage");
-  const defaultAvatar = document.getElementById("defaultAvatar");
   const profileImageInput = document.getElementById("profileImageInput");
   const uploadBtn = document.getElementById("uploadBtn");
+  const defaultAvatar = document.getElementById("defaultAvatar");
   const removeBtn = document.getElementById("removeBtn");
-  const uploadOverlay = document.getElementById("uploadOverlay");
 
-  uploadBtn.addEventListener("click", () => profileImageInput.click());
-  defaultAvatar.addEventListener("click", () => profileImageInput.click());
-  uploadOverlay.addEventListener("click", () => profileImageInput.click());
+  if (uploadBtn && profileImageInput) {
+    uploadBtn.addEventListener("click", () => profileImageInput.click());
+  }
 
-  profileImageInput.addEventListener("change", function (e) {
-    const file = e.target.files[0];
-    if (file) handleImageUpload(file);
-  });
+  if (defaultAvatar && profileImageInput) {
+    defaultAvatar.addEventListener("click", () => profileImageInput.click());
+  }
 
-  removeBtn.addEventListener("click", removeProfileImage);
+  if (profileImageInput) {
+    profileImageInput.addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (file) handleImageUpload(file);
+    });
+  }
+
+  if (removeBtn) {
+    removeBtn.addEventListener("click", removeProfileImage);
+  }
 }
 
 function initializePasswordChange() {
@@ -105,6 +203,15 @@ function initializePasswordChange() {
   const oldPasswordInput = document.getElementById("oldPassword");
   const newPasswordInput = document.getElementById("newPassword");
   const confirmPasswordInput = document.getElementById("confirmPassword");
+
+  if (
+    !saveBtn ||
+    !oldPasswordInput ||
+    !newPasswordInput ||
+    !confirmPasswordInput
+  ) {
+    return;
+  }
 
   saveBtn.addEventListener("click", function () {
     if (!oldPasswordInput.value) {
@@ -141,12 +248,12 @@ function initializePasswordChange() {
     // Show loading state
     saveBtn.disabled = true;
     saveBtn.innerHTML = `
-            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Updating Password...
-          `;
+      <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Updating Password...
+    `;
 
     // Simulate API call to update password
     setTimeout(() => {
@@ -162,9 +269,13 @@ function initializePasswordChange() {
 
 function initializeProfileEdit() {
   const editProfileBtn = document.getElementById("editProfileBtn");
+  const nameInput = document.getElementById("customerName");
+
+  if (!editProfileBtn || !nameInput) {
+    return;
+  }
 
   editProfileBtn.addEventListener("click", function () {
-    const nameInput = document.getElementById("customerName");
     const isEditing = !nameInput.disabled;
 
     if (isEditing) {
@@ -178,7 +289,6 @@ function initializeProfileEdit() {
 
       // Update current customer object
       currentCustomer.name = nameInput.value;
-
       showToast("Profile updated successfully!", "success");
     } else {
       // Enable editing only for name field
@@ -193,220 +303,451 @@ function initializeProfileEdit() {
   });
 }
 
-// Profile image functions
-function handleImageUpload(file) {
-  if (!file.type.startsWith("image/")) {
-    showToast("Please select a valid image file", "error");
-    return;
-  }
-
-  if (file.size > 5 * 1024 * 1024) {
-    showToast("Image size should be less than 5MB", "error");
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const imageData = e.target.result;
-    window.profileImageData = imageData;
-    displayProfileImage(imageData);
-    showToast("Profile picture updated successfully!", "success");
-  };
-  reader.readAsDataURL(file);
-}
-
-function displayProfileImage(imageData) {
-  const profileImage = document.getElementById("profileImage");
-  const defaultAvatar = document.getElementById("defaultAvatar");
-  const removeBtn = document.getElementById("removeBtn");
-
-  profileImage.src = imageData;
-  profileImage.classList.remove("hidden");
-  defaultAvatar.style.display = "none";
-  removeBtn.classList.remove("hidden");
-}
-
-function removeProfileImage() {
-  const profileImage = document.getElementById("profileImage");
-  const defaultAvatar = document.getElementById("defaultAvatar");
-  const removeBtn = document.getElementById("removeBtn");
-
-  profileImage.classList.add("hidden");
-  profileImage.src = "";
-  defaultAvatar.style.display = "flex";
-  removeBtn.classList.add("hidden");
-  window.profileImageData = null;
-  showToast("Profile picture removed", "success");
-}
-
-function loadSavedProfileImage() {
-  if (window.profileImageData) {
-    displayProfileImage(window.profileImageData);
-  }
-}
-
-// Toast notification function
-function showToast(message, type = "success") {
-  const container = document.getElementById("toast-container");
-  const toast = document.createElement("div");
-
-  let icon, borderColor, bgColor, textColor;
-
-  if (type === "success") {
-    icon = `
-            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          `;
-    borderColor = "border-green-200";
-    bgColor = "bg-green-50";
-    textColor = "text-green-800";
-  } else if (type === "error") {
-    icon = `
-            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-            </svg>
-          `;
-    borderColor = "border-red-200";
-    bgColor = "bg-red-50";
-    textColor = "text-red-800";
-  } else if (type === "info") {
-    icon = `
-            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          `;
-    borderColor = "border-blue-200";
-    bgColor = "bg-blue-50";
-    textColor = "text-blue-800";
-  }
-
-  toast.className = `toast flex items-center gap-3 px-6 py-4 rounded-xl shadow-lg ${bgColor} ${borderColor} ${textColor} border min-w-[350px] backdrop-blur-lg`;
-  toast.innerHTML = `
-          <div class="flex-shrink-0">${icon}</div>
-          <span class="font-medium flex-1">${message}</span>
-          <button class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors" onclick="this.parentElement.remove()">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        `;
-
-  container.appendChild(toast);
-
-  setTimeout(() => {
-    if (toast.parentElement) {
-      toast.classList.add("hide");
-      setTimeout(() => {
-        if (toast.parentElement) {
-          toast.remove();
-        }
-      }, 400);
-    }
-  }, 5000);
-}
-
 // Load external components
 function loadComponent(id, filepath) {
-  fetch(filepath)
-    .then((response) => response.text())
-    .then((data) => {
-      document.getElementById(id).innerHTML = data;
-      // Force light theme for navbar with more comprehensive approach
-      setTimeout(() => {
-        forceLightTheme();
-        highlightActiveLink();
-      }, 100);
+  return fetch(filepath)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.text();
     })
-    .catch((error) => console.error(`Error loading ${id}:`, error));
+    .then((data) => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.innerHTML = data;
+      }
+      // Force light theme immediately after loading
+      setTimeout(forceLightTheme, 50);
+    })
+    .catch((error) => {
+      console.error(`Error loading ${id}:`, error);
+    });
+}
+
+// Navbar functionality
+function initializeNavbar() {
+  const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+  const mobileMenu = document.getElementById("mobile-menu");
+
+  if (!mobileMenuBtn || !mobileMenu) {
+    console.log("Navbar elements not found, retrying...");
+    return false;
+  }
+
+  const hamburgerLines = document.querySelectorAll(
+    ".hamburger-line-1, .hamburger-line-2, .hamburger-line-3"
+  );
+
+  let isMenuOpen = false;
+
+  function toggleMenu() {
+    isMenuOpen = !isMenuOpen;
+
+    if (isMenuOpen) {
+      // Open menu
+      mobileMenu.classList.remove(
+        "-translate-y-full",
+        "opacity-0",
+        "invisible"
+      );
+      mobileMenu.classList.add("translate-y-0", "opacity-100", "visible");
+
+      // Animate hamburger to X
+      if (hamburgerLines.length >= 3) {
+        hamburgerLines[0].style.transform = "rotate(45deg) translate(6px, 6px)";
+        hamburgerLines[1].style.opacity = "0";
+        hamburgerLines[2].style.transform =
+          "rotate(-45deg) translate(6px, -6px)";
+      }
+
+      // Prevent body scroll
+      document.body.style.overflow = "hidden";
+    } else {
+      // Close menu
+      mobileMenu.classList.remove("translate-y-0", "opacity-100", "visible");
+      mobileMenu.classList.add("-translate-y-full", "opacity-0", "invisible");
+
+      // Reset hamburger
+      if (hamburgerLines.length >= 3) {
+        hamburgerLines[0].style.transform = "";
+        hamburgerLines[1].style.opacity = "1";
+        hamburgerLines[2].style.transform = "";
+      }
+
+      // Allow body scroll
+      document.body.style.overflow = "";
+    }
+  }
+
+  // Remove any existing event listeners to prevent duplicates
+  const newMobileMenuBtn = mobileMenuBtn.cloneNode(true);
+  mobileMenuBtn.parentNode.replaceChild(newMobileMenuBtn, mobileMenuBtn);
+
+  // Toggle menu on button click
+  newMobileMenuBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleMenu();
+  });
+
+  // Close menu when clicking on menu items
+  const menuLinks = mobileMenu.querySelectorAll("a");
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      if (isMenuOpen) {
+        toggleMenu();
+      }
+    });
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener("click", function (event) {
+    if (
+      isMenuOpen &&
+      !mobileMenu.contains(event.target) &&
+      !newMobileMenuBtn.contains(event.target)
+    ) {
+      toggleMenu();
+    }
+  });
+
+  // Close menu on escape key
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && isMenuOpen) {
+      toggleMenu();
+    }
+  });
+
+  // Handle window resize
+  window.addEventListener("resize", function () {
+    if (window.innerWidth >= 1024 && isMenuOpen) {
+      toggleMenu();
+    }
+  });
+
+  console.log("Navbar initialized successfully");
+  return true;
+}
+
+// Safe function to check if element has href and includes text
+function elementHasHrefAndIncludes(element, text) {
+  if (!element || !element.getAttribute) return false;
+
+  const href = element.getAttribute("href");
+  const elementText = element.textContent || "";
+
+  return (href && href.includes(text)) || elementText.includes(text);
 }
 
 // Comprehensive function to force light theme
 function forceLightTheme() {
-  // Remove dark class from html and body
-  document.documentElement.classList.remove("dark");
-  document.body.classList.remove("dark");
+  try {
+    // Remove dark class from html and body
+    document.documentElement.classList.remove("dark");
+    document.body.classList.remove("dark");
 
-  // Find and fix all dark theme elements in navbar
-  const navbar = document.getElementById("navbar");
-  if (navbar) {
-    // Remove dark class from navbar container
-    navbar.classList.remove("dark");
+    // Set light mode in localStorage
+    localStorage.setItem("darkMode", "false");
 
-    // Find all elements with dark theme classes and override them
-    const allElements = navbar.querySelectorAll("*");
-    allElements.forEach((el) => {
-      // Remove common dark theme classes
-      el.classList.remove(
-        "dark:bg-gray-800",
-        "dark:bg-gray-900",
-        "dark:text-white",
-        "dark:text-gray-100",
-        "dark:border-gray-700"
-      );
+    // Find and fix navbar elements
+    const navbar = document.getElementById("navbar");
+    if (navbar) {
+      navbar.classList.remove("dark");
 
-      // Force light theme classes if they have dark variants
-      if (
-        el.classList.contains("bg-gray-800") ||
-        el.classList.contains("bg-gray-900")
-      ) {
-        el.classList.remove("bg-gray-800", "bg-gray-900");
-        el.classList.add("bg-white");
-      }
+      // Remove dark classes from all elements in navbar
+      const allNavbarElements = navbar.querySelectorAll("*");
+      allNavbarElements.forEach((el) => {
+        if (el && el.classList) {
+          el.classList.remove(
+            "dark:bg-gray-800",
+            "dark:bg-gray-900",
+            "dark:text-white",
+            "dark:text-gray-100",
+            "dark:border-gray-700",
+            "dark"
+          );
 
-      if (el.classList.contains("border-gray-700")) {
-        el.classList.remove("border-gray-700");
-        el.classList.add("border-gray-200");
-      }
-    });
-
-    // Specifically target sidebar if it exists
-    const sidebar = navbar.querySelector("#sidebar");
-    if (sidebar) {
-      sidebar.classList.remove("bg-gray-800", "dark:bg-gray-800");
-      sidebar.classList.add("bg-white", "border-r", "border-gray-200");
-
-      // Fix sidebar links
-      const sidebarLinks = sidebar.querySelectorAll("a");
-      sidebarLinks.forEach((link) => {
-        if (!link.classList.contains("bg-purple-600")) {
-          link.classList.remove("text-gray-200", "text-white");
-          link.classList.add("text-gray-700");
+          // Force light background colors but keep white text for mobile menu
+          if (
+            el.classList.contains("bg-gray-800") ||
+            el.classList.contains("bg-gray-900")
+          ) {
+            el.classList.remove("bg-gray-800", "bg-gray-900");
+            el.classList.add("bg-white");
+          }
         }
       });
-    }
-  }
 
-  // Set localStorage to prevent dark mode from being applied
-  localStorage.setItem("darkMode", "false");
+      // Specifically fix mobile menu - ensure it has white background but proper text colors
+      const mobileMenu = document.getElementById("mobile-menu");
+      if (mobileMenu && mobileMenu.classList) {
+        mobileMenu.classList.remove(
+          "dark:bg-gray-800",
+          "bg-gray-800",
+          "dark:bg-gray-900"
+        );
+        mobileMenu.classList.add("bg-white");
+
+        const mobileLinks = mobileMenu.querySelectorAll("a, span, div");
+        mobileLinks.forEach((link) => {
+          if (link && link.classList) {
+            link.classList.remove(
+              "dark:text-white",
+              "text-gray-200",
+              "text-white"
+            );
+
+            // Remove active highlighting from Plans link by default
+            if (
+              elementHasHrefAndIncludes(link, "Plans") ||
+              elementHasHrefAndIncludes(link, "plans")
+            ) {
+              link.classList.remove(
+                "bg-purple-600",
+                "text-white",
+                "rounded-lg"
+              );
+              link.classList.add("text-gray-800", "hover:text-purple-600");
+            }
+
+            // Ensure Profile link is highlighted if we're on profile page
+            if (
+              elementHasHrefAndIncludes(link, "Profile") ||
+              elementHasHrefAndIncludes(link, "profile")
+            ) {
+              link.classList.add("bg-purple-600", "text-white", "rounded-lg");
+              link.classList.remove("text-gray-800", "hover:text-purple-600");
+            } else {
+              // For non-active links, use gray-800 text
+              link.classList.add("text-gray-800");
+            }
+          }
+        });
+      }
+
+      // Fix hamburger icon - make it dark for light background
+      const hamburgerBtn = document.getElementById("mobile-menu-btn");
+      if (hamburgerBtn && hamburgerBtn.classList) {
+        hamburgerBtn.classList.remove("dark:text-white", "text-white");
+        hamburgerBtn.classList.add("text-gray-800");
+      }
+    }
+  } catch (error) {
+    console.warn("Error in forceLightTheme:", error);
+  }
+}
+
+function fixMobileMenuActiveStates() {
+  try {
+    const mobileMenu = document.getElementById("mobile-menu");
+    if (!mobileMenu) return;
+
+    const mobileLinks = mobileMenu.querySelectorAll("a");
+    const currentPath = window.location.pathname;
+
+    mobileLinks.forEach((link) => {
+      if (!link || !link.classList) return;
+
+      // Remove all active classes first
+      link.classList.remove("bg-purple-600", "text-white", "rounded-lg");
+
+      // Add active class only to Profile link if we're on profile page
+      const href = link.getAttribute("href");
+      if (
+        href &&
+        (href.includes("profile") || currentPath.includes("profile"))
+      ) {
+        link.classList.add("bg-purple-600", "text-white", "rounded-lg");
+        link.classList.remove("text-gray-800", "hover:text-purple-600");
+      } else {
+        // For non-active links, ensure proper styling
+        link.classList.add("text-gray-800", "hover:text-purple-600");
+        link.classList.remove("text-white");
+
+        // Specifically remove active state from Plans link
+        if (
+          elementHasHrefAndIncludes(link, "Plans") ||
+          elementHasHrefAndIncludes(link, "plans")
+        ) {
+          link.classList.remove("bg-purple-600", "text-white");
+        }
+      }
+    });
+  } catch (error) {
+    console.warn("Error in fixMobileMenuActiveStates:", error);
+  }
 }
 
 function highlightActiveLink() {
-  const currentPath = window.location.pathname;
-  const links = document.querySelectorAll("#sidebar a");
+  try {
+    const currentPath = window.location.pathname;
+    const links = document.querySelectorAll("#sidebar a, #mobile-menu a");
 
-  links.forEach((link) => {
-    const href = link.getAttribute("href");
-    link.classList.remove(
-      "bg-purple-600",
-      "text-white",
-      "rounded-lg",
-      "hover:bg-purple-700"
-    );
-    link.classList.add("text-gray-200");
+    links.forEach((link) => {
+      if (!link || !link.classList) return;
 
-    if (href && (href.includes("profile") || currentPath.includes("profile"))) {
-      link.classList.remove("text-gray-200");
-      link.classList.add(
-        "bg-purple-600",
-        "text-white",
-        "rounded-lg",
-        "hover:bg-purple-700"
-      );
+      // Remove all active classes first
+      link.classList.remove("bg-purple-600", "text-white", "rounded-lg");
+
+      // Add active class only to Profile link if we're on profile page
+      const href = link.getAttribute("href");
+      if (
+        href &&
+        (href.includes("profile") || currentPath.includes("profile"))
+      ) {
+        link.classList.add("bg-purple-600", "text-white", "rounded-lg");
+        link.classList.remove(
+          "text-gray-800",
+          "text-gray-200",
+          "hover:text-purple-600"
+        );
+      } else {
+        // For non-active links
+        link.classList.add("text-gray-800", "hover:text-purple-600");
+        link.classList.remove("text-white");
+      }
+    });
+  } catch (error) {
+    console.warn("Error in highlightActiveLink:", error);
+  }
+}
+
+function ensureMobileMenuLightTheme() {
+  try {
+    const mobileMenu = document.getElementById("mobile-menu");
+    if (!mobileMenu) {
+      // Retry if mobile menu not found yet
+      setTimeout(ensureMobileMenuLightTheme, 100);
+      return;
     }
-  });
+
+    // Force light theme styles
+    mobileMenu.classList.remove(
+      "bg-gray-800",
+      "dark:bg-gray-800",
+      "dark:bg-gray-900"
+    );
+    mobileMenu.classList.add("bg-white");
+
+    const mobileLinks = mobileMenu.querySelectorAll("a");
+    mobileLinks.forEach((link) => {
+      if (!link || !link.classList) return;
+
+      link.classList.remove("text-white", "text-gray-200", "dark:text-white");
+
+      // Set appropriate text colors
+      if (link.classList.contains("bg-purple-600")) {
+        link.classList.add("text-white");
+      } else {
+        link.classList.add("text-gray-800");
+      }
+    });
+
+    console.log("Mobile menu light theme applied");
+  } catch (error) {
+    console.warn("Error in ensureMobileMenuLightTheme:", error);
+  }
 }
 
 // Initialize components
-loadComponent("navbar", "/components/navbar.html");
-loadComponent("footer", "/components/footer.html");
+async function initializeComponents() {
+  try {
+    await Promise.allSettled([
+      loadComponent("navbar", "/components/navbar.html"),
+      loadComponent("footer", "/components/footer.html"),
+    ]);
+
+    // Initialize navbar functionality after components are loaded
+    initializeNavbarWithRetry();
+
+    document.dispatchEvent(new Event("navloaded"));
+  } catch (error) {
+    console.warn("Some components failed to load:", error);
+  }
+}
+
+// Function to initialize navbar with retry logic
+function initializeNavbarWithRetry() {
+  let retryCount = 0;
+  const maxRetries = 10;
+
+  function tryInitNavbar() {
+    if (initializeNavbar()) {
+      console.log("Navbar initialized successfully");
+      return;
+    }
+
+    retryCount++;
+    if (retryCount < maxRetries) {
+      setTimeout(tryInitNavbar, 100);
+    } else {
+      console.warn("Failed to initialize navbar after", maxRetries, "attempts");
+    }
+  }
+
+  setTimeout(tryInitNavbar, 50);
+}
+
+// Main initialization function
+async function initializeApp() {
+  try {
+    console.log("Initializing profile application...");
+
+    // First check if user is logged in using loggedInUser
+    const loggedInUserStr = localStorage.getItem("loggedInUser");
+
+    if (!loggedInUserStr) {
+      showToast("Please log in to view your profile", "error");
+      setTimeout(() => {
+        window.location.href = "/pages/auth/login/login.html";
+      }, 2000);
+      return;
+    }
+
+    // Parse the loggedInUser data
+    loggedInUser = JSON.parse(loggedInUserStr);
+    console.log("Logged in user:", loggedInUser);
+
+    // Initialize components first (navbar, footer)
+    await initializeComponents();
+
+    // Then load customer data
+    await loadCustomerData();
+
+    // Load saved profile image if exists
+    loadSavedProfileImage();
+
+    // Initialize all functionality
+    initializeProfileImageUpload();
+    initializePasswordChange();
+    initializeProfileEdit();
+
+    // Force light theme and fix mobile menu with error handling
+    setTimeout(() => {
+      try {
+        forceLightTheme();
+        highlightActiveLink();
+        fixMobileMenuActiveStates();
+        ensureMobileMenuLightTheme();
+      } catch (error) {
+        console.warn("Error during theme initialization:", error);
+      }
+
+      // Re-initialize navbar after theme is forced
+      setTimeout(initializeNavbarWithRetry, 100);
+    }, 200);
+
+    console.log("Profile application initialized successfully");
+  } catch (error) {
+    console.error("Error initializing profile application:", error);
+    showToast("Error initializing application", "error");
+  }
+}
+
+// Initialize when DOM is ready
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeApp);
+} else {
+  initializeApp();
+}
