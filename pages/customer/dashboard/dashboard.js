@@ -146,7 +146,12 @@ function findActivePlan() {
     const plan = availablePlans.find((p) => p.id === transaction.planId);
 
     if (plan) {
-      const validity = parseInt(plan.validity.replace(/\D/g, "")) || 30; // Extract number from validity string, default 30
+      // For postpaid plans, validity is always 30 days (monthly)
+      const validity =
+        plan.type === "Postpaid"
+          ? 30
+          : parseInt(plan.validity.replace(/\D/g, "")) || 30;
+
       const daysDifference = Math.floor(
         (now - transactionDate) / (1000 * 60 * 60 * 24)
       );
@@ -163,9 +168,10 @@ function findActivePlan() {
           transaction: transaction,
           daysUsed: daysDifference,
           daysRemaining: validity - daysDifference,
-          isPrepaid:
-            (currentUser.type || "Prepaid").toLowerCase() === "prepaid",
+          isPrepaid: plan.type === "Prepaid",
+          isPostpaid: plan.type === "Postpaid",
         };
+        console.log("Active plan found:", currentActivePlan);
         break;
       }
     }
@@ -176,18 +182,30 @@ async function initializeDataUsage() {
   if (!currentActivePlan) return;
 
   // Use the 'limit' field from the plan API for total data
-  dailyDataUsage.totalGB = currentActivePlan.limit
-    ? parseFloat(currentActivePlan.limit)
-    : 2.5;
+  // For postpaid, use higher data limits
+  if (currentActivePlan.isPostpaid) {
+    // Postpaid plans typically have higher or unlimited data
+    dailyDataUsage.totalGB = currentActivePlan.limit
+      ? parseFloat(currentActivePlan.limit)
+      : 100; // Default to 100GB for postpaid
+  } else {
+    // Prepaid plans
+    dailyDataUsage.totalGB = currentActivePlan.limit
+      ? parseFloat(currentActivePlan.limit)
+      : 2.5;
+  }
 
   console.log("Plan Limit:", currentActivePlan.limit);
   console.log("Total Data Limit:", dailyDataUsage.totalGB + "GB");
+  console.log(
+    "Plan Type:",
+    currentActivePlan.isPostpaid ? "Postpaid" : "Prepaid"
+  );
 
   // Determine reset logic based on plan type
   const now = new Date();
-  const isPrepaid = currentActivePlan.isPrepaid;
 
-  if (isPrepaid) {
+  if (currentActivePlan.isPrepaid) {
     // Prepaid: Reset daily at midnight
     dailyDataUsage.lastResetDate = new Date(now);
     dailyDataUsage.lastResetDate.setHours(0, 0, 0, 0);
@@ -259,6 +277,14 @@ function updateDataUsageDisplay() {
       ${resetText}
     `;
   }
+
+  // Update plan status text
+  const planStatusElement = document.getElementById("currentPlanStatus");
+  if (planStatusElement) {
+    planStatusElement.textContent = currentActivePlan.isPostpaid
+      ? "Monthly Active"
+      : "Active";
+  }
 }
 
 function updateDashboard() {
@@ -277,7 +303,20 @@ function updateDashboard() {
   updateElementText("userDisplayName", currentUser.name);
   updateElementText("fullPhoneNumber", formatPhoneNumber(currentUser.phone));
   updateElementText("displayAccountType", currentUser.type || "Prepaid");
-  updateElementText("serviceType", `${currentUser.type || "Prepaid"} 5G`);
+
+  // Update service type based on user type and active plan
+  const serviceTypeElement = document.getElementById("serviceType");
+  if (serviceTypeElement) {
+    if (currentActivePlan && currentActivePlan.isPostpaid) {
+      serviceTypeElement.textContent = "Postpaid 5G";
+      serviceTypeElement.className =
+        "bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium";
+    } else {
+      serviceTypeElement.textContent = `${currentUser.type || "Prepaid"} 5G`;
+      serviceTypeElement.className =
+        "bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium";
+    }
+  }
 
   // Update plan information
   updatePlanInfo();
@@ -331,13 +370,19 @@ function updateDataUsageSection() {
             </div>
           `;
   } else {
+    // Determine plan type for display
+    const isPostpaid = currentActivePlan.isPostpaid;
+    const planTypeText = isPostpaid ? "Monthly Plan" : "Current Plan";
+    const statusText = isPostpaid ? "Monthly Active" : "Active";
+    const dataResetText = isPostpaid ? "Monthly data" : "Daily data";
+
     // Show data usage when there's an active plan
     dataUsageCard.innerHTML = `
             <div class="flex items-center justify-between mb-4">
               <h3 id="planName" class="text-xl font-bold">${
                 currentActivePlan.name || "Current Plan"
               }</h3>
-              <span class="text-subtext-light text-sm" id="currentPlanStatus">Active</span>
+              <span class="text-subtext-light text-sm" id="currentPlanStatus">${statusText}</span>
             </div>
 
             <div class="mb-6">
@@ -382,6 +427,11 @@ function updateDataUsageSection() {
                   <span class="material-icons text-sm mr-1">schedule</span>
                   Calculating...
                 </p>
+                ${
+                  isPostpaid
+                    ? '<span class="text-xs text-blue-600 font-semibold">Monthly Billing Cycle</span>'
+                    : ""
+                }
               </div>
             </div>
 
@@ -398,13 +448,17 @@ function updateDataUsageSection() {
                 class="bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 transform hover:scale-105"
               >
                 <span class="material-icons text-lg">add</span>
-                <span>Add Data</span>
+                <span>${isPostpaid ? "Add Data Pack" : "Add Data"}</span>
               </button>
             </div>
 
             <p class="text-xs text-subtext-light text-center">
               <span class="material-icons text-xs mr-1">info</span>
-              Balance updates within 60 minutes of usage
+              ${
+                isPostpaid
+                  ? "Monthly billing cycle. Data resets on renewal date."
+                  : "Balance updates within 60 minutes of usage"
+              }
             </p>
           `;
 
@@ -414,65 +468,57 @@ function updateDataUsageSection() {
 }
 
 function updatePlanInfo() {
+  const planCard = document.querySelector(
+    ".lg\\:col-span-2.space-y-6 > .bg-card-light.p-6.rounded-2xl.shadow-lg.border.border-border-light.hover\\:shadow-xl.transition-all.duration-300.animate-fade-in:nth-child(3)"
+  );
+
+  if (!planCard) return;
+
   if (currentActivePlan) {
     updateElementText("planStatus", "Active");
 
-    // Check if it's a postpaid plan
-    const isPostpaid =
-      currentActivePlan.type &&
-      currentActivePlan.type.toLowerCase() === "postpaid";
+    const isPostpaid = currentActivePlan.isPostpaid;
     const buttonText = isPostpaid ? "Pay Bill" : "Recharge Now";
     const buttonOnClick = isPostpaid ? "payBill()" : "rechargePlan()";
+    const planTypeText = isPostpaid ? "Monthly Plan" : "Active Plan";
+    const expiryText = isPostpaid ? "Renews on" : "Expires on";
 
     // Update active plan content
     const activePlanHTML = `
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold">${planTypeText}</h3>
+              <button
+                onclick="browsePlans()"
+                class="text-primary hover:text-primary-dark text-sm font-medium"
+              >
+                Browse Plans
+              </button>
+            </div>
+
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center space-x-4">
                 <span class="text-3xl font-bold bg-gradient-to-r from-purple-500 to-violet-600 bg-clip-text text-transparent">
                   ₹${currentActivePlan.price}
                 </span>
                 <div class="text-right">
-                  <p class="flex text-subtext-light text-sm">${
-                    isPostpaid ? "Billing Cycle" : "Expires on"
-                  }</p>
+                  <p class="flex text-subtext-light text-sm">${expiryText}</p>
                   <p class="flex font-bold text-lg">${formatDateExpiry(
                     currentActivePlan.expiryDate
                   )}</p>
                 </div>
               </div>
             </div>
-            <div class="p-4 bg-background-light rounded-xl">
+            <div class="p-4 bg-background-light rounded-xl mb-4">
               <p class="text-sm font-medium mb-2">Plan Features:</p>
-              <div class="grid grid-cols-2 gap-2 text-xs">
-                <div class="flex items-center space-x-2">
-                  <span class="material-icons text-green-500 text-sm">check_circle</span>
-                  <span>${
-                    currentActivePlan.benefits
-                      ? currentActivePlan.benefits[0]
-                      : "Unlimited Calls"
-                  }</span>
-                </div>
-                <div class="flex items-center space-x-2">
-                  <span class="material-icons text-green-500 text-sm">check_circle</span>
-                  <span>${
-                    currentActivePlan.benefits
-                      ? currentActivePlan.benefits[1]
-                      : "100 SMS/day"
-                  }</span>
-                </div>
-                
-                <div class="flex items-center space-x-2">
-                  <span class="material-icons text-green-500 text-sm">check_circle</span>
-                  <span>5G Access</span>
-                </div>
+              <div class="space-y-2 text-sm">
+                ${getPlanFeaturesHTML(currentActivePlan)}
               </div>
             </div>
           `;
-    updateElementHTML("activePlanContent", activePlanHTML);
 
-    // Update the button section
+    // Update button section
     const buttonHTML = `
-            <div class="grid grid-cols-2 gap-3 mt-6">
+            <div class="grid grid-cols-2 gap-3">
               <button
                 onclick="showPlanDetailsModal()"
                 class="bg-background-light hover:bg-gray-100 text-text-light font-semibold py-3 px-4 rounded-xl transition-all duration-200"
@@ -488,35 +534,129 @@ function updatePlanInfo() {
             </div>
           `;
 
-    // Find and update the button container
-    const planCard = document.querySelector(
-      ".lg\\:col-span-2.space-y-6 > .bg-card-light.p-6.rounded-2xl.shadow-lg.border.border-border-light.hover\\:shadow-xl.transition-all.duration-300.animate-fade-in:nth-child(3)"
-    );
-    if (planCard) {
-      const existingButtonContainer = planCard.querySelector(
-        ".grid.grid-cols-2.gap-3.mt-6"
-      );
-      if (existingButtonContainer) {
-        existingButtonContainer.outerHTML = buttonHTML;
-      } else {
-        // If button container doesn't exist, append it
-        planCard.innerHTML += buttonHTML;
-      }
-    }
+    planCard.innerHTML = activePlanHTML + buttonHTML;
   } else {
-    updateElementText("planStatus", "No Active Plan");
+    // No active plan
+    planCard.innerHTML = `
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-xl font-bold">Active Plan</h3>
+              <button
+                onclick="browsePlans()"
+                class="text-primary hover:text-primary-dark text-sm font-medium"
+              >
+                Browse Plans
+              </button>
+            </div>
 
-    const noActivePlanHTML = `
             <div class="text-center py-8">
               <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span class="material-icons text-gray-400 text-2xl">sim_card_alert</span>
               </div>
               <h3 class="font-bold text-lg mb-2">No Active Plan</h3>
               <p class="text-subtext-light text-sm mb-4">You don't have any active plan. Choose a plan to get started.</p>
+              
+              <div class="grid grid-cols-2 gap-3 mt-6">
+                <button
+                  onclick="showPlanDetailsModal()"
+                  class="bg-background-light hover:bg-gray-100 text-text-light font-semibold py-3 px-4 rounded-xl transition-all duration-200"
+                >
+                  View Plans
+                </button>
+                <button
+                  onclick="rechargePlan()"
+                  class="bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105"
+                >
+                  Recharge Now
+                </button>
+              </div>
             </div>
           `;
-    updateElementHTML("activePlanContent", noActivePlanHTML);
   }
+}
+
+// Helper function to generate plan features HTML
+function getPlanFeaturesHTML(plan) {
+  const isPostpaid = plan.isPostpaid;
+  const benefits = processPlanBenefits(plan.benefits);
+
+  let featuresHTML = "";
+
+  if (benefits.length > 0) {
+    featuresHTML = benefits
+      .slice(0, 4)
+      .map(
+        (benefit) => `
+      <div class="flex items-center space-x-2">
+        <span class="material-icons text-green-500 text-sm">check_circle</span>
+        <span>${benefit}</span>
+      </div>
+    `
+      )
+      .join("");
+  } else {
+    // Default features based on plan type
+    if (isPostpaid) {
+      featuresHTML = `
+        <div class="flex items-center space-x-2">
+          <span class="material-icons text-green-500 text-sm">check_circle</span>
+          <span>Unlimited 5G Data</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="material-icons text-green-500 text-sm">check_circle</span>
+          <span>Priority Network Access</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="material-icons text-green-500 text-sm">check_circle</span>
+          <span>OTT Subscriptions</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="material-icons text-green-500 text-sm">check_circle</span>
+          <span>Monthly Billing</span>
+        </div>
+      `;
+    } else {
+      featuresHTML = `
+        <div class="flex items-center space-x-2">
+          <span class="material-icons text-green-500 text-sm">check_circle</span>
+          <span>Unlimited Calls</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="material-icons text-green-500 text-sm">check_circle</span>
+          <span>100 SMS/day</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="material-icons text-green-500 text-sm">check_circle</span>
+          <span>5G Access</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="material-icons text-green-500 text-sm">check_circle</span>
+          <span>Daily Data Reset</span>
+        </div>
+      `;
+    }
+  }
+
+  return featuresHTML;
+}
+
+// Helper function to process plan benefits
+function processPlanBenefits(benefits) {
+  if (!benefits) return [];
+
+  if (typeof benefits === "string") {
+    return benefits
+      .split(",")
+      .map((b) => b.trim())
+      .filter((b) => b);
+  }
+
+  if (Array.isArray(benefits)) {
+    return benefits
+      .filter((b) => b && typeof b === "string")
+      .map((b) => b.trim());
+  }
+
+  return [];
 }
 
 function updateRenewalTimer() {
@@ -524,17 +664,17 @@ function updateRenewalTimer() {
 
   const now = new Date();
   let timeUntilReset = 0;
-  const isPrepaid = currentActivePlan.isPrepaid;
+  const isPostpaid = currentActivePlan.isPostpaid;
 
-  if (isPrepaid) {
+  if (isPostpaid) {
+    // Postpaid: Reset at plan expiry (monthly)
+    timeUntilReset = dailyDataUsage.nextResetDate - now;
+  } else {
     // Prepaid: Reset at next midnight
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
     timeUntilReset = tomorrow - now;
-  } else {
-    // Postpaid: Reset at plan expiry
-    timeUntilReset = dailyDataUsage.nextResetDate - now;
   }
 
   const hoursLeft = Math.floor(timeUntilReset / (1000 * 60 * 60));
@@ -543,15 +683,15 @@ function updateRenewalTimer() {
   );
 
   let renewalText = "";
-  if (isPrepaid) {
-    renewalText = `Renews in ${hoursLeft}h ${minutesLeft}m`;
-  } else {
+  if (isPostpaid) {
     const daysLeft = Math.floor(timeUntilReset / (1000 * 60 * 60 * 24));
     if (daysLeft > 0) {
       renewalText = `Renews in ${daysLeft} day${daysLeft > 1 ? "s" : ""}`;
     } else {
       renewalText = `Renews in ${hoursLeft}h ${minutesLeft}m`;
     }
+  } else {
+    renewalText = `Resets in ${hoursLeft}h ${minutesLeft}m`;
   }
 
   updateElementHTML(
@@ -751,7 +891,9 @@ function showDataUsageAlert() {
           <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
             <div class="flex items-center space-x-2">
               <span class="material-icons text-red-500 text-lg">info</span>
-              <span class="text-red-800 font-semibold">Alert! ${usedPercentage}% of your daily quota is used</span>
+              <span class="text-red-800 font-semibold">Alert! ${usedPercentage}% of your ${
+    currentActivePlan.isPostpaid ? "monthly" : "daily"
+  } quota is used</span>
             </div>
             <p class="text-red-700 text-sm mt-2">Only ${remainingPercentage}% (${(
     dailyDataUsage.totalGB - dailyDataUsage.usedGB
@@ -815,9 +957,7 @@ function showPlanDetailsModal() {
   const content = document.getElementById("planDetailsContent");
 
   if (currentActivePlan && content) {
-    const isPostpaid =
-      currentActivePlan.type &&
-      currentActivePlan.type.toLowerCase() === "postpaid";
+    const isPostpaid = currentActivePlan.isPostpaid;
 
     const planDetailsHTML = `
             <div class="space-y-6">
@@ -838,34 +978,7 @@ function showPlanDetailsModal() {
               <div class="bg-gray-50 p-4 rounded-lg">
                 <h4 class="font-semibold mb-3">Plan Benefits</h4>
                 <div class="space-y-2 text-sm">
-                  <div class="flex items-center justify-between">
-                    <span>Talk Time:</span>
-                    <span class="font-medium">${
-                      currentActivePlan.benefits
-                        ? currentActivePlan.benefits[0]
-                        : "Unlimited"
-                    }</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span>SMS:</span>
-                    <span class="font-medium">${
-                      currentActivePlan.benefits
-                        ? currentActivePlan.benefits[1]
-                        : "100/day"
-                    }</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span>Data:</span>
-                    <span class="font-medium">${
-                      currentActivePlan.limit ||
-                      currentActivePlan.data ||
-                      "2.5GB"
-                    }/day</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span>Network:</span>
-                    <span class="font-medium">5G Ready</span>
-                  </div>
+                  ${getPlanFeaturesHTML(currentActivePlan)}
                 </div>
               </div>
               
@@ -887,6 +1000,12 @@ function showPlanDetailsModal() {
                   <div class="flex items-center justify-between">
                     <span>Status:</span>
                     <span class="font-medium text-green-600">Active</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span>Type:</span>
+                    <span class="font-medium text-blue-600">${
+                      isPostpaid ? "Postpaid" : "Prepaid"
+                    }</span>
                   </div>
                 </div>
               </div>
@@ -923,11 +1042,11 @@ function showUsageDetailsModal() {
 
   if (content) {
     if (currentActivePlan && dailyDataUsage) {
-      const isPrepaid = currentActivePlan.isPrepaid;
-      const resetType = isPrepaid ? "daily" : "monthly";
-      const resetTime = isPrepaid
-        ? "12:00 AM tonight"
-        : formatDateExpiry(dailyDataUsage.nextResetDate);
+      const isPostpaid = currentActivePlan.isPostpaid;
+      const resetType = isPostpaid ? "monthly" : "daily";
+      const resetTime = isPostpaid
+        ? formatDateExpiry(dailyDataUsage.nextResetDate)
+        : "12:00 AM tonight";
 
       const usageDetailsHTML = `
               <div class="space-y-6">
@@ -936,7 +1055,7 @@ function showUsageDetailsModal() {
                     dailyDataUsage.usedPercentage * 100
                   ).toFixed(0)}%</div>
                   <div class="text-lg font-semibold">Data Usage ${
-                    isPrepaid ? "Today" : "This Month"
+                    isPostpaid ? "This Month" : "Today"
                   }</div>
                   <div class="text-sm text-subtext-light">${
                     dailyDataUsage.usedGB
@@ -946,7 +1065,7 @@ function showUsageDetailsModal() {
                 <div class="space-y-4">
                   <div class="bg-gray-50 p-4 rounded-lg">
                     <h4 class="font-semibold mb-3">${
-                      isPrepaid ? "Daily" : "Monthly"
+                      isPostpaid ? "Monthly" : "Daily"
                     } Usage Breakdown</h4>
                     <div class="space-y-3">
                       <div>
@@ -1004,6 +1123,9 @@ function showUsageDetailsModal() {
                       Renewal Information
                     </h4>
                     <p class="text-sm text-subtext-light">Your ${resetType} data quota will be refreshed on ${resetTime}.</p>
+                    <p class="text-xs text-yellow-600 mt-1">Plan Type: <strong>${
+                      isPostpaid ? "Postpaid" : "Prepaid"
+                    }</strong></p>
                   </div>
                 </div>
               </div>
