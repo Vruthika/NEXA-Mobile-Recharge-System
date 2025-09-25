@@ -235,6 +235,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Continue after successful payment
   continueButton.addEventListener("click", function () {
+    // Check if this was a bill payment
+    const lastTransaction = JSON.parse(
+      localStorage.getItem("lastTransaction") || "{}"
+    );
+
+    if (lastTransaction.isBillPayment) {
+      // Store flag to show bill payment success alert on dashboard
+      localStorage.setItem("showBillPaymentSuccess", "true");
+    }
+
     window.location.href = "/pages/customer/dashboard/dashboard.html";
   });
 
@@ -323,6 +333,10 @@ document.addEventListener("DOMContentLoaded", function () {
       // Fetch customer data from API to get the most up-to-date information
       const customerData = await fetchCustomerData(loggedInUser.id);
 
+      // Check if this is a bill payment or recharge
+      const urlParams = new URLSearchParams(window.location.search);
+      const isBillPayment = urlParams.get("type") === "bill";
+
       // Create transaction data with customer details
       const transactionData = {
         transactionId: getNextTransactionId(),
@@ -331,7 +345,7 @@ document.addEventListener("DOMContentLoaded", function () {
         phone: customerData.phone,
         planId: selectedPlan.id,
         plan: selectedPlan.name,
-        type: selectedPlan.type,
+        type: isBillPayment ? "Bill Payment" : "Recharge",
         status: "Success",
         date: formatDate(new Date()), // Format as YYYY-MM-DD
         amount: selectedPlan.price,
@@ -361,14 +375,15 @@ document.addEventListener("DOMContentLoaded", function () {
               createdTransaction
             );
 
-            // Show success animation
-            successAnimation.classList.add("active");
-
-            // Store transaction details for dashboard redirect
+            // Store transaction details with payment type info
+            createdTransaction.isBillPayment = isBillPayment;
             localStorage.setItem(
               "lastTransaction",
               JSON.stringify(createdTransaction)
             );
+
+            // Show success animation
+            successAnimation.classList.add("active");
           } else {
             throw new Error("Failed to create transaction");
           }
