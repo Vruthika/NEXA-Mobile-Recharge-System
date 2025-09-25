@@ -4,10 +4,517 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manage Content</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#4F46E5",
+              "background-light": "#FFFFFF",
+              "background-dark": "#111827",
+              "card-light": "#F9FAFB",
+              "card-dark": "#1F2937",
+              "text-light": "#111827",
+              "text-dark": "#F9FAFB",
+              "muted-light": "#6B7280",
+              "muted-dark": "#9CA3AF",
+            },
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      /* Your existing CSS styles remain the same */
+      .carousel-item {
+        scroll-snap-align: center;
+        flex: 0 0 100%;
+        transition: transform 0.5s ease-in-out;
+      }
+
+      .carousel-item:hover {
+        transform: translateY(-5px);
+      }
+
+      @media (min-width: 768px) {
+        .carousel-item {
+          flex: 0 0 50%;
+        }
+      }
+      @media (min-width: 1024px) {
+        .carousel-item {
+          flex: 0 0 33.333333%;
+        }
+      }
+
+      .banner-container {
+        background: linear-gradient(135deg, #4f46e5 0%, #7e22ce 100%);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .banner-content {
+        position: relative;
+        z-index: 2;
+      }
+
+      .banner-image {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        opacity: 0.7;
+      }
+
+      .image-carousel-item {
+        position: relative;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        height: 300px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+      }
+
+      .image-carousel-item:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+
+      .image-carousel-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+      }
+
+      .image-carousel-item:hover img {
+        transform: scale(1.05);
+      }
+
+      .plan-text-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 1.5rem;
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.7) 0%,
+          rgba(0, 0, 0, 0) 100%
+        );
+        color: white;
+        z-index: 2;
+      }
+
+      .plan-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+
+      .plan-details {
+        font-size: 1rem;
+        opacity: 0.9;
+      }
+
+      .plan-price {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #ffd700;
+        margin-top: 0.5rem;
+      }
+
+      .faq-item {
+        transition: all 0.3s ease;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
+          0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        margin-bottom: 1rem;
+        background: linear-gradient(145deg, #ffffff, #f0f0f0);
+        border-left: 4px solid #4f46e5;
+      }
+
+      .dark .faq-item {
+        background: linear-gradient(145deg, #1f2937, #111827);
+        border-left: 4px solid #7c3aed;
+      }
+
+      .faq-question {
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        padding: 1.5rem;
+      }
+
+      .faq-question:hover {
+        background-color: rgba(79, 70, 229, 0.05);
+      }
+
+      .dark .faq-question:hover {
+        background-color: rgba(124, 58, 237, 0.1);
+      }
+
+      .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease, padding 0.3s ease;
+        padding: 0 1.5rem;
+      }
+
+      .faq-item.active .faq-answer {
+        max-height: 300px;
+        padding-bottom: 1.5rem;
+      }
+
+      .faq-item.active .material-icons {
+        transform: rotate(180deg);
+        color: #4f46e5;
+      }
+
+      .dark .faq-item.active .material-icons {
+        color: #7c3aed;
+      }
+
+      .faq-question h3 {
+        font-weight: 600;
+        font-size: 1.1rem;
+        flex: 1;
+      }
+
+      .faq-question .material-icons {
+        transition: all 0.3s ease;
+        color: #6b7280;
+      }
+
+      .dark .faq-question .material-icons {
+        color: #9ca3af;
+      }
+
+      .faq-image-container {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 0.5rem;
+      }
+
+      .faq-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 0.5rem;
+      }
+
+      #carousel {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      #carousel::-webkit-scrollbar {
+        display: none;
+      }
+
+      .plan-button {
+        position: absolute;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        background: rgba(255, 255, 255, 0.9);
+        color: #4f46e5;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        font-weight: bold;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        z-index: 3;
+      }
+
+      .plan-button:hover {
+        background: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .carousel-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.8);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      .carousel-nav:hover {
+        background: white;
+        transform: translateY(-50%) scale(1.1);
+      }
+
+      .carousel-nav.prev {
+        left: 10px;
+      }
+
+      .carousel-nav.next {
+        right: 10px;
+      }
+
+      .carousel-nav:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .carousel-nav:disabled:hover {
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.8);
+      }
+
+      #toastContainer {
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        z-index: 1000;
+      }
+
+      #mobile-menu {
+        transition: all 0.3s ease-in-out;
+      }
+
+      #mobile-menu.hidden {
+        opacity: 0;
+        transform: translateY(-10px);
+        visibility: hidden;
+      }
+
+      #mobile-menu:not(.hidden) {
+        opacity: 1;
+        transform: translateY(0);
+        visibility: visible;
+      }
+
+      .hamburger-line-1.active {
+        transform: rotate(45deg) translate(5px, 5px);
+      }
+
+      .hamburger-line-2.active {
+        opacity: 0;
+      }
+
+      .hamburger-line-3.active {
+        transform: rotate(-45deg) translate(7px, -6px);
+      }
+
+      /* CMS Admin Panel Styles */
+      .cms-admin-panel {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+      }
+
+      .cms-toggle-btn {
+        background: #4f46e5;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+        transition: all 0.3s ease;
+      }
+
+      .cms-toggle-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.6);
+      }
+
+      .cms-panel {
+        position: absolute;
+        bottom: 80px;
+        right: 0;
+        width: 350px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        display: none;
+      }
+
+      .cms-panel.active {
+        display: block;
+      }
+
+      .cms-header {
+        background: #4f46e5;
+        color: white;
+        padding: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .cms-tabs {
+        display: flex;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .cms-tab {
+        flex: 1;
+        padding: 12px;
+        text-align: center;
+        cursor: pointer;
+        background: #f9fafb;
+        border-bottom: 2px solid transparent;
+      }
+
+      .cms-tab.active {
+        background: white;
+        border-bottom-color: #4f46e5;
+        font-weight: 600;
+      }
+
+      .cms-content {
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 16px;
+      }
+
+      .cms-section {
+        background: #f9fafb;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .cms-section:hover {
+        background: #f3f4f6;
+      }
+
+      .cms-section.active {
+        background: #e0e7ff;
+        border-left: 3px solid #4f46e5;
+      }
+
+      .cms-form {
+        display: none;
+      }
+
+      .cms-form.active {
+        display: block;
+      }
+
+      .cms-form input,
+      .cms-form textarea {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        margin-bottom: 12px;
+        font-size: 14px;
+      }
+
+      .cms-form textarea {
+        min-height: 80px;
+        resize: vertical;
+      }
+
+      .cms-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      .cms-btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+      }
+
+      .cms-btn-primary {
+        background: #4f46e5;
+        color: white;
+      }
+
+      .cms-btn-primary:hover {
+        background: #4338ca;
+      }
+
+      .cms-btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+      }
+
+      .cms-btn-secondary:hover {
+        background: #e5e7eb;
+      }
+
+      .cms-image-preview {
+        max-width: 100%;
+        max-height: 150px;
+        margin-top: 8px;
+        border-radius: 4px;
+      }
+
+      /* Fix for main section alignment */
+      main {
+        margin-left: 16rem; /* This matches the sidebar width */
+        width: calc(100% - 16rem); /* Calculate remaining width */
+        transition: margin-left 0.3s ease; /* Smooth transition when sidebar toggles */
+      }
+
+      /* When sidebar is hidden on mobile */
+      @media (max-width: 1023px) {
+        main {
+          margin-left: 0;
+          width: 100%;
+        }
+
+        /* When sidebar is open on mobile */
+        #sidebar:not(.-translate-x-full) + main {
+          margin-left: 16rem;
+          width: calc(100% - 16rem);
+        }
+      }
+    </style>
     <script src="./content.js"></script>
   </head>
-  <body class="bg-gray-100">
+  <body class="bg-gray-100 overflow-x-hidden">
     <!-- Mobile Menu Button -->
     <button
       id="mobile-menu-btn"
@@ -40,6 +547,1853 @@
       id="sidebar"
       class="fixed left-0 w-64 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300"
     ></div>
+
+    <main
+      class="ml-68 bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Toast Container -->
+        <div id="toastContainer"></div>
+
+        <!-- CMS Admin Panel -->
+        <div class="cms-admin-panel">
+          <button class="cms-toggle-btn" id="cmsToggle">
+            <span class="material-icons">settings</span>
+          </button>
+          <div class="cms-panel" id="cmsPanel">
+            <div class="cms-header">
+              <h3 class="text-lg font-semibold">Content Management</h3>
+              <button id="cmsClose" class="text-white">
+                <span class="material-icons">close</span>
+              </button>
+            </div>
+            <div class="cms-tabs">
+              <div class="cms-tab active" data-tab="banner">Banner</div>
+              <div class="cms-tab" data-tab="plans">Plans</div>
+              <div class="cms-tab" data-tab="faq">FAQ</div>
+            </div>
+            <div class="cms-content">
+              <!-- Banner Tab Content -->
+              <div class="cms-tab-content active" id="bannerTab">
+                <div class="cms-section active" data-section="banner-main">
+                  Main Banner
+                </div>
+                <form class="cms-form active" id="bannerForm">
+                  <input
+                    type="text"
+                    id="bannerTitle"
+                    placeholder="Banner Title"
+                  />
+                  <textarea
+                    id="bannerDescription"
+                    placeholder="Banner Description"
+                  ></textarea>
+                  <input
+                    type="text"
+                    id="bannerButtonText"
+                    placeholder="Button Text"
+                  />
+                  <input type="file" id="bannerImage" accept="image/*" />
+                  <img
+                    id="bannerImagePreview"
+                    class="cms-image-preview"
+                    src=""
+                    style="display: none"
+                  />
+                  <div class="cms-actions">
+                    <button
+                      type="button"
+                      class="cms-btn cms-btn-primary"
+                      id="saveBanner"
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      class="cms-btn cms-btn-secondary"
+                      id="cancelBanner"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- Plans Tab Content -->
+              <div class="cms-tab-content" id="plansTab">
+                <div class="cms-section active" data-section="plans-heading">
+                  Plans Heading
+                </div>
+                <div class="cms-section" data-section="plan-1">
+                  Plan 1: 2 GB/Day
+                </div>
+                <div class="cms-section" data-section="plan-2">
+                  Plan 2: 2.5 GB/Day
+                </div>
+                <div class="cms-section" data-section="plan-3">
+                  Plan 3: 3 GB/Day
+                </div>
+                <div class="cms-section" data-section="plan-4">
+                  Plan 4: Annual Plans
+                </div>
+                <div class="cms-section" data-section="plan-5">
+                  Plan 5: True Unlimited 5G
+                </div>
+                <div class="cms-section" data-section="plan-6">
+                  Plan 6: Individual Plans
+                </div>
+                <div class="cms-section" data-section="plan-7">
+                  Plan 7: Family Pack
+                </div>
+                <div class="cms-section" data-section="plan-8">
+                  Plan 8: JioHotstar Plans
+                </div>
+                <div class="cms-section" data-section="plan-9">
+                  Plan 9: Netflix Plans
+                </div>
+
+                <form class="cms-form active" id="plansForm">
+                  <input type="text" id="planTitle" placeholder="Plan Title" />
+                  <textarea
+                    id="planDescription"
+                    placeholder="Plan Description"
+                  ></textarea>
+                  <input type="text" id="planPrice" placeholder="Plan Price" />
+                  <input type="file" id="planImage" accept="image/*" />
+                  <img
+                    id="planImagePreview"
+                    class="cms-image-preview"
+                    src=""
+                    style="display: none"
+                  />
+                  <div class="cms-actions">
+                    <button
+                      type="button"
+                      class="cms-btn cms-btn-primary"
+                      id="savePlan"
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      class="cms-btn cms-btn-secondary"
+                      id="cancelPlan"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- FAQ Tab Content -->
+              <div class="cms-tab-content" id="faqTab">
+                <div class="cms-section active" data-section="faq-heading">
+                  FAQ Heading
+                </div>
+                <div class="cms-section" data-section="faq-1">
+                  FAQ 1: Switching to Nexa
+                </div>
+                <div class="cms-section" data-section="faq-2">
+                  FAQ 2: Keeping Phone Number
+                </div>
+                <div class="cms-section" data-section="faq-3">
+                  FAQ 3: 5G Coverage
+                </div>
+                <div class="cms-section" data-section="faq-4">
+                  FAQ 4: Data Usage Tracking
+                </div>
+                <div class="cms-section" data-section="faq-5">
+                  FAQ 5: Payment Methods
+                </div>
+                <div class="cms-section" data-section="faq-image">
+                  FAQ Image
+                </div>
+
+                <form class="cms-form active" id="faqForm">
+                  <input
+                    type="text"
+                    id="faqQuestion"
+                    placeholder="FAQ Question"
+                  />
+                  <textarea id="faqAnswer" placeholder="FAQ Answer"></textarea>
+                  <input type="file" id="faqImage" accept="image/*" />
+                  <img
+                    id="faqImagePreview"
+                    class="cms-image-preview"
+                    src=""
+                    style="display: none"
+                  />
+                  <div class="cms-actions">
+                    <button
+                      type="button"
+                      class="cms-btn cms-btn-primary"
+                      id="saveFaq"
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      class="cms-btn cms-btn-secondary"
+                      id="cancelFaq"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Your existing content continues here -->
+        <!-- Navbar -->
+        <nav
+          class="w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm top-0 z-50 border-b border-border-light dark:border-border-dark"
+        >
+          <!-- Your existing navbar content -->
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+              <!-- Logo + Name wrapper (Left side) -->
+              <div class="flex items-center space-x-3">
+                <img
+                  src="/assets/images/logo.png"
+                  alt="NEXA"
+                  class="h-12 w-12 sm:h-16 sm:w-16 rounded-full border border-purple-500"
+                />
+                <div
+                  class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+                >
+                  NEXA
+                </div>
+              </div>
+
+              <!-- Desktop Navigation -->
+              <div class="hidden lg:flex items-center space-x-8">
+                <!-- Search -->
+                <div class="relative">
+                  <input
+                    id="search-input"
+                    class="w-80 bg-gray-100 dark:bg-gray-700 border-none rounded-full pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-gray-600 transition-all text-sm"
+                    placeholder="Search plans..."
+                    type="text"
+                  />
+                  <span
+                    class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
+                    >search</span
+                  >
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="flex items-center space-x-6">
+                  <a
+                    class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
+                    href="#"
+                    >Home
+                    <span
+                      class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
+                    ></span>
+                  </a>
+                  <a
+                    class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
+                    href="#"
+                    >Plans<span
+                      class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
+                    ></span>
+                  </a>
+                  <a
+                    class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
+                    href="#faq"
+                    >FAQ
+                    <span
+                      class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
+                    ></span>
+                  </a>
+                  <a
+                    class="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:text-primary transition-colors relative group"
+                    href="#"
+                    >My Account
+                    <span
+                      class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
+                    ></span>
+                  </a>
+
+                  <button
+                    id="login-btn"
+                    class="px-5 py-2 rounded-md bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-medium hover:shadow-lg transition-all"
+                  >
+                    Login
+                  </button>
+                </div>
+              </div>
+
+              <!-- Mobile Hamburger Menu -->
+              <div class="lg:hidden flex items-center">
+                <button
+                  id="mobile-menu-btn"
+                  class="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 flex flex-col items-center justify-center space-y-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+                >
+                  <span
+                    class="w-5 h-0.5 bg-gray-600 dark:bg-gray-300 transition-all duration-300 hamburger-line-1"
+                  ></span>
+                  <span
+                    class="w-5 h-0.5 bg-gray-600 dark:bg-gray-300 transition-all duration-300 hamburger-line-2"
+                  ></span>
+                  <span
+                    class="w-5 h-0.5 bg-gray-600 dark:bg-gray-300 transition-all duration-300 hamburger-line-3"
+                  ></span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Mobile Dropdown Menu -->
+            <div
+              id="mobile-menu"
+              class="lg:hidden hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-border-light dark:border-border-dark shadow-lg"
+            >
+              <!-- Your existing mobile menu content -->
+              <div class="px-4 py-6 space-y-4">
+                <!-- Mobile Search -->
+                <div class="relative">
+                  <input
+                    id="mobile-search-input"
+                    class="w-full bg-gray-100 dark:bg-gray-700 border-none rounded-full pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-gray-600 transition-all text-sm"
+                    placeholder="Search plans..."
+                    type="text"
+                  />
+                  <span
+                    class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
+                    >search</span
+                  >
+                </div>
+
+                <!-- Mobile Navigation Links -->
+                <div class="space-y-2">
+                  <a
+                    href="#"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+                  >
+                    <span
+                      class="material-icons text-gray-500 group-hover:text-primary transition-colors"
+                      >home</span
+                    >
+                    <span
+                      class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
+                      >Home</span
+                    >
+                  </a>
+
+                  <a
+                    href="#"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+                  >
+                    <span
+                      class="material-icons text-gray-500 group-hover:text-primary transition-colors"
+                      >card_giftcard</span
+                    >
+                    <span
+                      class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
+                      >Plans</span
+                    >
+                  </a>
+
+                  <a
+                    href="#faq"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+                  >
+                    <span
+                      class="material-icons text-gray-500 group-hover:text-primary transition-colors"
+                      >help</span
+                    >
+                    <span
+                      class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
+                      >FAQ</span
+                    >
+                  </a>
+
+                  <a
+                    href="#"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+                  >
+                    <span
+                      class="material-icons text-gray-500 group-hover:text-primary transition-colors"
+                      >person</span
+                    >
+                    <span
+                      class="text-gray-700 dark:text-gray-200 group-hover:text-primary transition-colors font-medium"
+                      >My Account</span
+                    >
+                  </a>
+
+                  <button
+                    id="mobile-login-btn"
+                    class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-medium w-full text-left"
+                  >
+                    <span class="material-icons">login</span>
+                    <span>Login</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Banner Section -->
+        <section class="my-12">
+          <div
+            class="banner-container rounded-lg h-80 flex items-center justify-center text-white"
+          >
+            <div class="banner-content text-center px-4">
+              <h1 id="banner-title" class="text-4xl md:text-5xl font-bold mb-4">
+                Experience Next-Gen Mobile Connectivity
+              </h1>
+              <p id="banner-description" class="text-xl mb-8">
+                Fast, reliable, and affordable mobile plans for everyone
+              </p>
+              <button
+                id="banner-button"
+                class="bg-white text-primary font-semibold py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                Explore Plans
+              </button>
+            </div>
+            <div class="banner-image hidden md:block">
+              <img
+                id="banner-image"
+                src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                alt="Mobile connectivity"
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- Popular Plans Image Carousel -->
+        <section class="my-24">
+          <h2
+            id="plans-heading"
+            class="text-3xl font-bold text-center mb-12 text-text-light dark:text-text-dark"
+          >
+            Popular Plans
+          </h2>
+          <div class="relative">
+            <button class="carousel-nav prev" id="carousel-prev" disabled>
+              <span class="material-icons">chevron_left</span>
+            </button>
+            <div
+              class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth -mx-4"
+              id="carousel"
+            >
+              <!-- Plan 1: 2 GB/Day -->
+              <div class="carousel-item px-4">
+                <div class="image-carousel-item">
+                  <div class="plan-text-overlay">
+                    <div id="plan-1-title" class="plan-title">
+                      2 GB/Day Plan
+                    </div>
+                    <div id="plan-1-details" class="plan-details">
+                      Daily high-speed data with unlimited calls
+                    </div>
+                    <div id="plan-1-price" class="plan-price">
+                      Starts @ ₹299/month
+                    </div>
+                  </div>
+                  <img
+                    id="plan-1-image"
+                    src="https://www.informalnewz.com/wp-content/uploads/2024/12/3300GB-data-plan.jpg"
+                    alt="2 GB/Day Plan"
+                  />
+                  <a href="#" class="plan-button">GET NOW ></a>
+                </div>
+              </div>
+
+              <!-- Plan 2: 2.5 GB/Day -->
+              <div class="carousel-item px-4">
+                <div class="image-carousel-item">
+                  <div class="plan-text-overlay">
+                    <div id="plan-2-title" class="plan-title">
+                      2.5 GB/Day Plan
+                    </div>
+                    <div id="plan-2-details" class="plan-details">
+                      Extra data for heavy users
+                    </div>
+                    <div id="plan-2-price" class="plan-price">
+                      Starts @ ₹349/month
+                    </div>
+                  </div>
+                  <img
+                    id="plan-2-image"
+                    src="https://images.unsplash.com/photo-1556656793-08538906a9f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                    alt="2.5 GB/Day Plan"
+                  />
+                  <a href="#" class="plan-button">GET NOW ></a>
+                </div>
+              </div>
+
+              <!-- Plan 3: 3 GB/Day -->
+              <div class="carousel-item px-4">
+                <div class="image-carousel-item">
+                  <div class="plan-text-overlay">
+                    <div id="plan-3-title" class="plan-title">
+                      3 GB/Day Plan
+                    </div>
+                    <div id="plan-3-details" class="plan-details">
+                      Maximum daily data allowance
+                    </div>
+                    <div id="plan-3-price" class="plan-price">
+                      Starts @ ₹399/month
+                    </div>
+                  </div>
+                  <img
+                    id="plan-3-image"
+                    src="https://www.informalnewz.com/wp-content/webp-express/webp-images/uploads/2023/09/Jio-brings-amazing-offer-2.jpg.webp"
+                    alt="3 GB/Day Plan"
+                  />
+                  <a href="#" class="plan-button">GET NOW ></a>
+                </div>
+              </div>
+
+              <!-- Plan 4: Annual Plans -->
+              <div class="carousel-item px-4">
+                <div class="image-carousel-item">
+                  <div class="plan-text-overlay">
+                    <div id="plan-4-title" class="plan-title">Annual Plans</div>
+                    <div id="plan-4-details" class="plan-details">
+                      Save big with yearly subscription
+                    </div>
+                    <div id="plan-4-price" class="plan-price">
+                      From ₹2599/year
+                    </div>
+                  </div>
+                  <img
+                    id="plan-4-image"
+                    src="https://cloudinary.hbs.edu/hbsit/image/upload/s--gDL4YzuO--/f_auto,c_fill,h_375,w_750,/v20200101/4698FDC0B92A17E34F0155D15C423FEC.jpg"
+                    alt="Annual Plans"
+                  />
+                  <a href="#" class="plan-button">GET NOW ></a>
+                </div>
+              </div>
+
+              <!-- Plan 5: True Unlimited 5G -->
+              <div class="carousel-item px-4">
+                <div class="image-carousel-item">
+                  <div class="plan-text-overlay">
+                    <div id="plan-5-title" class="plan-title">
+                      True Unlimited 5G
+                    </div>
+                    <div id="plan-5-details" class="plan-details">
+                      Next-gen connectivity without limits
+                    </div>
+                    <div id="plan-5-price" class="plan-price">
+                      Starts @ ₹799/month
+                    </div>
+                  </div>
+                  <img
+                    id="plan-5-image"
+                    src="https://myjiostatic.cdn.jio.com/cms/assets/true5g/true-5g-mobile.webp"
+                    alt="True Unlimited 5G Plan"
+                  />
+                  <a href="#" class="plan-button">GET NOW ></a>
+                </div>
+              </div>
+
+              <!-- Plan 6: Individual Plans -->
+              <div class="carousel-item px-4">
+                <div class="image-carousel-item">
+                  <div class="plan-text-overlay">
+                    <div id="plan-6-title" class="plan-title">
+                      Individual Plans
+                    </div>
+                    <div id="plan-6-details" class="plan-details">
+                      Tailored for single users
+                    </div>
+                    <div id="plan-6-price" class="plan-price">
+                      From ₹399/month
+                    </div>
+                  </div>
+                  <img
+                    id="plan-6-image"
+                    src="https://bharatnet.in/wp-content/uploads/2025/02/Cheapest-Postpaid-Plans-of-Airtel-Jio-and-Vodafone-Idea.jpg"
+                    alt="Individual Plans"
+                  />
+                  <a href="#" class="plan-button">GET NOW ></a>
+                </div>
+              </div>
+
+              <!-- Plan 7: Family Pack -->
+              <div class="carousel-item px-4">
+                <div class="image-carousel-item">
+                  <div class="plan-text-overlay">
+                    <div id="plan-7-title" class="plan-title">Family Pack</div>
+                    <div id="plan-7-details" class="plan-details">
+                      Connect your entire family
+                    </div>
+                    <div id="plan-7-price" class="plan-price">
+                      ₹999/month for 3 SIMs
+                    </div>
+                  </div>
+                  <img
+                    id="plan-7-image"
+                    src="https://www.myvi.in/content/dam/vodafoneideadigital/StaticPages/consumerimages/blog/family-plans/family-plans-mobile.webp"
+                    alt="Family Pack"
+                  />
+                  <a href="#" class="plan-button">GET NOW ></a>
+                </div>
+              </div>
+
+              <!-- Plan 8: JioHotstar Plans -->
+              <div class="carousel-item px-4">
+                <div class="image-carousel-item">
+                  <div class="plan-text-overlay">
+                    <div id="plan-8-title" class="plan-title">
+                      JioHotstar Plans
+                    </div>
+                    <div id="plan-8-details" class="plan-details">
+                      Data + Hotstar Premium included
+                    </div>
+                    <div id="plan-8-price" class="plan-price">
+                      Starts @ ₹799/month
+                    </div>
+                  </div>
+                  <img
+                    id="plan-8-image"
+                    src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh-Oshq9HvmCEeWL9dsqceRihCgvLA-UgNJiAWyQ7mRUefN0GeG5HeZXeiWNIkAbEZ_Ky6MjTzlIKmUHAX5cOeWvF34ZAD9gCLF0N7YWCoiRGaqbCdY_NPGBzIZG_mVSsMF0qMNK35a-3TqxeAYUACIv_liy9Hr9J3ReuPtxrFkf4qbb-nLPc62O4XBZeBn/s1792/DALL%C2%B7E%202025-03-13%2019.15.47%20-%20A%20vibrant%20digital%20illustration%20showcasing%20JioHotstar,%20the%20newly%20merged%20streaming%20platform%20in%20India.%20The%20image%20features%20a%20sleek%20smart%20TV%20screen%20display.webp"
+                    alt="JioHotstar Plans"
+                  />
+                  <a href="#" class="plan-button">GET NOW ></a>
+                </div>
+              </div>
+
+              <!-- Plan 9: Netflix Plans -->
+              <div class="carousel-item px-4">
+                <div class="image-carousel-item">
+                  <div class="plan-text-overlay">
+                    <div id="plan-9-title" class="plan-title">
+                      Netflix Plans
+                    </div>
+                    <div id="plan-9-details" class="plan-details">
+                      Data + Netflix subscription included
+                    </div>
+                    <div id="plan-9-price" class="plan-price">
+                      Starts @ ₹1099/month
+                    </div>
+                  </div>
+                  <img
+                    id="plan-9-image"
+                    src="https://cdn.mos.cms.futurecdn.net/rqzeqosQ6SVMZELTBuAaDk.jpg"
+                    alt="Netflix Plans"
+                  />
+                  <a href="#" class="plan-button">GET NOW ></a>
+                </div>
+              </div>
+            </div>
+            <button class="carousel-nav next" id="carousel-next">
+              <span class="material-icons">chevron_right</span>
+            </button>
+          </div>
+          <div
+            class="flex justify-center mt-8 space-x-2"
+            id="carousel-dots"
+          ></div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="my-24" id="faq">
+          <h2
+            id="faq-heading"
+            class="text-3xl font-bold text-center mb-12 text-text-light dark:text-text-dark"
+          >
+            Frequently Asked Questions
+          </h2>
+          <div class="grid md:grid-cols-2 gap-16 items-start">
+            <div class="space-y-4">
+              <!-- FAQ 1 -->
+              <div class="faq-item">
+                <div class="faq-question">
+                  <h3 id="faq-1-question">How do I switch to Nexa?</h3>
+                  <span class="material-icons">expand_more</span>
+                </div>
+                <div class="faq-answer">
+                  <p
+                    id="faq-1-answer"
+                    class="text-muted-light dark:text-muted-dark"
+                  >
+                    Switching to Nexa is simple! Just choose a plan that fits
+                    your needs, and we'll help you transfer your number from
+                    your current provider. The process typically takes 1-2
+                    business days to complete.
+                  </p>
+                </div>
+              </div>
+
+              <!-- FAQ 2 -->
+              <div class="faq-item">
+                <div class="faq-question">
+                  <h3 id="faq-2-question">
+                    Can I keep my current phone number?
+                  </h3>
+                  <span class="material-icons">expand_more</span>
+                </div>
+                <div class="faq-answer">
+                  <p
+                    id="faq-2-answer"
+                    class="text-muted-light dark:text-muted-dark"
+                  >
+                    Yes, absolutely! We make it easy to bring your current phone
+                    number to Nexa. During the signup process, you'll have the
+                    option to port your existing number. There's no additional
+                    cost for this service.
+                  </p>
+                </div>
+              </div>
+
+              <!-- FAQ 3 -->
+              <div class="faq-item">
+                <div class="faq-question">
+                  <h3 id="faq-3-question">What is 5G coverage like?</h3>
+                  <span class="material-icons">expand_more</span>
+                </div>
+                <div class="faq-answer">
+                  <p
+                    id="faq-3-answer"
+                    class="text-muted-light dark:text-muted-dark"
+                  >
+                    Nexa offers extensive 5G coverage across the country, with
+                    continuous expansion. Our 5G network provides faster speeds
+                    and lower latency. Check our coverage map for specific
+                    details about your area.
+                  </p>
+                </div>
+              </div>
+
+              <!-- FAQ 4 -->
+              <div class="faq-item">
+                <div class="faq-question">
+                  <h3 id="faq-4-question">How can I track my data usage?</h3>
+                  <span class="material-icons">expand_more</span>
+                </div>
+                <div class="faq-answer">
+                  <p
+                    id="faq-4-answer"
+                    class="text-muted-light dark:text-muted-dark"
+                  >
+                    You can easily track your data usage through our mobile app
+                    or customer portal. We also send notifications when you're
+                    approaching your data limit to help you avoid overage
+                    charges.
+                  </p>
+                </div>
+              </div>
+
+              <!-- FAQ 5 -->
+              <div class="faq-item">
+                <div class="faq-question">
+                  <h3 id="faq-5-question">
+                    What payment methods do you accept?
+                  </h3>
+                  <span class="material-icons">expand_more</span>
+                </div>
+                <div class="faq-answer">
+                  <p
+                    id="faq-5-answer"
+                    class="text-muted-light dark:text-muted-dark"
+                  >
+                    We accept all major credit cards, debit cards, PayPal, and
+                    bank transfers. You can also set up automatic payments for
+                    convenience and never worry about missing a payment.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- FAQ Image Section -->
+            <div class="faq-image-container">
+              <img
+                id="faq-image"
+                src="https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                alt="Customer Support"
+                class="faq-image"
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- Support Section -->
+        <section class="mt-16 text-center">
+          <h2 class="text-3xl font-bold mb-4">Need Help?</h2>
+          <p class="text-muted-light dark:text-muted-dark mb-8">
+            Our support team is here to assist you 24/7
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div
+              class="bg-card-light dark:bg-card-dark p-8 rounded-2xl shadow-lg border border-border-light dark:border-border-dark cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+            >
+              <div
+                class="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              >
+                <span class="material-icons text-blue-600 text-3xl">call</span>
+              </div>
+              <h3 class="font-bold text-lg mb-2">Call Support</h3>
+              <p class="text-muted-light dark:text-muted-dark text-sm mb-3">
+                Speak with our experts
+              </p>
+              <p class="text-primary font-semibold">9998887766</p>
+            </div>
+
+            <div
+              class="bg-card-light dark:bg-card-dark p-8 rounded-2xl shadow-lg border border-border-light dark:border-border-dark cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+            >
+              <div
+                class="w-20 h-20 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              >
+                <span class="material-icons text-purple-600 text-3xl"
+                  >chat</span
+                >
+              </div>
+              <h3 class="font-bold text-lg mb-2">Live Chat</h3>
+              <p class="text-muted-light dark:text-muted-dark text-sm mb-3">
+                Get instant responses
+              </p>
+              <span
+                class="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium"
+              >
+                <span
+                  class="w-2 h-2 bg-green-500 rounded-full inline-block mr-1 animate-pulse"
+                ></span>
+                Online Now
+              </span>
+            </div>
+
+            <div
+              class="bg-card-light dark:bg-card-dark p-8 rounded-2xl shadow-lg border border-border-light dark:border-border-dark cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+            >
+              <div
+                class="w-20 h-20 bg-gradient-to-br from-violet-100 to-violet-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              >
+                <span class="material-icons text-violet-600 text-3xl"
+                  >email</span
+                >
+              </div>
+              <h3 class="font-bold text-lg mb-2">Email Support</h3>
+              <p class="text-muted-light dark:text-muted-dark text-sm mb-3">
+                Detailed assistance
+              </p>
+              <p class="text-primary font-semibold text-sm">support@nexa.com</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Footer -->
+      <footer
+        class="bg-gray-900 text-white py-12 sm:py-16 w-screen relative left-1/2 right-1/2 -mx-[50vw] mt-16 sm:mt-20"
+      >
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div
+            class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8"
+          >
+            <!-- Logo -->
+            <div
+              class="col-span-2 md:col-span-1 flex items-start justify-center md:justify-start"
+            >
+              <img
+                src="/assets/images/logo-footer.jpg"
+                alt="NEXA"
+                class="h-24 w-28 sm:h-32 sm:w-36 lg:h-40 lg:w-48 rounded-lg object-contain"
+              />
+            </div>
+
+            <!-- About -->
+            <div>
+              <h3
+                class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-purple-400"
+              >
+                About the Company
+              </h3>
+              <ul class="space-y-2 sm:space-y-3">
+                <li>
+                  <a
+                    class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                    href="/pages/info/about.html"
+                  >
+                    About Us
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                    href="/pages/info/nexaGroups.html"
+                  >
+                    Nexa Group
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                    href="/pages/info/5G.html"
+                  >
+                    5G
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Prepaid -->
+            <div>
+              <h3
+                class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-blue-400"
+              >
+                Prepaid Plans
+              </h3>
+              <ul class="space-y-2 sm:space-y-3">
+                <li>
+                  <a
+                    class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                    href="/pages/customer/prepaid/prepaid-home.html"
+                  >
+                    Popular Prepaid Plans
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                    href="/pages/customer/plans/plans.html"
+                  >
+                    Unlimited 5G
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                    href="/pages/customer/plans/plans.html"
+                  >
+                    Top Up Data Packs
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Postpaid -->
+            <div>
+              <h3
+                class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-violet-400"
+              >
+                Postpaid Plans
+              </h3>
+              <ul class="space-y-2 sm:space-y-3">
+                <li>
+                  <a
+                    class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                    href="/pages/customer/postpaid/postpaid-home.html"
+                  >
+                    <span class="hidden sm:inline"
+                      >Trending Postpaid Plans</span
+                    >
+                    <span class="sm:hidden">Top Postpaid Plans</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                    href="/pages/customer/plans/plans.html?type=postpaid"
+                  >
+                    <span class="hidden sm:inline"
+                      >Postpaid Individual Plans</span
+                    >
+                    <span class="sm:hidden">Individual Plans</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                    href="/pages/customer/plans/plans.html?type=postpaid"
+                  >
+                    <span class="hidden sm:inline">Postpaid Family Plans</span>
+                    <span class="sm:hidden">Family Plans</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Support -->
+            <div>
+              <h3
+                class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-purple-400"
+              >
+                Support
+              </h3>
+              <ul class="space-y-2 sm:space-y-3">
+                <li>
+                  <a
+                    class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                    href="/pages/info/5G.html#faq"
+                  >
+                    FAQ
+                  </a>
+                </li>
+
+                <li>
+                  <a
+                    class="text-sm sm:text-base text-gray-300 hover:text-white transition-colors hover:translate-x-1 transform inline-block"
+                    href="#"
+                  >
+                    Contact Us
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div
+            class="border-t border-gray-800 pt-6 sm:pt-8 mt-6 sm:mt-8 text-center"
+          >
+            <a href="/components/terms.html">Terms & Conditions</a>
+            <p class="text-sm sm:text-base text-gray-300">
+              ©2025 Nexa. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+      <!-- Fixed CMS JavaScript -->
+      <script>
+        // CMS functionality
+        document.addEventListener("DOMContentLoaded", function () {
+          // CMS Panel Toggle
+          const cmsToggle = document.getElementById("cmsToggle");
+          const cmsPanel = document.getElementById("cmsPanel");
+          const cmsClose = document.getElementById("cmsClose");
+
+          if (cmsToggle && cmsPanel) {
+            cmsToggle.addEventListener("click", function () {
+              cmsPanel.classList.toggle("active");
+            });
+          }
+
+          if (cmsClose) {
+            cmsClose.addEventListener("click", function () {
+              cmsPanel.classList.remove("active");
+            });
+          }
+
+          // Tab Switching
+          const tabs = document.querySelectorAll(".cms-tab");
+          tabs.forEach((tab) => {
+            tab.addEventListener("click", function () {
+              // Remove active class from all tabs
+              tabs.forEach((t) => t.classList.remove("active"));
+              // Add active class to clicked tab
+              this.classList.add("active");
+
+              // Hide all tab contents
+              document
+                .querySelectorAll(".cms-tab-content")
+                .forEach((content) => {
+                  content.classList.remove("active");
+                });
+
+              // Show selected tab content
+              const tabId = this.getAttribute("data-tab") + "Tab";
+              const tabContent = document.getElementById(tabId);
+              if (tabContent) {
+                tabContent.classList.add("active");
+              }
+
+              // Reset form visibility and section selection
+              document.querySelectorAll(".cms-form").forEach((form) => {
+                form.classList.remove("active");
+              });
+
+              // Show the first section's form
+              const firstSection = document.querySelector(
+                `#${tabId} .cms-section`
+              );
+              if (firstSection) {
+                // Remove active class from all sections
+                document.querySelectorAll(".cms-section").forEach((s) => {
+                  s.classList.remove("active");
+                });
+
+                firstSection.classList.add("active");
+                loadSectionContent(firstSection.getAttribute("data-section"));
+
+                // Show the form for the active section
+                const form = document.querySelector(`#${tabId} .cms-form`);
+                if (form) {
+                  form.classList.add("active");
+                }
+              }
+            });
+          });
+
+          // Section Selection
+          const sections = document.querySelectorAll(".cms-section");
+          sections.forEach((section) => {
+            section.addEventListener("click", function () {
+              // Remove active class from all sections
+              document.querySelectorAll(".cms-section").forEach((s) => {
+                s.classList.remove("active");
+              });
+
+              // Add active class to clicked section
+              this.classList.add("active");
+
+              // Load current content into form
+              loadSectionContent(this.getAttribute("data-section"));
+            });
+          });
+
+          // Image Preview
+          const imageInputs = document.querySelectorAll('input[type="file"]');
+          imageInputs.forEach((input) => {
+            input.addEventListener("change", function () {
+              const file = this.files[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                  const previewId = this.id + "Preview";
+                  const preview = document.getElementById(previewId);
+                  if (preview) {
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                  }
+                }.bind(this);
+                reader.readAsDataURL(file);
+              }
+            });
+          });
+
+          // Save Functions - with null checks
+          const saveBannerBtn = document.getElementById("saveBanner");
+          const savePlanBtn = document.getElementById("savePlan");
+          const saveFaqBtn = document.getElementById("saveFaq");
+
+          if (saveBannerBtn) {
+            saveBannerBtn.addEventListener("click", saveBanner);
+          }
+
+          if (savePlanBtn) {
+            savePlanBtn.addEventListener("click", savePlan);
+          }
+
+          if (saveFaqBtn) {
+            saveFaqBtn.addEventListener("click", saveFaq);
+          }
+
+          // Cancel Functions
+          const cancelBannerBtn = document.getElementById("cancelBanner");
+          const cancelPlanBtn = document.getElementById("cancelPlan");
+          const cancelFaqBtn = document.getElementById("cancelFaq");
+
+          if (cancelBannerBtn) {
+            cancelBannerBtn.addEventListener("click", resetForm);
+          }
+
+          if (cancelPlanBtn) {
+            cancelPlanBtn.addEventListener("click", resetForm);
+          }
+
+          if (cancelFaqBtn) {
+            cancelFaqBtn.addEventListener("click", resetForm);
+          }
+
+          // Load initial content
+          loadAllContent();
+        });
+
+        // Load all content from localStorage
+        function loadAllContent() {
+          // Banner content
+          const bannerTitle = localStorage.getItem("bannerTitle");
+          const bannerDescription = localStorage.getItem("bannerDescription");
+          const bannerButtonText = localStorage.getItem("bannerButtonText");
+          const bannerImage = localStorage.getItem("bannerImage");
+
+          const bannerTitleEl = document.getElementById("banner-title");
+          const bannerDescEl = document.getElementById("banner-description");
+          const bannerButtonEl = document.getElementById("banner-button");
+          const bannerImageEl = document.getElementById("banner-image");
+
+          if (bannerTitle && bannerTitleEl)
+            bannerTitleEl.textContent = bannerTitle;
+          if (bannerDescription && bannerDescEl)
+            bannerDescEl.textContent = bannerDescription;
+          if (bannerButtonText && bannerButtonEl)
+            bannerButtonEl.textContent = bannerButtonText;
+          if (bannerImage && bannerImageEl) bannerImageEl.src = bannerImage;
+
+          // Plans heading
+          const plansHeading = localStorage.getItem("plansHeading");
+          const plansHeadingEl = document.getElementById("plans-heading");
+          if (plansHeading && plansHeadingEl)
+            plansHeadingEl.textContent = plansHeading;
+
+          // FAQ heading
+          const faqHeading = localStorage.getItem("faqHeading");
+          const faqHeadingEl = document.getElementById("faq-heading");
+          if (faqHeading && faqHeadingEl) faqHeadingEl.textContent = faqHeading;
+
+          // FAQ image
+          const faqImage = localStorage.getItem("faqImage");
+          const faqImageEl = document.getElementById("faq-image");
+          if (faqImage && faqImageEl) faqImageEl.src = faqImage;
+
+          // Load each plan
+          for (let i = 1; i <= 9; i++) {
+            const planTitle = localStorage.getItem(`plan-${i}-title`);
+            const planDetails = localStorage.getItem(`plan-${i}-details`);
+            const planPrice = localStorage.getItem(`plan-${i}-price`);
+            const planImage = localStorage.getItem(`plan-${i}-image`);
+
+            const planTitleEl = document.getElementById(`plan-${i}-title`);
+            const planDetailsEl = document.getElementById(`plan-${i}-details`);
+            const planPriceEl = document.getElementById(`plan-${i}-price`);
+            const planImageEl = document.getElementById(`plan-${i}-image`);
+
+            if (planTitle && planTitleEl) planTitleEl.textContent = planTitle;
+            if (planDetails && planDetailsEl)
+              planDetailsEl.textContent = planDetails;
+            if (planPrice && planPriceEl) planPriceEl.textContent = planPrice;
+            if (planImage && planImageEl) planImageEl.src = planImage;
+          }
+
+          // Load each FAQ
+          for (let i = 1; i <= 5; i++) {
+            const faqQuestion = localStorage.getItem(`faq-${i}-question`);
+            const faqAnswer = localStorage.getItem(`faq-${i}-answer`);
+
+            const faqQuestionEl = document.getElementById(`faq-${i}-question`);
+            const faqAnswerEl = document.getElementById(`faq-${i}-answer`);
+
+            if (faqQuestion && faqQuestionEl)
+              faqQuestionEl.textContent = faqQuestion;
+            if (faqAnswer && faqAnswerEl) faqAnswerEl.textContent = faqAnswer;
+          }
+        }
+
+        // Load section content into form
+        function loadSectionContent(sectionId) {
+          // Reset all previews
+          document.querySelectorAll(".cms-image-preview").forEach((preview) => {
+            preview.style.display = "none";
+          });
+
+          if (sectionId === "banner-main") {
+            const bannerTitleEl = document.getElementById("bannerTitle");
+            const bannerDescEl = document.getElementById("bannerDescription");
+            const bannerButtonTextEl =
+              document.getElementById("bannerButtonText");
+
+            if (bannerTitleEl)
+              bannerTitleEl.value = localStorage.getItem("bannerTitle") || "";
+            if (bannerDescEl)
+              bannerDescEl.value =
+                localStorage.getItem("bannerDescription") || "";
+            if (bannerButtonTextEl)
+              bannerButtonTextEl.value =
+                localStorage.getItem("bannerButtonText") || "";
+
+            const bannerImage = localStorage.getItem("bannerImage");
+            const bannerPreviewEl =
+              document.getElementById("bannerImagePreview");
+            if (bannerImage && bannerPreviewEl) {
+              bannerPreviewEl.src = bannerImage;
+              bannerPreviewEl.style.display = "block";
+            }
+          } else if (sectionId === "plans-heading") {
+            const planTitleEl = document.getElementById("planTitle");
+            const planDescEl = document.getElementById("planDescription");
+            const planPriceEl = document.getElementById("planPrice");
+
+            if (planTitleEl)
+              planTitleEl.value = localStorage.getItem("plansHeading") || "";
+            if (planDescEl) planDescEl.value = "";
+            if (planPriceEl) planPriceEl.value = "";
+          } else if (sectionId.startsWith("plan-")) {
+            const planNum = sectionId.split("-")[1];
+            const planTitleEl = document.getElementById("planTitle");
+            const planDescEl = document.getElementById("planDescription");
+            const planPriceEl = document.getElementById("planPrice");
+
+            if (planTitleEl)
+              planTitleEl.value =
+                localStorage.getItem(`plan-${planNum}-title`) || "";
+            if (planDescEl)
+              planDescEl.value =
+                localStorage.getItem(`plan-${planNum}-details`) || "";
+            if (planPriceEl)
+              planPriceEl.value =
+                localStorage.getItem(`plan-${planNum}-price`) || "";
+
+            const planImage = localStorage.getItem(`plan-${planNum}-image`);
+            const planPreviewEl = document.getElementById("planImagePreview");
+            if (planImage && planPreviewEl) {
+              planPreviewEl.src = planImage;
+              planPreviewEl.style.display = "block";
+            }
+          } else if (sectionId === "faq-heading") {
+            const faqQuestionEl = document.getElementById("faqQuestion");
+            const faqAnswerEl = document.getElementById("faqAnswer");
+
+            if (faqQuestionEl)
+              faqQuestionEl.value = localStorage.getItem("faqHeading") || "";
+            if (faqAnswerEl) faqAnswerEl.value = "";
+          } else if (
+            sectionId.startsWith("faq-") &&
+            sectionId !== "faq-image"
+          ) {
+            const faqNum = sectionId.split("-")[1];
+            const faqQuestionEl = document.getElementById("faqQuestion");
+            const faqAnswerEl = document.getElementById("faqAnswer");
+
+            if (faqQuestionEl)
+              faqQuestionEl.value =
+                localStorage.getItem(`faq-${faqNum}-question`) || "";
+            if (faqAnswerEl)
+              faqAnswerEl.value =
+                localStorage.getItem(`faq-${faqNum}-answer`) || "";
+          } else if (sectionId === "faq-image") {
+            const faqQuestionEl = document.getElementById("faqQuestion");
+            const faqAnswerEl = document.getElementById("faqAnswer");
+
+            if (faqQuestionEl) faqQuestionEl.value = "";
+            if (faqAnswerEl) faqAnswerEl.value = "";
+
+            const faqImage = localStorage.getItem("faqImage");
+            const faqPreviewEl = document.getElementById("faqImagePreview");
+            if (faqImage && faqPreviewEl) {
+              faqPreviewEl.src = faqImage;
+              faqPreviewEl.style.display = "block";
+            }
+          }
+        }
+
+        // Save banner content
+        function saveBanner() {
+          const titleEl = document.getElementById("bannerTitle");
+          const descEl = document.getElementById("bannerDescription");
+          const buttonTextEl = document.getElementById("bannerButtonText");
+
+          if (!titleEl || !descEl || !buttonTextEl) return;
+
+          const title = titleEl.value;
+          const description = descEl.value;
+          const buttonText = buttonTextEl.value;
+
+          localStorage.setItem("bannerTitle", title);
+          localStorage.setItem("bannerDescription", description);
+          localStorage.setItem("bannerButtonText", buttonText);
+
+          // Handle image
+          const imageInput = document.getElementById("bannerImage");
+          if (imageInput && imageInput.files.length > 0) {
+            const file = imageInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              localStorage.setItem("bannerImage", e.target.result);
+              const bannerImageEl = document.getElementById("banner-image");
+              if (bannerImageEl) bannerImageEl.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+          }
+
+          // Update page content
+          const bannerTitleEl = document.getElementById("banner-title");
+          const bannerDescEl = document.getElementById("banner-description");
+          const bannerButtonEl = document.getElementById("banner-button");
+
+          if (bannerTitleEl) bannerTitleEl.textContent = title;
+          if (bannerDescEl) bannerDescEl.textContent = description;
+          if (bannerButtonEl) bannerButtonEl.textContent = buttonText;
+
+          showToast("Banner content saved successfully!", "success");
+        }
+
+        // Save plan content
+        function savePlan() {
+          const activeSection = document.querySelector(".cms-section.active");
+          if (!activeSection) return;
+
+          const sectionId = activeSection.getAttribute("data-section");
+          const titleEl = document.getElementById("planTitle");
+          const descEl = document.getElementById("planDescription");
+          const priceEl = document.getElementById("planPrice");
+
+          if (!titleEl || !descEl || !priceEl) return;
+
+          const title = titleEl.value;
+          const description = descEl.value;
+          const price = priceEl.value;
+
+          if (sectionId === "plans-heading") {
+            localStorage.setItem("plansHeading", title);
+            const plansHeadingEl = document.getElementById("plans-heading");
+            if (plansHeadingEl) plansHeadingEl.textContent = title;
+          } else if (sectionId.startsWith("plan-")) {
+            const planNum = sectionId.split("-")[1];
+            localStorage.setItem(`plan-${planNum}-title`, title);
+            localStorage.setItem(`plan-${planNum}-details`, description);
+            localStorage.setItem(`plan-${planNum}-price`, price);
+
+            const planTitleEl = document.getElementById(
+              `plan-${planNum}-title`
+            );
+            const planDetailsEl = document.getElementById(
+              `plan-${planNum}-details`
+            );
+            const planPriceEl = document.getElementById(
+              `plan-${planNum}-price`
+            );
+
+            if (planTitleEl) planTitleEl.textContent = title;
+            if (planDetailsEl) planDetailsEl.textContent = description;
+            if (planPriceEl) planPriceEl.textContent = price;
+
+            // Handle image
+            const imageInput = document.getElementById("planImage");
+            if (imageInput && imageInput.files.length > 0) {
+              const file = imageInput.files[0];
+              const reader = new FileReader();
+              reader.onload = function (e) {
+                localStorage.setItem(`plan-${planNum}-image`, e.target.result);
+                const planImageEl = document.getElementById(
+                  `plan-${planNum}-image`
+                );
+                if (planImageEl) planImageEl.src = e.target.result;
+              };
+              reader.readAsDataURL(file);
+            }
+          }
+
+          showToast("Plan content saved successfully!", "success");
+        }
+
+        // Save FAQ content
+        function saveFaq() {
+          const activeSection = document.querySelector(".cms-section.active");
+          if (!activeSection) return;
+
+          const sectionId = activeSection.getAttribute("data-section");
+          const questionEl = document.getElementById("faqQuestion");
+          const answerEl = document.getElementById("faqAnswer");
+
+          if (!questionEl || !answerEl) return;
+
+          const question = questionEl.value;
+          const answer = answerEl.value;
+
+          if (sectionId === "faq-heading") {
+            localStorage.setItem("faqHeading", question);
+            const faqHeadingEl = document.getElementById("faq-heading");
+            if (faqHeadingEl) faqHeadingEl.textContent = question;
+          } else if (sectionId === "faq-image") {
+            // Handle FAQ image
+            const imageInput = document.getElementById("faqImage");
+            if (imageInput && imageInput.files.length > 0) {
+              const file = imageInput.files[0];
+              const reader = new FileReader();
+              reader.onload = function (e) {
+                localStorage.setItem("faqImage", e.target.result);
+                const faqImageEl = document.getElementById("faq-image");
+                if (faqImageEl) faqImageEl.src = e.target.result;
+              };
+              reader.readAsDataURL(file);
+            }
+          } else if (sectionId.startsWith("faq-")) {
+            const faqNum = sectionId.split("-")[1];
+            localStorage.setItem(`faq-${faqNum}-question`, question);
+            localStorage.setItem(`faq-${faqNum}-answer`, answer);
+
+            const faqQuestionEl = document.getElementById(
+              `faq-${faqNum}-question`
+            );
+            const faqAnswerEl = document.getElementById(`faq-${faqNum}-answer`);
+
+            if (faqQuestionEl) faqQuestionEl.textContent = question;
+            if (faqAnswerEl) faqAnswerEl.textContent = answer;
+          }
+
+          showToast("FAQ content saved successfully!", "success");
+        }
+
+        // Reset form
+        function resetForm() {
+          document
+            .querySelectorAll(".cms-form input, .cms-form textarea")
+            .forEach((input) => {
+              input.value = "";
+            });
+          document.querySelectorAll(".cms-image-preview").forEach((preview) => {
+            preview.style.display = "none";
+          });
+        }
+
+        // Your existing JavaScript functions
+        function showToast(message, type = "info") {
+          const toast = document.createElement("div");
+          const bgColor =
+            type === "success"
+              ? "bg-green-500"
+              : type === "error"
+              ? "bg-red-500"
+              : "bg-blue-500";
+
+          toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full`;
+          toast.textContent = message;
+
+          const container = document.getElementById("toastContainer");
+          if (container) {
+            container.appendChild(toast);
+
+            setTimeout(() => toast.classList.remove("translate-x-full"), 100);
+
+            setTimeout(() => {
+              toast.classList.add("translate-x-full");
+              setTimeout(() => toast.remove(), 300);
+            }, 3000);
+          }
+        }
+      </script>
+
+      <!-- Your existing landing.js functionality -->
+      <script>
+        // Mobile menu functionality - will be initialized after navbar loads
+        let mobileMenuInitialized = false;
+
+        function initializeMobileMenu() {
+          const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+          const mobileMenu = document.getElementById("mobile-menu");
+
+          // Check if elements exist and haven't been initialized yet
+          if (!mobileMenuBtn || !mobileMenu || mobileMenuInitialized) {
+            return false;
+          }
+
+          const hamburgerLines = document.querySelectorAll(
+            ".hamburger-line-1, .hamburger-line-2, .hamburger-line-3"
+          );
+
+          function toggleMobileMenu() {
+            const isHidden = mobileMenu.classList.contains("hidden");
+
+            if (isHidden) {
+              // Show menu
+              mobileMenu.classList.remove("hidden");
+              // Animate hamburger to X
+              hamburgerLines.forEach((line, index) => {
+                line.classList.add("active");
+              });
+            } else {
+              // Hide menu
+              mobileMenu.classList.add("hidden");
+              // Animate X back to hamburger
+              hamburgerLines.forEach((line, index) => {
+                line.classList.remove("active");
+              });
+            }
+          }
+
+          mobileMenuBtn.addEventListener("click", toggleMobileMenu);
+
+          // Close mobile menu when clicking outside
+          document.addEventListener("click", (e) => {
+            if (
+              !mobileMenuBtn.contains(e.target) &&
+              !mobileMenu.contains(e.target) &&
+              !mobileMenu.classList.contains("hidden")
+            ) {
+              toggleMobileMenu();
+            }
+          });
+
+          // Close mobile menu on escape key
+          document.addEventListener("keydown", (e) => {
+            if (
+              e.key === "Escape" &&
+              !mobileMenu.classList.contains("hidden")
+            ) {
+              toggleMobileMenu();
+            }
+          });
+
+          // Close mobile menu when screen size changes to desktop
+          window.addEventListener("resize", () => {
+            if (
+              window.innerWidth >= 1024 &&
+              !mobileMenu.classList.contains("hidden")
+            ) {
+              toggleMobileMenu();
+            }
+          });
+
+          mobileMenuInitialized = true;
+          console.log("Mobile menu initialized successfully");
+          return true;
+        }
+
+        // Toast notification function
+        function showToast(message, type = "info") {
+          const toast = document.createElement("div");
+          const bgColor =
+            type === "success"
+              ? "bg-green-500"
+              : type === "error"
+              ? "bg-red-500"
+              : "bg-blue-500";
+
+          toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full`;
+          toast.textContent = message;
+
+          const container = document.getElementById("toastContainer");
+          if (container) {
+            container.appendChild(toast);
+
+            setTimeout(() => toast.classList.remove("translate-x-full"), 100);
+
+            setTimeout(() => {
+              toast.classList.add("translate-x-full");
+              setTimeout(() => toast.remove(), 300);
+            }, 3000);
+          }
+        }
+
+        function startLiveChat() {
+          showToast("Live chat feature coming soon!", "info");
+        }
+
+        function emailSupport() {
+          window.open("mailto:support@nexa.com?subject=Support Request");
+        }
+
+        // Carousel functionality
+        function initializeCarousel() {
+          const carousel = document.getElementById("carousel");
+          const dotsContainer = document.getElementById("carousel-dots");
+          const prevBtn = document.getElementById("carousel-prev");
+          const nextBtn = document.getElementById("carousel-next");
+
+          // Check if carousel elements exist
+          if (!carousel || !dotsContainer) {
+            console.warn("Carousel elements not found");
+            return;
+          }
+
+          const items = document.querySelectorAll(".carousel-item");
+          const totalItems = items.length;
+
+          if (totalItems === 0) {
+            console.warn("No carousel items found");
+            return;
+          }
+
+          let dots = [];
+          let currentIndex = 0;
+          let autoScrollInterval;
+
+          // Create dots based on number of items
+          for (let i = 0; i < totalItems; i++) {
+            const dot = document.createElement("button");
+            dot.classList.add(
+              "w-2.5",
+              "h-2.5",
+              "rounded-full",
+              "transition-colors",
+              "mx-1"
+            );
+
+            if (i === 0) {
+              dot.classList.add("bg-primary");
+            } else {
+              dot.classList.add("bg-gray-300", "dark:bg-gray-600");
+            }
+
+            dot.addEventListener("click", () => {
+              goToSlide(i);
+            });
+
+            dotsContainer.appendChild(dot);
+            dots.push(dot);
+          }
+
+          // Navigation functions
+          function goToSlide(index) {
+            if (index < 0) index = 0;
+            if (index >= totalItems) index = totalItems - 1;
+
+            currentIndex = index;
+            const itemWidth = items[0].clientWidth;
+            const scrollPosition = currentIndex * itemWidth;
+
+            carousel.scrollTo({
+              left: scrollPosition,
+              behavior: "smooth",
+            });
+
+            updateDots(currentIndex);
+            updateNavButtons();
+          }
+
+          function nextSlide() {
+            goToSlide(currentIndex + 1);
+          }
+
+          function prevSlide() {
+            goToSlide(currentIndex - 1);
+          }
+
+          // Update dots function
+          function updateDots(activeIndex) {
+            dots.forEach((dot, i) => {
+              if (i === activeIndex) {
+                dot.classList.add("bg-primary");
+                dot.classList.remove("bg-gray-300", "dark:bg-gray-600");
+              } else {
+                dot.classList.remove("bg-primary");
+                dot.classList.add("bg-gray-300", "dark:bg-gray-600");
+              }
+            });
+          }
+
+          // Update navigation buttons
+          function updateNavButtons() {
+            if (prevBtn) {
+              prevBtn.disabled = currentIndex === 0;
+              prevBtn.style.opacity = currentIndex === 0 ? "0.5" : "1";
+            }
+            if (nextBtn) {
+              nextBtn.disabled = currentIndex === totalItems - 1;
+              nextBtn.style.opacity =
+                currentIndex === totalItems - 1 ? "0.5" : "1";
+            }
+          }
+
+          // Event listeners for navigation buttons
+          if (prevBtn) prevBtn.addEventListener("click", prevSlide);
+          if (nextBtn) nextBtn.addEventListener("click", nextSlide);
+
+          // Update dots on scroll
+          carousel.addEventListener("scroll", () => {
+            const itemWidth = items[0].clientWidth;
+            const scrollLeft = carousel.scrollLeft;
+            const newIndex = Math.round(scrollLeft / itemWidth);
+
+            if (newIndex !== currentIndex) {
+              currentIndex = newIndex;
+              updateDots(currentIndex);
+              updateNavButtons();
+            }
+          });
+
+          // Auto-scroll functionality
+          function startAutoScroll() {
+            autoScrollInterval = setInterval(() => {
+              if (currentIndex < totalItems - 1) {
+                nextSlide();
+              } else {
+                goToSlide(0);
+              }
+            }, 5000);
+          }
+
+          function stopAutoScroll() {
+            if (autoScrollInterval) {
+              clearInterval(autoScrollInterval);
+            }
+          }
+
+          // Start auto-scroll on page load
+          startAutoScroll();
+
+          // Pause auto-scroll on hover
+          carousel.addEventListener("mouseenter", stopAutoScroll);
+          carousel.addEventListener("mouseleave", startAutoScroll);
+
+          // Pause auto-scroll when interacting with navigation
+          if (prevBtn) {
+            prevBtn.addEventListener("mouseenter", stopAutoScroll);
+            prevBtn.addEventListener("mouseleave", startAutoScroll);
+          }
+          if (nextBtn) {
+            nextBtn.addEventListener("mouseenter", stopAutoScroll);
+            nextBtn.addEventListener("mouseleave", startAutoScroll);
+          }
+
+          // Initialize navigation buttons
+          updateNavButtons();
+
+          // Handle window resize
+          window.addEventListener("resize", () => {
+            goToSlide(currentIndex); // Re-center current slide
+          });
+        }
+
+        // FAQ accordion functionality
+        function initializeFAQ() {
+          const faqItems = document.querySelectorAll(".faq-item");
+
+          if (faqItems.length === 0) {
+            console.warn("No FAQ items found");
+            return;
+          }
+
+          faqItems.forEach((item) => {
+            const question = item.querySelector(".faq-question");
+
+            if (question) {
+              question.addEventListener("click", () => {
+                // Close all other items
+                faqItems.forEach((otherItem) => {
+                  if (
+                    otherItem !== item &&
+                    otherItem.classList.contains("active")
+                  ) {
+                    otherItem.classList.remove("active");
+                  }
+                });
+
+                // Toggle current item
+                item.classList.toggle("active");
+              });
+            }
+          });
+        }
+
+        // Initialize everything when DOM is ready
+        document.addEventListener("DOMContentLoaded", function () {
+          console.log("DOM loaded, initializing components...");
+
+          // Initialize components that don't depend on navbar
+          initializeCarousel();
+          initializeFAQ();
+
+          // Try to initialize mobile menu immediately
+          initializeMobileMenu();
+
+          // If mobile menu not initialized (navbar not loaded yet), set up polling
+          if (!mobileMenuInitialized) {
+            console.log("Mobile menu elements not found, starting polling...");
+            const navbarCheckInterval = setInterval(() => {
+              if (initializeMobileMenu()) {
+                console.log("Mobile menu initialized via polling");
+                clearInterval(navbarCheckInterval);
+              }
+            }, 100); // Check every 100ms
+
+            // Stop checking after 5 seconds to avoid infinite loop
+            setTimeout(() => {
+              clearInterval(navbarCheckInterval);
+              if (!mobileMenuInitialized) {
+                console.warn("Mobile menu elements not found after 5 seconds");
+              }
+            }, 5000);
+          }
+        });
+
+        // Optional: If you can modify navbar-loader.js, add this event listener
+        document.addEventListener("navbarLoaded", function () {
+          console.log("Navbar loaded event received");
+          initializeMobileMenu();
+        });
+      </script>
+    </main>
   </body>
   <script>
     // Mobile sidebar functionality
