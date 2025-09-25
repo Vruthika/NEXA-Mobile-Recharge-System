@@ -21,7 +21,7 @@
       <!-- Desktop Navigation -->
       <div class="hidden lg:flex items-center space-x-8">
         <!-- Search (only shown on plans pages) -->
-        <div id="search-container" class="relative" style="display: none;">
+        <div id="search-container" class="relative" style="display: none">
           <input
             id="search-input"
             class="w-80 bg-gray-100 border-none rounded-full pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-sm"
@@ -38,7 +38,7 @@
         <div class="flex items-center space-x-6">
           <a
             class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors relative group"
-            href="../dashboard/dashboard.html"
+            href="/pages/customer/dashboard/dashboard.html"
             >Home
             <span
               class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
@@ -53,8 +53,8 @@
           </a>
           <a
             class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors relative group"
-            href="/pages/customer/landing/landing.html#faq"
-            >FAQ
+            href="/pages/support/contact.html"
+            >Contact Us
             <span
               class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"
             ></span>
@@ -69,9 +69,9 @@
             >
               Login
             </button>
-            
+
             <!-- User Profile Dropdown (shown when logged in) -->
-            <div id="user-profile" class="relative" style="display: none;">
+            <div id="user-profile" class="relative" style="display: none">
               <!-- User Avatar Button -->
               <button
                 id="user-avatar-btn"
@@ -138,7 +138,11 @@
     >
       <div class="px-4 py-6 space-y-4">
         <!-- Mobile Search (only shown on plans pages) -->
-        <div id="mobile-search-container" class="relative" style="display: none;">
+        <div
+          id="mobile-search-container"
+          class="relative"
+          style="display: none"
+        >
           <input
             id="mobile-search-input"
             class="w-full bg-gray-100 border-none rounded-full pl-10 pr-4 py-3 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-sm"
@@ -154,7 +158,7 @@
         <!-- Mobile Navigation Links -->
         <div class="space-y-2">
           <a
-            href="../dashboard/dashboard.html"
+            href="/pages/customer/dashboard/dashboard.html"
             class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors group"
           >
             <span
@@ -176,7 +180,7 @@
           </a>
 
           <a
-            href="/pages/customer/landing/landing.html#faq"
+            href="/pages/support/contact.html"
             class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors group"
           >
             <span
@@ -185,7 +189,7 @@
             >
             <span
               class="text-gray-700 group-hover:text-primary transition-colors font-medium"
-              >FAQ</span
+              >Contact Us</span
             >
           </a>
 
@@ -200,11 +204,13 @@
               <span class="material-icons">login</span>
               <span>Login</span>
             </button>
-            
+
             <!-- Mobile User Profile & Logout (shown when logged in) -->
-            <div id="mobile-user-profile" style="display: none;">
+            <div id="mobile-user-profile" style="display: none">
               <!-- Mobile User Info -->
-              <div class="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg mb-2">
+              <div
+                class="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg mb-2"
+              >
                 <div
                   id="mobile-user-avatar"
                   class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-sm font-semibold"
@@ -216,7 +222,7 @@
                   <div class="text-xs opacity-80">Logged in</div>
                 </div>
               </div>
-              
+
               <a
                 href="/pages/customer/profile/profile.html"
                 class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors group"
@@ -235,9 +241,7 @@
                 class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-red-100 transition-colors w-full text-left"
               >
                 <span class="material-icons text-red-500">logout</span>
-                <span class="text-red-600 font-medium"
-                  >Logout</span
-                >
+                <span class="text-red-600 font-medium">Logout</span>
               </button>
             </div>
           </div>
