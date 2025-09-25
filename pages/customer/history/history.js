@@ -485,7 +485,7 @@ function getRemainingDays(transaction, plan) {
 
 // Render user profile
 function renderUserProfile() {
-  const userProfile = document.getElementById("user-profile");
+  const userProfile = document.getElementById("user-profile1");
   if (!userProfile || !currentUser) return;
 
   // Get the most recent successful transaction for this user
