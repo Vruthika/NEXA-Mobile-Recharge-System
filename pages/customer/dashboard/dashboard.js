@@ -32,16 +32,6 @@ async function initializeApp() {
   // Check if user is logged in
   let loggedInUser = localStorage.getItem("loggedInUser");
   if (!loggedInUser) {
-    // Set a default user for testing purposes (e.g., John Doe from mock data)
-    currentUser = {
-      id: "",
-      name: "John Doe",
-      phone: "9090909090",
-      type: "Prepaid",
-      password: "john@123",
-      status: "Active",
-    };
-    // localStorage.setItem("loggedInUser", JSON.stringify(currentUser));
     window.location.href = "/pages/auth/login/login.html";
     return;
   } else {
@@ -178,11 +168,13 @@ function findActivePlan() {
 async function initializeDataUsage() {
   if (!currentActivePlan) return;
 
-  // Extract data amount from plan (handle different formats like "2.5GB/day", "2.5 GB/day", etc.)
-  const dataMatch = currentActivePlan.data
-    ? currentActivePlan.data.match(/(\d+(\.\d+)?)\s*GB/)
-    : null;
-  dailyDataUsage.totalGB = dataMatch ? parseFloat(dataMatch[1]) : 2.5; // Default to 2.5GB if not found
+  // Use the 'limit' field from the plan API for total data
+  dailyDataUsage.totalGB = currentActivePlan.limit
+    ? parseFloat(currentActivePlan.limit)
+    : 2.5;
+
+  console.log("Plan Limit:", currentActivePlan.limit);
+  console.log("Total Data Limit:", dailyDataUsage.totalGB + "GB");
 
   // Determine reset logic based on plan type
   const now = new Date();
@@ -207,66 +199,21 @@ async function initializeDataUsage() {
     dailyDataUsage.nextResetDate.setHours(0, 0, 0, 0);
   }
 
-  // Check if we need to reset data (for prepaid daily reset)
-  if (isPrepaid) {
-    const lastReset = localStorage.getItem(`dataReset_${currentUser.id}`);
-    const today = new Date().toDateString();
-
-    if (lastReset !== today) {
-      // Reset data usage for new day
-      dailyDataUsage.usedGB = 0;
-      dailyDataUsage.usedPercentage = 0;
-      localStorage.setItem(`dataReset_${currentUser.id}`, today);
-      localStorage.setItem(
-        `dataUsage_${currentUser.id}`,
-        JSON.stringify(dailyDataUsage)
-      );
-    } else {
-      // Load existing data usage
-      const savedUsage = localStorage.getItem(`dataUsage_${currentUser.id}`);
-      if (savedUsage) {
-        const parsedUsage = JSON.parse(savedUsage);
-        dailyDataUsage.usedGB = parsedUsage.usedGB || 0;
-        dailyDataUsage.usedPercentage = parsedUsage.usedPercentage || 0;
-      }
-    }
-  } else {
-    // Postpaid: Load saved usage or initialize
-    const savedUsage = localStorage.getItem(`dataUsage_${currentUser.id}`);
-    if (savedUsage) {
-      const parsedUsage = JSON.parse(savedUsage);
-      // Check if we're still in the same billing cycle
-      const savedResetDate = new Date(parsedUsage.lastResetDate);
-      if (savedResetDate.getTime() === dailyDataUsage.lastResetDate.getTime()) {
-        dailyDataUsage.usedGB = parsedUsage.usedGB || 0;
-        dailyDataUsage.usedPercentage = parsedUsage.usedPercentage || 0;
-      } else {
-        // New billing cycle, reset data
-        dailyDataUsage.usedGB = 0;
-        dailyDataUsage.usedPercentage = 0;
-      }
-    }
-  }
-
-  // Generate some random usage if none exists (for demo purposes)
-  if (dailyDataUsage.usedGB === 0) {
-    dailyDataUsage.usedPercentage = Math.random() * 0.3 + 0.1; // 10% to 40% used initially
-    dailyDataUsage.usedGB = (
-      dailyDataUsage.totalGB * dailyDataUsage.usedPercentage
-    ).toFixed(2);
-  } else {
-    // Recalculate percentage based on saved usage
-    dailyDataUsage.usedPercentage =
-      dailyDataUsage.usedGB / dailyDataUsage.totalGB;
-  }
-
-  // Save current usage
-  localStorage.setItem(
-    `dataUsage_${currentUser.id}`,
-    JSON.stringify(dailyDataUsage)
-  );
+  // Generate random usage on every page reload (don't save to localStorage)
+  // Random usage between 10% to 95% to ensure variety
+  dailyDataUsage.usedPercentage = Math.random() * 0.85 + 0.1;
+  dailyDataUsage.usedGB = (
+    dailyDataUsage.totalGB * dailyDataUsage.usedPercentage
+  ).toFixed(2);
 
   updateDataUsageDisplay();
+
+  // Check if we need to show the alert modal (less than 25% remaining)
+  if (dailyDataUsage.usedPercentage >= 0.75) {
+    setTimeout(() => {
+      showDataUsageAlert();
+    }, 1000);
+  }
 }
 
 function updateDataUsageDisplay() {
@@ -304,13 +251,6 @@ function updateDataUsageDisplay() {
       <span class="material-icons text-sm mr-1">schedule</span>
       ${resetText}
     `;
-  }
-
-  // Show alert if data usage is >= 90%
-  if (dailyDataUsage.usedPercentage >= 0.9) {
-    setTimeout(() => {
-      showDataUsageAlert();
-    }, 2000);
   }
 }
 
@@ -506,7 +446,9 @@ function updatePlanInfo() {
                 </div>
                 <div class="flex items-center space-x-2">
                   <span class="material-icons text-green-500 text-sm">check_circle</span>
-                  <span>${currentActivePlan.data || "2.5GB/day"}</span>
+                  <span>${
+                    currentActivePlan.limit || currentActivePlan.data || "2.5GB"
+                  }/day</span>
                 </div>
                 <div class="flex items-center space-x-2">
                   <span class="material-icons text-green-500 text-sm">check_circle</span>
@@ -632,105 +574,122 @@ function showToast(message, type = "info") {
 }
 
 function startPeriodicUpdates() {
-  // Update data usage every 5 minutes (only if there's an active plan)
-  setInterval(() => {
-    if (currentActivePlan) {
-      checkDataReset();
-      updateDataUsageDisplay();
-    }
-  }, 300000);
-
   // Update renewal timer every minute (only if there's an active plan)
   setInterval(() => {
     if (currentActivePlan) {
       updateRenewalTimer();
     }
   }, 60000);
-
-  // Check for data reset every minute
-  setInterval(() => {
-    if (currentActivePlan) {
-      checkDataReset();
-    }
-  }, 60000);
 }
 
-function checkDataReset() {
-  if (!currentActivePlan || !dailyDataUsage) return;
-
-  const now = new Date();
-  const isPrepaid = currentActivePlan.isPrepaid;
-
-  if (isPrepaid) {
-    // Check if it's past midnight for prepaid users
-    const today = new Date().toDateString();
-    const lastReset = localStorage.getItem(`dataReset_${currentUser.id}`);
-
-    if (lastReset !== today) {
-      // Reset data for new day
-      dailyDataUsage.usedGB = 0;
-      dailyDataUsage.usedPercentage = 0;
-      dailyDataUsage.lastResetDate = new Date(now);
-      dailyDataUsage.lastResetDate.setHours(0, 0, 0, 0);
-
-      dailyDataUsage.nextResetDate = new Date(now);
-      dailyDataUsage.nextResetDate.setDate(
-        dailyDataUsage.nextResetDate.getDate() + 1
-      );
-      dailyDataUsage.nextResetDate.setHours(0, 0, 0, 0);
-
-      localStorage.setItem(`dataReset_${currentUser.id}`, today);
-      localStorage.setItem(
-        `dataUsage_${currentUser.id}`,
-        JSON.stringify(dailyDataUsage)
-      );
-
-      showToast("Daily data quota has been reset!", "success");
-    }
-  } else {
-    // Check if billing cycle has ended for postpaid users
-    if (now >= dailyDataUsage.nextResetDate) {
-      // Reset data for new billing cycle
-      dailyDataUsage.usedGB = 0;
-      dailyDataUsage.usedPercentage = 0;
-      dailyDataUsage.lastResetDate = new Date(now);
-      dailyDataUsage.lastResetDate.setHours(0, 0, 0, 0);
-
-      // Set next reset date (30 days from now)
-      dailyDataUsage.nextResetDate = new Date(now);
-      dailyDataUsage.nextResetDate.setDate(
-        dailyDataUsage.nextResetDate.getDate() + 30
-      );
-      dailyDataUsage.nextResetDate.setHours(0, 0, 0, 0);
-
-      localStorage.setItem(
-        `dataUsage_${currentUser.id}`,
-        JSON.stringify(dailyDataUsage)
-      );
-
-      showToast("Monthly data quota has been reset!", "success");
-    }
-  }
-}
-
-// Modal Functions (remain the same as before)
+// Modal Functions
 function showDataUsageAlert() {
   if (!currentActivePlan || !dailyDataUsage) return;
 
-  updateElementText(
-    "alertUsagePercent",
-    `${(dailyDataUsage.usedPercentage * 100).toFixed(0)}%`
-  );
-  const modal = document.getElementById("dataAlertModal");
-  if (modal) {
-    modal.classList.remove("hidden");
+  const usedPercentage = (dailyDataUsage.usedPercentage * 100).toFixed(0);
+  const remainingPercentage = 100 - usedPercentage;
+
+  // Create and show the alert modal
+  const alertModalHTML = `
+    <div id="dataAlertModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300 scale-95 animate-scale-in">
+        <div class="p-6">
+          <!-- Header -->
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-3">
+              <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <span class="material-icons text-red-500 text-2xl">warning</span>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold text-gray-900">Data Usage Alert</h3>
+                <p class="text-sm text-gray-600">High data consumption detected</p>
+              </div>
+            </div>
+            <button onclick="closeDataAlert()" class="text-gray-400 hover:text-gray-600 transition-colors">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="mb-6">
+            <div class="flex justify-between text-sm mb-2">
+              <span class="text-gray-700">Data Used: ${
+                dailyDataUsage.usedGB
+              } GB</span>
+              <span class="text-gray-700">Remaining: ${(
+                dailyDataUsage.totalGB - dailyDataUsage.usedGB
+              ).toFixed(2)} GB</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+              <div class="bg-red-500 h-3 rounded-full transition-all duration-1000" style="width: ${usedPercentage}%"></div>
+            </div>
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+              <span>0%</span>
+              <span>${usedPercentage}% Used</span>
+              <span>100%</span>
+            </div>
+          </div>
+
+          <!-- Alert Message -->
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center space-x-2">
+              <span class="material-icons text-red-500 text-lg">info</span>
+              <span class="text-red-800 font-semibold">Alert! ${usedPercentage}% of your daily quota is used</span>
+            </div>
+            <p class="text-red-700 text-sm mt-2">Only ${remainingPercentage}% (${(
+    dailyDataUsage.totalGB - dailyDataUsage.usedGB
+  ).toFixed(2)} GB) remaining.</p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex space-x-3">
+            <button onclick="closeDataAlert()" class="flex-1 bg-gray-100 text-gray-700 font-semibold py-3 px-4 rounded-xl hover:bg-gray-200 transition-colors">
+              Dismiss
+            </button>
+            <button onclick="addDataBooster(); closeDataAlert();" class="flex-1 bg-red-500 text-white font-semibold py-3 px-4 rounded-xl hover:bg-red-600 transition-colors flex items-center justify-center space-x-2">
+              <span class="material-icons text-lg">add</span>
+              <span>Add Data</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Remove existing modal if any
+  const existingModal = document.getElementById("dataAlertModal");
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  // Add new modal to the page
+  document.body.insertAdjacentHTML("beforeend", alertModalHTML);
+
+  // Add animation styles if not already present
+  if (!document.querySelector("#alertStyles")) {
+    const styles = `
+      <style id="alertStyles">
+        @keyframes scale-in {
+          0% { transform: scale(0.9); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-scale-in {
+          animation: scale-in 0.3s ease-out;
+        }
+      </style>
+    `;
+    document.head.insertAdjacentHTML("beforeend", styles);
   }
 }
 
 function closeDataAlert() {
   const modal = document.getElementById("dataAlertModal");
   if (modal) {
-    modal.classList.add("hidden");
+    modal.style.opacity = "0";
+    modal.style.transform = "scale(0.9)";
+    setTimeout(() => {
+      modal.remove();
+    }, 300);
   }
 }
 
@@ -775,8 +734,10 @@ function showPlanDetailsModal() {
                   <div class="flex items-center justify-between">
                     <span>Data:</span>
                     <span class="font-medium">${
-                      currentActivePlan.data || "2.5GB/day"
-                    }</span>
+                      currentActivePlan.limit ||
+                      currentActivePlan.data ||
+                      "2.5GB"
+                    }/day</span>
                   </div>
                   <div class="flex items-center justify-between">
                     <span>Network:</span>
@@ -956,7 +917,7 @@ function closeUsageDetailsModal() {
   }
 }
 
-// Event Handlers (remain the same as before)
+// Event Handlers
 function logout() {
   if (confirm("Are you sure you want to logout?")) {
     localStorage.removeItem("loggedInUser");
@@ -977,25 +938,30 @@ function refreshAccount() {
   initializeApp();
 }
 
-// Feature Functions (remain the same as before)
+// Feature Functions
 function showRechargeModal() {
-  showToast("Recharge modal would open here", "info");
+  // showToast("Recharge modal would open here", "info");
+  window.location.href = "/pages/customer/plans/plans.html";
 }
 
 function showHistory() {
-  showToast("History page would load here", "info");
+  // showToast("History page would load here", "info");
+  window.location.href = "/pages/customer/history/history.html";
 }
 
 function addDataBooster() {
-  showToast("Add data booster page would load here", "info");
+  // showToast("Add data booster page would load here", "info");
+  window.location.href = "/pages/customer/plans/plans.html";
 }
 
 function rechargePlan() {
-  showToast("Recharge plan page would load here", "info");
+  // showToast("Recharge plan page would load here", "info");
+  window.location.href = "/pages/customer/plans/plans.html";
 }
 
 function browsePlans() {
-  showToast("Browse plans page would load here", "info");
+  // showToast("Browse plans page would load here", "info");
+  window.location.href = "/pages/customer/prepaid/prepaid-home.html";
 }
 
 function startLiveChat() {
