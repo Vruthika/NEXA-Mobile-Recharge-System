@@ -126,6 +126,7 @@
   <body
     class="min-h-screen bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark overflow-x-hidden"
   >
+    <!-- Full Width Header -->
     <div id="navbar"></div>
 
     <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -161,14 +162,14 @@
           class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-6 sm:mb-8 animate-fadeInUp px-2"
         >
           <button
-            class="category-btn px-3 sm:px-6 py-2 sm:py-3 rounded-full bg-gray-200 dark:bg-gray-700 text-xs sm:text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            class="category-btn px-3 sm:px-6 py-2 sm:py-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs sm:text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
             data-category="Most Trending Plans"
           >
             <span class="hidden sm:inline">Most Trending Plans</span>
             <span class="sm:hidden">Trending</span>
           </button>
           <button
-            class="category-btn px-3 sm:px-6 py-2 sm:py-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs sm:text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+            class="category-btn px-3 sm:px-6 py-2 sm:py-3 rounded-full bg-gray-200 dark:bg-gray-700 text-xs sm:text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             data-category="Individual Plans"
           >
             Individual Plans
@@ -419,6 +420,106 @@
     <div id="footer"></div>
 
     <script src="./postpaid-home.js"></script>
+
+    <!-- Hamburger Menu JavaScript -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+        const mobileMenu = document.getElementById("mobile-menu");
+        const hamburgerLines = document.querySelectorAll(
+          ".hamburger-line-1, .hamburger-line-2, .hamburger-line-3"
+        );
+        let isMenuOpen = false;
+
+        function toggleMenu() {
+          isMenuOpen = !isMenuOpen;
+
+          if (isMenuOpen) {
+            // Open menu
+            mobileMenu.classList.remove(
+              "-translate-y-full",
+              "opacity-0",
+              "invisible"
+            );
+            mobileMenu.classList.add("translate-y-0", "opacity-100", "visible");
+
+            // Animate hamburger to X
+            hamburgerLines[0].style.transform =
+              "rotate(45deg) translate(6px, 6px)";
+            hamburgerLines[1].style.opacity = "0";
+            hamburgerLines[2].style.transform =
+              "rotate(-45deg) translate(6px, -6px)";
+
+            // Prevent body scroll
+            document.body.style.overflow = "hidden";
+          } else {
+            // Close menu
+            mobileMenu.classList.remove(
+              "translate-y-0",
+              "opacity-100",
+              "visible"
+            );
+            mobileMenu.classList.add(
+              "-translate-y-full",
+              "opacity-0",
+              "invisible"
+            );
+
+            // Reset hamburger
+            hamburgerLines[0].style.transform = "";
+            hamburgerLines[1].style.opacity = "1";
+            hamburgerLines[2].style.transform = "";
+
+            // Allow body scroll
+            document.body.style.overflow = "";
+          }
+        }
+
+        // Toggle menu on button click
+        if (mobileMenuBtn) {
+          mobileMenuBtn.addEventListener("click", toggleMenu);
+        }
+
+        // Close menu when clicking on menu items
+        if (mobileMenu) {
+          const menuLinks = mobileMenu.querySelectorAll("a");
+          menuLinks.forEach((link) => {
+            link.addEventListener("click", () => {
+              if (isMenuOpen) {
+                toggleMenu();
+              }
+            });
+          });
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener("click", function (event) {
+          if (
+            isMenuOpen &&
+            mobileMenu &&
+            mobileMenuBtn &&
+            !mobileMenu.contains(event.target) &&
+            !mobileMenuBtn.contains(event.target)
+          ) {
+            toggleMenu();
+          }
+        });
+
+        // Close menu on escape key
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "Escape" && isMenuOpen) {
+            toggleMenu();
+          }
+        });
+
+        // Handle window resize
+        window.addEventListener("resize", function () {
+          if (window.innerWidth >= 1024 && isMenuOpen) {
+            toggleMenu();
+          }
+        });
+      });
+    </script>
     <script src="/components/navbar.js"></script>
   </body>
 </html>

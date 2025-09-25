@@ -1,3 +1,103 @@
+// Navbar functionality
+function initializeNavbar() {
+  const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+  const mobileMenu = document.getElementById("mobile-menu");
+  const hamburgerLines = document.querySelectorAll(
+    ".hamburger-line-1, .hamburger-line-2, .hamburger-line-3"
+  );
+
+  // Return early if elements don't exist
+  if (!mobileMenuBtn || !mobileMenu || hamburgerLines.length === 0) {
+    console.log("Navbar elements not found, retrying...");
+    return false;
+  }
+
+  let isMenuOpen = false;
+
+  function toggleMenu() {
+    isMenuOpen = !isMenuOpen;
+
+    if (isMenuOpen) {
+      // Open menu
+      mobileMenu.classList.remove(
+        "-translate-y-full",
+        "opacity-0",
+        "invisible"
+      );
+      mobileMenu.classList.add("translate-y-0", "opacity-100", "visible");
+
+      // Animate hamburger to X
+      hamburgerLines[0].style.transform = "rotate(45deg) translate(6px, 6px)";
+      hamburgerLines[1].style.opacity = "0";
+      hamburgerLines[2].style.transform = "rotate(-45deg) translate(6px, -6px)";
+
+      // Prevent body scroll
+      document.body.style.overflow = "hidden";
+    } else {
+      // Close menu
+      mobileMenu.classList.remove("translate-y-0", "opacity-100", "visible");
+      mobileMenu.classList.add("-translate-y-full", "opacity-0", "invisible");
+
+      // Reset hamburger
+      hamburgerLines[0].style.transform = "";
+      hamburgerLines[1].style.opacity = "1";
+      hamburgerLines[2].style.transform = "";
+
+      // Allow body scroll
+      document.body.style.overflow = "";
+    }
+  }
+
+  // Remove any existing event listeners to prevent duplicates
+  const newMobileMenuBtn = mobileMenuBtn.cloneNode(true);
+  mobileMenuBtn.parentNode.replaceChild(newMobileMenuBtn, mobileMenuBtn);
+
+  // Toggle menu on button click
+  newMobileMenuBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleMenu();
+  });
+
+  // Close menu when clicking on menu items
+  const menuLinks = mobileMenu.querySelectorAll("a");
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      if (isMenuOpen) {
+        toggleMenu();
+      }
+    });
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener("click", function (event) {
+    if (
+      isMenuOpen &&
+      !mobileMenu.contains(event.target) &&
+      !newMobileMenuBtn.contains(event.target)
+    ) {
+      toggleMenu();
+    }
+  });
+
+  // Close menu on escape key
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && isMenuOpen) {
+      toggleMenu();
+    }
+  });
+
+  // Handle window resize
+  window.addEventListener("resize", function () {
+    if (window.innerWidth >= 1024 && isMenuOpen) {
+      toggleMenu();
+    }
+  });
+
+  console.log("Navbar initialized successfully");
+  return true;
+}
+
 function loadComponent(id, filepath) {
   return fetch(filepath)
     .then((response) => {
@@ -10,6 +110,34 @@ function loadComponent(id, filepath) {
       const element = document.getElementById(id);
       if (element) {
         element.innerHTML = data;
+      }
+      // highlightActiveLink();
+
+      // If navbar was loaded, initialize it
+      if (id === "navbar") {
+        // Try to initialize navbar, with retries if elements aren't ready
+        let retryCount = 0;
+        const maxRetries = 10;
+
+        function tryInitNavbar() {
+          if (initializeNavbar()) {
+            console.log("Navbar initialized on attempt", retryCount + 1);
+            return;
+          }
+
+          retryCount++;
+          if (retryCount < maxRetries) {
+            setTimeout(tryInitNavbar, 100);
+          } else {
+            console.warn(
+              "Failed to initialize navbar after",
+              maxRetries,
+              "attempts"
+            );
+          }
+        }
+
+        setTimeout(tryInitNavbar, 50);
       }
     })
     .catch((error) => {
@@ -36,9 +164,9 @@ const TRANSACTIONS_API =
   "https://68ca32f2430c4476c3488311.mockapi.io/Transactions";
 const PLANS_API = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans";
 
-// Global variables
+// Global variables - CHANGED: Default category is now "Most Trending Plans"
 let allPlans = [];
-let currentCategory = "Individual Plans";
+let currentCategory = "Most Trending Plans";
 let searchTerm = "";
 let currentSelectedPlanId = null;
 
@@ -229,22 +357,6 @@ function redirectToDashboard() {
 
   // Redirect to dashboard page
   window.location.href = "/pages/customer/dashboard/dashboard.html";
-}
-
-// Function to close activation success
-function closeActivationSuccess() {
-  const successModal = document.getElementById("activation-success");
-  if (successModal) {
-    successModal.remove();
-  }
-}
-
-// Function to close activation success
-function closeActivationSuccess() {
-  const successModal = document.getElementById("activation-success");
-  if (successModal) {
-    successModal.remove();
-  }
 }
 
 // Function to close activation success
@@ -553,7 +665,7 @@ async function loadPlans() {
           name: "Postpaid Plus",
           price: 599,
           validity: "Monthly",
-          category: "Individual Plans",
+          category: "Most Trending Plans",
           type: "Postpaid",
           benefits:
             "Unlimited 5G Data, Netflix Premium, Amazon Prime, 100GB Data",
@@ -563,7 +675,7 @@ async function loadPlans() {
           name: "Business Pro",
           price: 899,
           validity: "Monthly",
-          category: "Individual Plans",
+          category: "Most Trending Plans",
           type: "Postpaid",
           benefits:
             "Unlimited 5G Data, Priority Network, OTT Bundle, International Roaming",
@@ -573,7 +685,7 @@ async function loadPlans() {
           name: "Family Pack",
           price: 1299,
           validity: "Monthly",
-          category: "Individual Plans",
+          category: "Most Trending Plans",
           type: "Postpaid",
           benefits:
             "4 Connections, Shared Data, Family OTT Subscriptions, Free Calling",
@@ -583,7 +695,7 @@ async function loadPlans() {
           name: "Premium Ultra",
           price: 1499,
           validity: "Monthly",
-          category: "Individual Plans",
+          category: "Most Trending Plans",
           type: "Postpaid",
           benefits:
             "Unlimited Everything, 5G Priority, Premium OTT, International Benefits",
@@ -631,6 +743,9 @@ async function initializeApp() {
 
     // Load all plans first
     await fetchAllPlans();
+
+    // Update category buttons to show "Most Trending Plans" as active
+    updateCategoryButtons(currentCategory);
 
     // Load initial postpaid plans
     await loadPlans();
@@ -697,9 +812,9 @@ function setupEventListeners() {
           updateCategoryButtons("");
           currentCategory = "";
         } else {
-          // Reset to Individual Plans when search is cleared
-          currentCategory = "Individual Plans";
-          updateCategoryButtons("Individual Plans");
+          // Reset to Most Trending Plans when search is cleared
+          currentCategory = "Most Trending Plans";
+          updateCategoryButtons("Most Trending Plans");
         }
         await loadPlans();
       }, 300); // Debounce search
