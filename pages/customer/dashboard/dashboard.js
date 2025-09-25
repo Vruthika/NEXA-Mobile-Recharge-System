@@ -418,8 +418,8 @@ function updatePlanInfo() {
                   ₹${currentActivePlan.price}
                 </span>
                 <div class="text-right">
-                  <p class="text-subtext-light text-sm">Expires on</p>
-                  <p class="font-bold text-lg">${formatDateExpiry(
+                  <p class="flex text-subtext-light text-sm">Expires on</p>
+                  <p class="flex font-bold text-lg">${formatDateExpiry(
                     currentActivePlan.expiryDate
                   )}</p>
                 </div>
@@ -444,12 +444,7 @@ function updatePlanInfo() {
                       : "100 SMS/day"
                   }</span>
                 </div>
-                <div class="flex items-center space-x-2">
-                  <span class="material-icons text-green-500 text-sm">check_circle</span>
-                  <span>${
-                    currentActivePlan.limit || currentActivePlan.data || "2.5GB"
-                  }/day</span>
-                </div>
+                
                 <div class="flex items-center space-x-2">
                   <span class="material-icons text-green-500 text-sm">check_circle</span>
                   <span>5G Access</span>
