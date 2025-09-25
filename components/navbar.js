@@ -2,6 +2,7 @@ document.addEventListener("navloaded", function () {
   function handleLogout() {
     // Clear user details
     localStorage.removeItem("loggedInUser");
+    localStorage.removeItem("customerId");
     // Redirect to login page (adjust path if needed)
     window.location.href = "/pages/customer/landing/landing.html";
   }
