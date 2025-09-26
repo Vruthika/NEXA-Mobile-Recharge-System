@@ -329,6 +329,115 @@ function closeModal() {
   modalOverlay.classList.add("hidden");
 }
 
+// Duplicate validation function
+function checkForDuplicatePlan(planData) {
+  return totalPlans.find((plan) => {
+    const nameMatch =
+      plan.name.toLowerCase().trim() === planData.name.toLowerCase().trim();
+    const categoryMatch =
+      plan.category.toLowerCase().trim() ===
+      planData.category.toLowerCase().trim();
+    const typeMatch =
+      plan.type.toLowerCase().trim() === planData.type.toLowerCase().trim();
+    const validityMatch =
+      plan.validity.toLowerCase().trim() ===
+      planData.validity.toLowerCase().trim();
+    const priceMatch = parseFloat(plan.price) === parseFloat(planData.price);
+    const descriptionMatch =
+      (plan.description || "").toLowerCase().trim() ===
+      (planData.description || "").toLowerCase().trim();
+
+    // Compare benefits arrays
+    let benefitsMatch = false;
+    if (Array.isArray(plan.benefits) && Array.isArray(planData.benefits)) {
+      if (plan.benefits.length === planData.benefits.length) {
+        const planBenefits = plan.benefits
+          .map((b) => b.toLowerCase().trim())
+          .sort();
+        const dataBenefits = planData.benefits
+          .map((b) => b.toLowerCase().trim())
+          .sort();
+        benefitsMatch = planBenefits.every(
+          (benefit, index) => benefit === dataBenefits[index]
+        );
+      }
+    } else {
+      benefitsMatch = (plan.benefits || "") === (planData.benefits || "");
+    }
+
+    return (
+      nameMatch &&
+      categoryMatch &&
+      typeMatch &&
+      validityMatch &&
+      priceMatch &&
+      descriptionMatch &&
+      benefitsMatch
+    );
+  });
+}
+
+// Show duplicate alert modal
+function showDuplicateAlert(existingPlan) {
+  const alertContent = `
+    <div class="p-6">
+      <div class="flex items-center justify-center mb-4">
+        <div class="flex items-center justify-center w-16 h-16 bg-red-100 rounded-full">
+          <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+      </div>
+      
+      <div class="text-center mb-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-2">Plan Already Exists!</h2>
+        <p class="text-gray-600">A plan with identical details already exists in the database.</p>
+      </div>
+      
+      <div class="bg-gray-50 p-4 rounded-lg mb-6">
+        <h3 class="font-medium text-gray-800 mb-3">Existing Plan Details:</h3>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="font-medium">Plan ID:</span>
+            <span>${existingPlan.id}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium">Name:</span>
+            <span>${existingPlan.name}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium">Category:</span>
+            <span>${existingPlan.category}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium">Type:</span>
+            <span>${existingPlan.type}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium">Price:</span>
+            <span>Rs. ${existingPlan.price}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium">Validity:</span>
+            <span>${existingPlan.validity}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex justify-center space-x-3">
+        <button onclick="closeModal()" class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
+          OK, Got it
+        </button>
+        <button onclick="closeModal(); viewPlan(${existingPlan.id});" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+          View Existing Plan
+        </button>
+      </div>
+    </div>
+  `;
+
+  showModal(alertContent);
+}
+
 // Add Plan Function
 function showAddPlanModal() {
   const modalContent = `
@@ -393,8 +502,8 @@ function showAddPlanModal() {
               </div>
               
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Benefits</label>
-                <textarea id="planBenefits" name="planBenefits" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="Enter plan benefits (one per line)..."></textarea>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Benefits *</label>
+                <textarea id="planBenefits" name="planBenefits" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="Enter plan benefits (one per line)..."></textarea>
               </div>
               
               <div class="flex justify-end space-x-3 pt-4">
@@ -426,7 +535,6 @@ async function handleAddPlan(e) {
     .filter((benefit) => benefit.length > 0);
 
   const planData = {
-    id: nextPlanId,
     name: formData.get("planName"),
     type: formData.get("planType"),
     category: formData.get("planCategory"),
@@ -436,13 +544,30 @@ async function handleAddPlan(e) {
     benefits: benefitsArray,
   };
 
+  // Check for duplicate plan
+  const duplicatePlan = checkForDuplicatePlan(planData);
+
+  if (duplicatePlan) {
+    closeModal(); // Close the add plan modal first
+    setTimeout(() => {
+      showDuplicateAlert(duplicatePlan);
+    }, 300); // Small delay for smooth transition
+    return;
+  }
+
+  // Add the ID for API submission
+  const planDataWithId = {
+    ...planData,
+    id: nextPlanId,
+  };
+
   try {
     const response = await fetch(plansURL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(planData),
+      body: JSON.stringify(planDataWithId),
     });
 
     if (response.ok) {
