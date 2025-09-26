@@ -44,6 +44,7 @@ const transactionsURL =
 
 let totalTransactions = [];
 let filteredTransactions = [];
+let allPlans = [];
 
 let transactionCurrentPage = 1;
 const transactionRowsPerPage = 10;
@@ -70,28 +71,61 @@ async function fetchPlans() {
       "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans"
     );
     const plans = await res.json();
+    allPlans = plans; // Store all plans globally
 
-    const filterPlan = document.getElementById("filterPlan");
-    if (filterPlan) {
-      // Reset dropdown
-      filterPlan.innerHTML = `<option value="All">All</option>`;
-
-      // Populate from API response
-      plans.forEach((plan) => {
-        const option = document.createElement("option");
-        option.value = plan.name;
-        option.textContent = plan.name;
-        filterPlan.appendChild(option);
-      });
-    }
+    populatePlanDropdown(plans); // Initial population with all plans
   } catch (error) {
     console.error("Error fetching plans:", error);
   }
 }
+// Function to populate plan dropdown
+function populatePlanDropdown(plans) {
+  const filterPlan = document.getElementById("filterPlan");
+  if (filterPlan) {
+    // Store current selection
+    const currentSelection = filterPlan.value;
 
+    // Reset dropdown
+    filterPlan.innerHTML = `<option value="All">All</option>`;
+
+    // Populate from filtered plans
+    plans.forEach((plan) => {
+      const option = document.createElement("option");
+      option.value = plan.name;
+      option.textContent = plan.name;
+      filterPlan.appendChild(option);
+    });
+
+    // Restore selection if it still exists in filtered plans
+    const optionExists = [...filterPlan.options].some(
+      (option) => option.value === currentSelection
+    );
+    if (optionExists) {
+      filterPlan.value = currentSelection;
+    } else {
+      filterPlan.value = "All"; // Reset to "All" if current selection is no longer available
+    }
+  }
+}
+
+// Function to filter plans based on type
+function updatePlanDropdown() {
+  const selectedType = document.getElementById("filterType").value;
+
+  let filteredPlans;
+  if (selectedType === "All") {
+    filteredPlans = allPlans; // Show all plans
+  } else {
+    // Filter plans by type (assuming plans have a 'type' property)
+    filteredPlans = allPlans.filter((plan) => plan.type === selectedType);
+  }
+
+  populatePlanDropdown(filteredPlans);
+}
 // Load plans after DOM is ready
-document.addEventListener("DOMContentLoaded", fetchPlans);
+// document.addEventListener("DOMContentLoaded", fetchPlans);
 
+// Updated applyFilters function
 function applyFilters() {
   const typeFilter = document.getElementById("filterType").value;
   const statusFilter = document.getElementById("filterStatus").value;
@@ -106,10 +140,13 @@ function applyFilters() {
     const statusMatch =
       statusFilter === "All" || transaction.status === statusFilter;
     const planMatch = planFilter === "All" || transaction.plan === planFilter;
+
+    // Safe search matching with null/undefined checks
     const searchMatch =
       searchInput === "" ||
-      transaction.name.toLowerCase().includes(searchInput) ||
-      transaction.phone.toString().includes(searchInput);
+      (transaction.name &&
+        transaction.name.toLowerCase().includes(searchInput)) ||
+      (transaction.phone && transaction.phone.toString().includes(searchInput));
 
     return typeMatch && statusMatch && searchMatch && planMatch;
   });
@@ -117,8 +154,7 @@ function applyFilters() {
   transactionCurrentPage = 1;
   renderTransactions();
 }
-
-// Initialize event listeners after DOM is loaded
+// Updated event listener initialization
 function initializeFilters() {
   const typeFilter = document.getElementById("filterType");
   const statusFilter = document.getElementById("filterStatus");
@@ -126,12 +162,16 @@ function initializeFilters() {
   const searchInput = document.getElementById("searchNameOrNumber");
 
   if (typeFilter) {
-    typeFilter.addEventListener("change", applyFilters);
+    typeFilter.addEventListener("change", () => {
+      updatePlanDropdown(); // Update plan dropdown first
+      applyFilters(); // Then apply filters
+    });
   }
 
   if (statusFilter) {
     statusFilter.addEventListener("change", applyFilters);
   }
+
   if (planFilter) {
     planFilter.addEventListener("change", applyFilters);
   }
@@ -142,7 +182,11 @@ function initializeFilters() {
 }
 
 // Wait for DOM to be fully loaded
-document.addEventListener("DOMContentLoaded", initializeFilters);
+// document.addEventListener("DOMContentLoaded", initializeFilters);
+document.addEventListener("DOMContentLoaded", () => {
+  fetchPlans();
+  initializeFilters();
+});
 
 // Total Transactions + Pagination
 function renderTransactions() {
@@ -157,11 +201,11 @@ function renderTransactions() {
     tbody.innerHTML += `
       <tr class="text-center border">
         <td class="p-3 border">${start + index + 1}</td>
-        <td class="p-3 border">${t.name}</td>
-        <td class="p-3 border">${t.phone}</td>
-        <td class="p-3 border">${t.type}</td>
-        <td class="p-3 border">${t.plan}</td>
-        <td class="p-3 border">${t.status}</td>
+        <td class="p-3 border">${t.name || "N/A"}</td>
+        <td class="p-3 border">${t.phone || "N/A"}</td>
+        <td class="p-3 border">${t.type || "N/A"}</td>
+        <td class="p-3 border">${t.plan || "N/A"}</td>
+        <td class="p-3 border">${t.status || "N/A"}</td>
       </tr>`;
   });
 
