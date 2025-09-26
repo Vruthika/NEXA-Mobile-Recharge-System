@@ -42,97 +42,169 @@
     ></div>
 
     <!-- Main Content -->
-    <main class="pt-16  lg:ml-64 p-4 lg:p-6 space-y-5 ">
+    <main class="pt-16 lg:ml-64 p-4 lg:p-6 space-y-5">
       <h3 class="text-xl lg:text-2xl font-bold px-2 lg:px-0">
         Transaction History
       </h3>
-      </div>
 
       <!-- Transaction History Table -->
       <div class="bg-white p-4 lg:py-0 rounded-lg shadow">
-      <!-- Heading -->
-      <h2 class="text-lg lg:text-xl font-semibold mb-4 pt-4 pl-2">Transactions</h2>
+        <!-- Heading -->
+        <h2 class="text-lg lg:text-xl font-semibold mb-4 pt-4 pl-2">
+          Transactions
+        </h2>
 
-  <!-- Filters and Search  -->
-  <div
-  class="flex flex-col lg:flex-row lg:items-center justify-between mb-4 space-y-3 lg:space-y-0"
->
+        <!-- Filters and Search  -->
+        <div
+          class="flex flex-col lg:flex-row lg:items-center justify-between mb-4 space-y-3 lg:space-y-0 lg:flex-wrap gap-3"
+        >
+          <!-- Search by Name or Number -->
+          <div class="flex items-center gap-2 text-sm lg:text-base">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5 text-gray-600"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m21 21-5.197-5.197m0 0A7.5 7.5 
+                   0 1 0 5.196 5.196a7.5 7.5 
+                   0 0 0 10.607 10.607Z"
+              />
+            </svg>
+            <label for="searchNameOrNumber" class="whitespace-nowrap"
+              >Search:</label
+            >
+            <input
+              type="text"
+              id="searchNameOrNumber"
+              class="w-48 sm:w-56 px-2 py-1 border rounded-md shadow-sm focus:ring focus:ring-purple-300 text-sm"
+            />
+          </div>
 
+          <!-- Filter by Type -->
+          <div class="flex items-center gap-2 text-sm lg:text-base">
+            <label for="filterType" class="whitespace-nowrap">Type:</label>
+            <select
+              id="filterType"
+              class="px-2 py-1 border rounded-md shadow-sm focus:ring focus:ring-purple-300 text-sm"
+            >
+              <option value="All">All</option>
+              <option value="Prepaid">Prepaid</option>
+              <option value="Postpaid">Postpaid</option>
+            </select>
+          </div>
 
-    <!-- Search by Name or Number -->
-<div class="flex items-center gap-2 text-sm lg:text-base">
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-    class="w-5 h-5 text-gray-600">
-    <path stroke-linecap="round" stroke-linejoin="round"
-      d="m21 21-5.197-5.197m0 0A7.5 7.5 
-         0 1 0 5.196 5.196a7.5 7.5 
-         0 0 0 10.607 10.607Z" />
-  </svg>
-  <label for="searchNameOrNumber" class="whitespace-nowrap">Search:</label>
-  <input type="text" id="searchNameOrNumber"
-    class="w-48 sm:w-56 px-2 py-1 border rounded-md shadow-sm 
-           focus:ring focus:ring-purple-300 text-sm">
-</div>
+          <!-- Filter by Plan -->
+          <div class="flex items-center gap-2 text-sm lg:text-base">
+            <label for="filterPlan" class="whitespace-nowrap">Plan:</label>
+            <select
+              id="filterPlan"
+              class="px-2 py-1 border rounded-md shadow-sm focus:ring focus:ring-purple-300 text-sm"
+            >
+              <option value="All">All</option>
+            </select>
+          </div>
 
-<!-- Filter by Type -->
-<div class="flex items-center gap-2 text-sm lg:text-base">
-  <label for="filterType" class="whitespace-nowrap">Type:</label>
-  <select id="filterType"
-    class="px-2 py-1 border rounded-md shadow-sm 
-           focus:ring focus:ring-purple-300 text-sm">
-    <option value="All">All</option>
-    <option value="Prepaid">Prepaid</option>
-    <option value="Postpaid">Postpaid</option>
-  </select>
-</div>
+          <!-- Filter by Status -->
+          <div class="flex items-center gap-2 text-sm lg:text-base">
+            <label for="filterStatus" class="whitespace-nowrap">Status:</label>
+            <select
+              id="filterStatus"
+              class="px-2 py-1 border rounded-md shadow-sm focus:ring focus:ring-purple-300 text-sm"
+            >
+              <option value="All">All</option>
+              <option value="Success">Success</option>
+              <option value="Failed">Failed</option>
+            </select>
+          </div>
 
-<!-- Filter by Plan -->
-<div class="flex items-center gap-2 text-sm lg:text-base">
-  <label for="filterPlan" class="whitespace-nowrap">Plan:</label>
-  <select id="filterPlan"
-    class="px-2 py-1 border rounded-md shadow-sm 
-           focus:ring focus:ring-purple-300 text-sm">
-    <option value="All">All</option>
-  </select>
-</div>
-
-<!-- Filter by Status -->
-<div class="flex items-center gap-2 text-sm lg:text-base">
-  <label for="filterStatus" class="whitespace-nowrap">Status:</label>
-  <select id="filterStatus"
-    class="px-2 py-1 border rounded-md shadow-sm 
-           focus:ring focus:ring-purple-300 text-sm">
-    <option value="All">All</option>
-    <option value="Success">Success</option>
-    <option value="Failed">Failed</option>
-  </select>
-</div>
-
-  </div>
-
-  <!-- Table -->
-  <div class="overflow-x-auto">
-    <table class="border-collapse border border-gray-400 min-w-full">
-      <thead>
-        <tr class="bg-gray-200 text-center">
-          <th class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm">S.No</th>
-          <th class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm">Name</th>
-          <th class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm">Phone Number</th>
-          <th class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm">Type</th>
-          <th class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm">Recharged Plan</th>
-          <th class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm">Status</th>
-        </tr>
-      </thead>
-      <tbody id="transactionTable"></tbody>
-    </table>
-  </div>
-
-  <!-- Pagination -->
-        <div id="transactionPagination" class="flex justify-center lg:justify-end space-x-1 lg:space-x-2 mt-4 overflow-x-auto py-2">
+          <!-- Date Range Filter -->
+          <div
+            class="flex flex-col sm:flex-row items-start sm:items-center gap-2 text-sm lg:text-base"
+          >
+            <span class="whitespace-nowrap font-medium">Date Range:</span>
+            <div class="flex items-center gap-2">
+              <label for="dateFrom" class="whitespace-nowrap">From:</label>
+              <input
+                type="date"
+                id="dateFrom"
+                class="px-2 py-1 border rounded-md shadow-sm focus:ring focus:ring-purple-300 text-sm"
+              />
+            </div>
+            <div class="flex items-center gap-2">
+              <label for="dateTo" class="whitespace-nowrap">To:</label>
+              <input
+                type="date"
+                id="dateTo"
+                class="px-2 py-1 border rounded-md shadow-sm focus:ring focus:ring-purple-300 text-sm"
+              />
+            </div>
+            <button
+              id="clearDateFilters"
+              class="px-6 py-2 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 transition duration-300"
+            >
+              Clear Dates
+            </button>
+          </div>
         </div>
-      </div>
 
+        <!-- Table -->
+        <div class="overflow-x-auto">
+          <table class="border-collapse border border-gray-400 min-w-full">
+            <thead>
+              <tr class="bg-gray-200 text-center">
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  S.No
+                </th>
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  Name
+                </th>
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  Phone Number
+                </th>
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  Type
+                </th>
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  Recharged Plan
+                </th>
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  Status
+                </th>
+                <th
+                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                >
+                  Date
+                </th>
+              </tr>
+            </thead>
+            <tbody id="transactionTable"></tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div
+          id="transactionPagination"
+          class="flex justify-center lg:justify-end space-x-1 lg:space-x-2 mt-4 overflow-x-auto py-2"
+        ></div>
+      </div>
     </main>
 
     <script>

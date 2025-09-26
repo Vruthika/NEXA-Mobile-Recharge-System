@@ -44,7 +44,7 @@ const transactionsURL =
 
 let totalTransactions = [];
 let filteredTransactions = [];
-let allPlans = [];
+let allPlans = []; // Store all plans globally
 
 let transactionCurrentPage = 1;
 const transactionRowsPerPage = 10;
@@ -78,6 +78,7 @@ async function fetchPlans() {
     console.error("Error fetching plans:", error);
   }
 }
+
 // Function to populate plan dropdown
 function populatePlanDropdown(plans) {
   const filterPlan = document.getElementById("filterPlan");
@@ -122,14 +123,58 @@ function updatePlanDropdown() {
 
   populatePlanDropdown(filteredPlans);
 }
-// Load plans after DOM is ready
-// document.addEventListener("DOMContentLoaded", fetchPlans);
 
-// Updated applyFilters function
+// Parse date from different formats
+function parseDate(dateString) {
+  if (!dateString) return null;
+
+  // Try parsing as ISO date first
+  let date = new Date(dateString);
+  if (!isNaN(date.getTime())) {
+    return date;
+  }
+
+  // Try parsing common formats like DD/MM/YYYY, MM/DD/YYYY, etc.
+  const dateFormats = [
+    /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/, // DD/MM/YYYY or MM/DD/YYYY
+    /^(\d{4})-(\d{1,2})-(\d{1,2})$/, // YYYY-MM-DD
+    /^(\d{1,2})-(\d{1,2})-(\d{4})$/, // DD-MM-YYYY or MM-DD-YYYY
+  ];
+
+  for (let format of dateFormats) {
+    const match = dateString.match(format);
+    if (match) {
+      // Assume DD/MM/YYYY format for slash-separated dates
+      if (format === dateFormats[0]) {
+        date = new Date(match[3], match[2] - 1, match[1]);
+      } else if (format === dateFormats[1]) {
+        date = new Date(match[1], match[2] - 1, match[3]);
+      } else {
+        date = new Date(match[3], match[1] - 1, match[2]);
+      }
+
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+  }
+
+  return null;
+}
+
+// Clear date filters
+function clearDateFilters() {
+  document.getElementById("dateFrom").value = "";
+  document.getElementById("dateTo").value = "";
+  applyFilters();
+}
+
 function applyFilters() {
   const typeFilter = document.getElementById("filterType").value;
   const statusFilter = document.getElementById("filterStatus").value;
   const planFilter = document.getElementById("filterPlan").value;
+  const dateFrom = document.getElementById("dateFrom").value;
+  const dateTo = document.getElementById("dateTo").value;
   const searchInput = document
     .getElementById("searchNameOrNumber")
     .value.toLowerCase()
@@ -148,18 +193,49 @@ function applyFilters() {
         transaction.name.toLowerCase().includes(searchInput)) ||
       (transaction.phone && transaction.phone.toString().includes(searchInput));
 
-    return typeMatch && statusMatch && searchMatch && planMatch;
+    // Date range filtering
+    let dateMatch = true;
+    if (dateFrom || dateTo) {
+      const transactionDate = parseDate(
+        transaction.date || transaction.createdAt || transaction.timestamp
+      );
+
+      if (transactionDate) {
+        const fromDate = dateFrom ? new Date(dateFrom) : null;
+        const toDate = dateTo ? new Date(dateTo) : null;
+
+        // Set time to start/end of day for proper comparison
+        if (fromDate) fromDate.setHours(0, 0, 0, 0);
+        if (toDate) toDate.setHours(23, 59, 59, 999);
+
+        if (fromDate && transactionDate < fromDate) {
+          dateMatch = false;
+        }
+        if (toDate && transactionDate > toDate) {
+          dateMatch = false;
+        }
+      } else if (dateFrom || dateTo) {
+        // If date filters are applied but transaction has no valid date, exclude it
+        dateMatch = false;
+      }
+    }
+
+    return typeMatch && statusMatch && searchMatch && planMatch && dateMatch;
   });
 
   transactionCurrentPage = 1;
   renderTransactions();
 }
-// Updated event listener initialization
+
+// Initialize event listeners after DOM is loaded
 function initializeFilters() {
   const typeFilter = document.getElementById("filterType");
   const statusFilter = document.getElementById("filterStatus");
   const planFilter = document.getElementById("filterPlan");
   const searchInput = document.getElementById("searchNameOrNumber");
+  const dateFrom = document.getElementById("dateFrom");
+  const dateTo = document.getElementById("dateTo");
+  const clearDateBtn = document.getElementById("clearDateFilters");
 
   if (typeFilter) {
     typeFilter.addEventListener("change", () => {
@@ -179,10 +255,21 @@ function initializeFilters() {
   if (searchInput) {
     searchInput.addEventListener("input", applyFilters);
   }
+
+  if (dateFrom) {
+    dateFrom.addEventListener("change", applyFilters);
+  }
+
+  if (dateTo) {
+    dateTo.addEventListener("change", applyFilters);
+  }
+
+  if (clearDateBtn) {
+    clearDateBtn.addEventListener("click", clearDateFilters);
+  }
 }
 
 // Wait for DOM to be fully loaded
-// document.addEventListener("DOMContentLoaded", initializeFilters);
 document.addEventListener("DOMContentLoaded", () => {
   fetchPlans();
   initializeFilters();
@@ -198,6 +285,15 @@ function renderTransactions() {
   let paginated = filteredTransactions.slice(start, end);
 
   paginated.forEach((t, index) => {
+    // Format date for display
+    let displayDate = "N/A";
+    if (t.date || t.createdAt || t.timestamp) {
+      const date = parseDate(t.date || t.createdAt || t.timestamp);
+      if (date) {
+        displayDate = date.toLocaleDateString();
+      }
+    }
+
     tbody.innerHTML += `
       <tr class="text-center border">
         <td class="p-3 border">${start + index + 1}</td>
@@ -206,11 +302,13 @@ function renderTransactions() {
         <td class="p-3 border">${t.type || "N/A"}</td>
         <td class="p-3 border">${t.plan || "N/A"}</td>
         <td class="p-3 border">${t.status || "N/A"}</td>
+        <td class="p-3 border">${displayDate}</td>
       </tr>`;
   });
 
   renderTransactionPagination();
 }
+
 function renderTransactionPagination() {
   let pagination = document.getElementById("transactionPagination");
   pagination.innerHTML = "";
