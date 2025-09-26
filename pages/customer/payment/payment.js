@@ -323,7 +323,7 @@ document.addEventListener("DOMContentLoaded", function () {
       '<span class="material-icons animate-spin mr-2">hourglass_empty</span>Processing...';
     button.disabled = true;
 
-    let lastTransactionId = 1028;
+    let lastTransactionId = 1040;
     function getNextTransactionId() {
       lastTransactionId++;
       return "TNX" + lastTransactionId;
@@ -339,7 +339,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Create transaction data with customer details
       const transactionData = {
-        transactionId: getNextTransactionId(),
+        transaction_id: getNextTransactionId(),
         userId: customerData.id,
         name: customerData.name,
         phone: customerData.phone,
