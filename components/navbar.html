@@ -37,6 +37,7 @@
         <!-- Navigation Links -->
         <div class="flex items-center space-x-6">
           <a
+            id="desktop-home-link"
             class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors relative group"
             href="/pages/customer/dashboard/dashboard.html"
             >Home
@@ -45,6 +46,7 @@
             ></span>
           </a>
           <a
+            id="desktop-plans-link"
             class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors relative group"
             href="/pages/customer/prepaid/prepaid-home.html"
             >Plans<span
@@ -52,6 +54,7 @@
             ></span>
           </a>
           <a
+            id="desktop-contact-link"
             class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors relative group"
             href="/pages/support/contact.html"
             >Contact Us
@@ -158,6 +161,7 @@
         <!-- Mobile Navigation Links -->
         <div class="space-y-2">
           <a
+            id="mobile-home-link"
             href="/pages/customer/dashboard/dashboard.html"
             class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors group"
           >
@@ -172,14 +176,22 @@
           </a>
 
           <a
+            id="mobile-plans-link"
             href="/pages/customer/prepaid/prepaid-home.html"
-            class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-primary/10 border-l-4 border-primary"
+            class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors group"
           >
-            <span class="material-icons text-primary">card_giftcard</span>
-            <span class="text-primary font-medium">Plans</span>
+            <span
+              class="material-icons text-gray-500 group-hover:text-primary transition-colors"
+              >card_giftcard</span
+            >
+            <span
+              class="text-gray-700 group-hover:text-primary transition-colors font-medium"
+              >Plans</span
+            >
           </a>
 
           <a
+            id="mobile-contact-link"
             href="/pages/support/contact.html"
             class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors group"
           >
