@@ -14,130 +14,363 @@
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3b82f6",
+              "primary-dark": "#2563eb",
+              secondary: "#8b5cf6",
+              "secondary-dark": "#7c3aed",
+              tertiary: "#a855f7",
+              "background-light": "#f8fafc",
+              "background-dark": "#0f172a",
+              "card-light": "#ffffff",
+              "card-dark": "#1e293b",
+              "text-light": "#0f172a",
+              "text-dark": "#f1f5f9",
+              "subtext-light": "#64748b",
+              "subtext-dark": "#94a3b8",
+              "border-light": "#e2e8f0",
+              "border-dark": "#334155",
+            },
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
     <style>
+      :root {
+        --primary-gradient: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        --secondary-gradient: linear-gradient(135deg, #8b5cf6, #a855f7);
+        --purple-gradient: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+      }
+
       .support-container {
         max-width: 1200px;
         margin: 2rem auto;
         padding: 2rem;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        background: linear-gradient(135deg, #fafaff, #f0f0ff);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(139, 92, 246, 0.1);
+        border: 1px solid rgba(139, 92, 246, 0.1);
       }
 
       .support-header {
         text-align: center;
         margin-bottom: 3rem;
+        position: relative;
+      }
+
+      .support-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: var(--purple-gradient);
+        border-radius: 2px;
+        margin-bottom: 2rem;
       }
 
       .support-header h1 {
-        color: #2c3e50;
+        background: var(--purple-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         margin-bottom: 1rem;
+        margin-top: 1rem;
       }
 
-      .support-options {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 2rem;
-        margin-bottom: 3rem;
-      }
-
-      .support-card {
-        flex: 1;
-        min-width: 300px;
-        max-width: 350px;
+      .enhanced-support-card {
+        background: white;
+        border-radius: 16px;
         padding: 2rem;
-        background-color: #f8f9fa;
-        border-radius: 8px;
         text-align: center;
-        transition: transform 0.3s, box-shadow 0.3s;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         cursor: pointer;
-      }
-
-      .support-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-      }
-
-      .support-card i {
-        font-size: 3rem;
-        color: #3498db;
-        margin-bottom: 1.5rem;
-      }
-
-      .support-card h3 {
-        color: #2c3e50;
-        margin-bottom: 1rem;
-      }
-
-      .support-card p {
-        color: #7f8c8d;
-        margin-bottom: 1.5rem;
-      }
-
-      .support-card a {
-        display: inline-block;
-        padding: 0.5rem 1.5rem;
-        background-color: #3498db;
-        color: white;
-        border-radius: 5px;
-        text-decoration: none;
-        transition: background-color 0.3s;
-      }
-
-      .support-card a:hover {
-        background-color: #2980b9;
-      }
-
-      .faq-section {
-        margin-top: 3rem;
-      }
-
-      .faq-section h2 {
-        color: #2c3e50;
-        margin-bottom: 1.5rem;
-        text-align: center;
-      }
-
-      .faq-item {
-        margin-bottom: 1rem;
-        border: 1px solid #e0e0e0;
-        border-radius: 5px;
+        border: 2px solid transparent;
+        box-shadow: 0 4px 20px rgba(139, 92, 246, 0.1);
+        position: relative;
         overflow: hidden;
       }
 
-      .faq-question {
-        padding: 1rem;
-        background-color: #f8f9fa;
+      .enhanced-support-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--purple-gradient);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+      }
+
+      .enhanced-support-card:hover::before {
+        transform: scaleX(1);
+      }
+
+      .enhanced-support-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+        border-color: rgba(139, 92, 246, 0.3);
+      }
+
+      .support-icon-wrapper {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: var(--purple-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .enhanced-support-card:hover .support-icon-wrapper {
+        transform: rotate(10deg) scale(1.1);
+        box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+      }
+
+      .support-icon-wrapper i {
+        font-size: 2rem;
+        color: white;
+      }
+
+      .support-card-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: var(--purple-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+      }
+
+      .support-card-desc {
+        color: #64748b;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+      }
+
+      .support-cta-btn {
+        background: var(--purple-gradient);
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-block;
+        border: 2px solid transparent;
+      }
+
+      .support-cta-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+        border-color: white;
+      }
+
+      .faq-section {
+        margin-top: 4rem;
+        padding-top: 3rem;
+      }
+
+      .faq-title {
+        background: var(--purple-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-align: center;
+        margin-bottom: 3rem;
+        position: relative;
+      }
+
+      .faq-title::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: var(--purple-gradient);
+        border-radius: 2px;
+      }
+
+      .enhanced-faq-item {
+        margin-bottom: 1rem;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.1);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(139, 92, 246, 0.1);
+        background: white;
+      }
+
+      .enhanced-faq-item:hover {
+        box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+        transform: translateY(-2px);
+      }
+
+      .enhanced-faq-question {
+        padding: 1.5rem;
         cursor: pointer;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        transition: all 0.3s ease;
+        position: relative;
       }
 
-      .faq-question h3 {
+      .enhanced-faq-question::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--purple-gradient);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+      }
+
+      .enhanced-faq-item.active .enhanced-faq-question::before,
+      .enhanced-faq-question:hover::before {
+        transform: scaleY(1);
+      }
+
+      .enhanced-faq-question h3 {
         margin: 0;
         font-size: 1.1rem;
-        color: #2c3e50;
+        font-weight: 600;
+        color: #1e293b;
+        transition: color 0.3s ease;
       }
 
-      .faq-answer {
-        padding: 1rem;
-        background-color: #fff;
-        display: none;
+      .enhanced-faq-item.active .enhanced-faq-question h3,
+      .enhanced-faq-question:hover h3 {
+        background: var(--purple-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
 
-      .faq-answer p {
-        margin: 0;
-        color: #7f8c8d;
+      .faq-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--purple-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
       }
 
-      .faq-item.active .faq-answer {
-        display: block;
+      .faq-icon i {
+        color: white;
+        font-size: 12px;
+        transition: transform 0.3s ease;
       }
 
-      .faq-item.active .faq-question i {
+      .enhanced-faq-item.active .faq-icon {
         transform: rotate(180deg);
+      }
+
+      .enhanced-faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        background: linear-gradient(135deg, #fafaff, #f8f9ff);
+        border-top: 1px solid rgba(139, 92, 246, 0.1);
+      }
+
+      .enhanced-faq-item.active .enhanced-faq-answer {
+        max-height: 200px;
+        padding: 1.5rem;
+      }
+
+      .enhanced-faq-answer p {
+        margin: 0;
+        color: #64748b;
+        line-height: 1.7;
+      }
+
+      .pulse-animation {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
+        }
+        70% {
+          transform: scale(1.05);
+          box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+        }
+      }
+
+      .floating-elements {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      .floating-elements::before,
+      .floating-elements::after {
+        content: "";
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: rgba(139, 92, 246, 0.1);
+        animation: float 6s ease-in-out infinite;
+      }
+
+      .floating-elements::before {
+        top: 20%;
+        left: 10%;
+        animation-delay: -2s;
+      }
+
+      .floating-elements::after {
+        bottom: 20%;
+        right: 10%;
+        animation-delay: -4s;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
       }
     </style>
   </head>
@@ -148,9 +381,11 @@
     <div id="navbar"></div>
 
     <div class="container mx-auto px-4 py-12">
+      <div class="floating-elements"></div>
+
       <!-- Support Header -->
-      <div class="text-center mb-12 pb-6 border-b border-blue-100">
-        <h1 class="text-4xl md:text-5xl font-bold text-blue-800 mb-4">
+      <div class="text-center mb-12 pb-6 border-b border-purple-100">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">
           How Can We Help You?
         </h1>
         <p class="text-lg text-gray-600">
@@ -159,213 +394,189 @@
         </p>
       </div>
 
-      <!-- Support Options -->
+      <!-- Enhanced Support Options -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
         <!-- Call Us Card -->
-        <div
-          class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform hover:-translate-y-2 duration-300 border border-blue-50 relative"
-        >
-          <div class="h-2 bg-gradient-to-r from-blue-600 to-purple-600"></div>
-          <div class="p-8 text-center">
-            <div
-              class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-6"
-            >
-              <i class="fas fa-phone-alt text-2xl text-blue-600"></i>
-            </div>
-            <h3 class="text-xl font-bold text-blue-800 mb-3">Call Us</h3>
-            <p class="text-gray-600 mb-4">
-              Speak directly with our customer support team for immediate
-              assistance.
-            </p>
-            <p class="font-bold text-gray-800 mb-2">+1 (800) 123-4567</p>
-            <p class="text-sm text-gray-500">Available 24/7</p>
+        <div class="enhanced-support-card">
+          <div class="support-icon-wrapper">
+            <i class="fas fa-phone-alt"></i>
           </div>
+          <h3 class="support-card-title">Call Us</h3>
+          <p class="support-card-desc">
+            Speak directly with our customer support team for immediate
+            assistance with any mobile recharge issues.
+          </p>
+          <div class="mb-4">
+            <p class="font-bold text-gray-800 mb-1">+1 (800) 123-4567</p>
+            <p class="text-sm text-purple-600 font-medium">Available 24/7</p>
+          </div>
+          <a href="tel:+18001234567" class="support-cta-btn">Call Now</a>
         </div>
 
         <!-- Live Chat Card -->
-        <div
-          class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform hover:-translate-y-2 duration-300 border border-blue-50 relative"
-        >
-          <div class="h-2 bg-gradient-to-r from-blue-600 to-purple-600"></div>
-          <div class="p-8 text-center">
-            <div
-              class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-6"
-            >
-              <i class="fas fa-comments text-2xl text-blue-600"></i>
-            </div>
-            <h3 class="text-xl font-bold text-blue-800 mb-3">Live Chat</h3>
-            <p class="text-gray-600 mb-6">
-              Chat with our support agents in real-time for quick solutions.
-            </p>
-            <a
-              href="#"
-              class="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition duration-200"
-            >
-              Start Chat
-            </a>
+        <div class="enhanced-support-card">
+          <div class="support-icon-wrapper pulse-animation">
+            <i class="fas fa-comments"></i>
           </div>
+          <h3 class="support-card-title">Live Chat</h3>
+          <p class="support-card-desc">
+            Chat with our support agents in real-time for quick solutions and
+            instant help.
+          </p>
+          <div class="mb-4">
+            <p class="text-sm text-purple-600 font-medium mb-1">
+              <i class="fas fa-circle text-green-500 text-xs mr-1"></i>
+              Online Now
+            </p>
+            <p class="text-sm text-gray-500">Average response: 30 seconds</p>
+          </div>
+          <a href="#" class="support-cta-btn" onclick="startLiveChat()"
+            >Start Chat</a
+          >
         </div>
 
         <!-- Email Support Card -->
-        <div
-          class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform hover:-translate-y-2 duration-300 border border-blue-50 relative"
-        >
-          <div class="h-2 bg-gradient-to-r from-blue-600 to-purple-600"></div>
-          <div class="p-8 text-center">
-            <div
-              class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-6"
-            >
-              <i class="fas fa-envelope text-2xl text-blue-600"></i>
-            </div>
-            <h3 class="text-xl font-bold text-blue-800 mb-3">Email Support</h3>
-            <p class="text-gray-600 mb-6">
-              Send us an email and we'll get back to you within 24 hours.
-            </p>
-            <a
-              href="pages/support/contact.html"
-              class="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition duration-200"
-            >
-              Contact Us
-            </a>
+        <div class="enhanced-support-card">
+          <div class="support-icon-wrapper">
+            <i class="fas fa-envelope"></i>
           </div>
+          <h3 class="support-card-title">Email Support</h3>
+          <p class="support-card-desc">
+            Send us an email and we'll get back to you within 24 hours with
+            detailed solutions.
+          </p>
+          <div class="mb-4">
+            <p class="font-bold text-gray-800 mb-1">support@nexarecharge.com</p>
+            <p class="text-sm text-purple-600 font-medium">
+              Response within 24 hours
+            </p>
+          </div>
+          <a href="pages/support/contact.html" class="support-cta-btn"
+            >Contact Us</a
+          >
         </div>
       </div>
 
-      <!-- FAQ Section -->
-      <div class="mt-16 pt-8 border-t border-blue-100">
-        <h2
-          class="text-3xl font-bold text-center text-blue-800 mb-12 relative inline-block left-1/2 transform -translate-x-1/2"
-        >
-          Frequently Asked Questions
-          <span
-            class="block w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mt-4 mx-auto rounded"
-          ></span>
-        </h2>
+      <!-- Enhanced FAQ Section -->
+      <div class="faq-section">
+        <h2 class="text-3xl font-bold faq-title">Frequently Asked Questions</h2>
 
-        <div class="max-w-3xl mx-auto">
+        <div class="max-w-4xl mx-auto">
           <!-- FAQ Item 1 -->
-          <div
-            class="mb-4 border border-blue-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
-          >
-            <div
-              class="faq-question flex justify-between items-center p-5 bg-white cursor-pointer"
-            >
-              <h3 class="font-semibold text-gray-800">
-                How do I recharge my mobile?
-              </h3>
-              <i
-                class="fas fa-chevron-down text-blue-600 transition-transform duration-300"
-              ></i>
+          <div class="enhanced-faq-item">
+            <div class="enhanced-faq-question" onclick="toggleFAQ(this)">
+              <h3>How do I recharge my mobile?</h3>
+              <div class="faq-icon">
+                <i class="fas fa-plus"></i>
+              </div>
             </div>
-            <div
-              class="faq-answer hidden bg-gray-50 p-5 border-t border-blue-50"
-            >
-              <p class="text-gray-600">
-                To recharge your mobile, log in to your account, select the
-                "Recharge" option, enter your mobile number, choose a plan or
-                enter an amount, and proceed to payment. Once payment is
-                successful, your mobile will be recharged instantly.
+            <div class="enhanced-faq-answer">
+              <p>
+                To recharge your mobile, simply log in to your NEXA account,
+                select the "Recharge" option from the dashboard, enter your
+                mobile number, choose your preferred plan or enter a custom
+                amount, select your payment method, and proceed to checkout.
+                Once payment is successful, your mobile will be recharged
+                instantly with SMS confirmation.
               </p>
             </div>
           </div>
 
           <!-- FAQ Item 2 -->
-          <div
-            class="mb-4 border border-blue-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
-          >
-            <div
-              class="faq-question flex justify-between items-center p-5 bg-white cursor-pointer"
-            >
-              <h3 class="font-semibold text-gray-800">
-                What payment methods are accepted?
-              </h3>
-              <i
-                class="fas fa-chevron-down text-blue-600 transition-transform duration-300"
-              ></i>
+          <div class="enhanced-faq-item">
+            <div class="enhanced-faq-question" onclick="toggleFAQ(this)">
+              <h3>What payment methods are accepted?</h3>
+              <div class="faq-icon">
+                <i class="fas fa-plus"></i>
+              </div>
             </div>
-            <div
-              class="faq-answer hidden bg-gray-50 p-5 border-t border-blue-50"
-            >
-              <p class="text-gray-600">
-                We accept various payment methods including credit/debit cards,
-                net banking, UPI, mobile wallets, and more. All transactions are
-                secure and encrypted for your safety.
+            <div class="enhanced-faq-answer">
+              <p>
+                We accept a wide range of payment methods including all major
+                credit and debit cards (Visa, MasterCard, American Express), net
+                banking from 100+ banks, UPI payments (GPay, PhonePe, Paytm),
+                mobile wallets, and digital payment platforms. All transactions
+                are secured with 256-bit SSL encryption for your safety.
               </p>
             </div>
           </div>
 
           <!-- FAQ Item 3 -->
-          <div
-            class="mb-4 border border-blue-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
-          >
-            <div
-              class="faq-question flex justify-between items-center p-5 bg-white cursor-pointer"
-            >
-              <h3 class="font-semibold text-gray-800">
-                How can I check my recharge history?
-              </h3>
-              <i
-                class="fas fa-chevron-down text-blue-600 transition-transform duration-300"
-              ></i>
+          <div class="enhanced-faq-item">
+            <div class="enhanced-faq-question" onclick="toggleFAQ(this)">
+              <h3>How can I check my recharge history?</h3>
+              <div class="faq-icon">
+                <i class="fas fa-plus"></i>
+              </div>
             </div>
-            <div
-              class="faq-answer hidden bg-gray-50 p-5 border-t border-blue-50"
-            >
-              <p class="text-gray-600">
-                You can check your recharge history by logging into your account
-                and navigating to "My Account" > "Recharge History". Here you'll
-                find details of all your past transactions.
+            <div class="enhanced-faq-answer">
+              <p>
+                You can easily check your complete recharge history by logging
+                into your NEXA account and navigating to "My Account" >
+                "Recharge History". Here you'll find detailed information about
+                all your past transactions including date, amount, mobile
+                number, transaction ID, and status. You can also download
+                receipts and filter by date range.
               </p>
             </div>
           </div>
 
           <!-- FAQ Item 4 -->
-          <div
-            class="mb-4 border border-blue-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
-          >
-            <div
-              class="faq-question flex justify-between items-center p-5 bg-white cursor-pointer"
-            >
-              <h3 class="font-semibold text-gray-800">
-                What should I do if my recharge fails?
-              </h3>
-              <i
-                class="fas fa-chevron-down text-blue-600 transition-transform duration-300"
-              ></i>
+          <div class="enhanced-faq-item">
+            <div class="enhanced-faq-question" onclick="toggleFAQ(this)">
+              <h3>What should I do if my recharge fails?</h3>
+              <div class="faq-icon">
+                <i class="fas fa-plus"></i>
+              </div>
             </div>
-            <div
-              class="faq-answer hidden bg-gray-50 p-5 border-t border-blue-50"
-            >
-              <p class="text-gray-600">
-                If your recharge fails, don't worry. The amount will be refunded
-                to your payment source within 5-7 business days. You can also
-                check the status in your "Recharge History" or contact our
-                support team for assistance.
+            <div class="enhanced-faq-answer">
+              <p>
+                If your recharge fails, don't worry! First, check your "Recharge
+                History" to confirm the transaction status. If the amount has
+                been debited but recharge wasn't processed, it will be
+                automatically refunded within 5-7 business days. For immediate
+                assistance, contact our 24/7 support team with your transaction
+                ID. We also provide instant retry options for failed
+                transactions.
               </p>
             </div>
           </div>
 
           <!-- FAQ Item 5 -->
-          <div
-            class="mb-4 border border-blue-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
-          >
-            <div
-              class="faq-question flex justify-between items-center p-5 bg-white cursor-pointer"
-            >
-              <h3 class="font-semibold text-gray-800">
-                How do I change my registered mobile number?
-              </h3>
-              <i
-                class="fas fa-chevron-down text-blue-600 transition-transform duration-300"
-              ></i>
+          <div class="enhanced-faq-item">
+            <div class="enhanced-faq-question" onclick="toggleFAQ(this)">
+              <h3>How do I change my registered mobile number?</h3>
+              <div class="faq-icon">
+                <i class="fas fa-plus"></i>
+              </div>
             </div>
-            <div
-              class="faq-answer hidden bg-gray-50 p-5 border-t border-blue-50"
-            >
-              <p class="text-gray-600">
-                To change your registered mobile number, go to "My Account" >
-                "Profile Settings" and update your mobile number. You'll receive
-                a verification code on the new number to confirm the change.
+            <div class="enhanced-faq-answer">
+              <p>
+                To update your registered mobile number, go to "My Account" >
+                "Profile Settings" and click on "Edit Mobile Number". Enter your
+                new mobile number and click "Update". You'll receive an OTP on
+                the new number for verification. Once verified, your account
+                will be updated with the new mobile number. This ensures
+                security and helps us send you important transaction updates.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ Item 6 -->
+          <div class="enhanced-faq-item">
+            <div class="enhanced-faq-question" onclick="toggleFAQ(this)">
+              <h3>Are there any additional charges for recharges?</h3>
+              <div class="faq-icon">
+                <i class="fas fa-plus"></i>
+              </div>
+            </div>
+            <div class="enhanced-faq-answer">
+              <p>
+                NEXA offers transparent pricing with no hidden charges! We don't
+                charge any convenience fees for standard recharges. The amount
+                you pay is exactly what goes to your mobile account. However,
+                some premium payment methods might have minimal processing fees
+                which are clearly displayed before payment confirmation.
               </p>
             </div>
           </div>
@@ -376,50 +587,7 @@
     <!-- Include footer component -->
     <div id="footer"></div>
 
-    <script src="../../assets/js/main.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        // Load navbar
-        fetch("/components/navbar.html")
-          .then((response) => response.text())
-          .then((data) => {
-            document.getElementById("navbar").innerHTML = data;
-            if (typeof initializeNavbar === "function") {
-              initializeNavbar();
-            }
-          });
-
-        // Load footer
-        fetch("/components/footer.html")
-          .then((response) => response.text())
-          .then((data) => {
-            document.getElementById("footer").innerHTML = data;
-            if (typeof initializeFooter === "function") {
-              initializeFooter();
-            }
-          });
-
-        // FAQ toggle functionality
-        const faqQuestions = document.querySelectorAll(".faq-question");
-
-        faqQuestions.forEach((question) => {
-          question.addEventListener("click", () => {
-            const answer = question.nextElementSibling;
-            const icon = question.querySelector("i");
-
-            // Toggle answer visibility
-            if (answer.classList.contains("hidden")) {
-              answer.classList.remove("hidden");
-              icon.classList.add("transform", "rotate-180");
-            } else {
-              answer.classList.add("hidden");
-              icon.classList.remove("transform", "rotate-180");
-            }
-          });
-        });
-      });
-    </script>
     <script src="/components/navbar.js"></script>
-    <script src="/assets/js/navbar-loader.js"></script>
+    <script src="./contact.js"></script>
   </body>
 </html>
