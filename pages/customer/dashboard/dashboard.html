@@ -212,6 +212,40 @@
               </div>
             </div>
 
+            <!-- Recharge for Another Number -->
+            <div
+              class="bg-card-light p-6 rounded-2xl shadow-lg border border-border-light hover:shadow-xl transition-all duration-300 animate-fade-in"
+            >
+              <div class="text-center">
+                <div
+                  class="w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                >
+                  <span class="material-icons text-purple-600 text-2xl"
+                    >phone_forwarded</span
+                  >
+                </div>
+                <h3 class="font-bold text-lg mb-2">Recharge for Someone</h3>
+                <p class="text-subtext-light text-sm mb-4 leading-relaxed">
+                  Recharge for your friends or family members
+                </p>
+                <div class="mb-4">
+                  <input
+                    type="text"
+                    id="rechargeForNumber"
+                    placeholder="Enter mobile number"
+                    class="w-full px-4 py-3 rounded-xl border border-border-light focus:ring-2 focus:ring-primary focus:border-transparent"
+                    maxlength="10"
+                  />
+                </div>
+                <button
+                  onclick="rechargeForAnotherNumber()"
+                  class="w-full bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105"
+                >
+                  Proceed to Recharge
+                </button>
+              </div>
+            </div>
+
             <!-- Add Friends Section - Commented Out -->
             <!-- <div
               class="bg-card-light p-6 rounded-2xl shadow-lg border border-border-light hover:shadow-xl transition-all duration-300 animate-fade-in"

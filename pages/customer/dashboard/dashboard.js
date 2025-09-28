@@ -1314,6 +1314,10 @@ function refreshAccount() {
 
 // Feature Functions
 function showRechargeModal() {
+  // Clear any previously set recharge number to indicate this is for the user's own number
+  localStorage.removeItem("rechargeForNumber");
+
+  // Navigate to plans page
   window.location.href = "/pages/customer/plans/plans.html";
 }
 
@@ -1331,6 +1335,27 @@ function rechargePlan() {
 
 function browsePlans() {
   window.location.href = "/pages/customer/prepaid/prepaid-home.html";
+}
+
+// Recharge for another number functionality
+function rechargeForAnotherNumber() {
+  const rechargeNumber = document.getElementById("rechargeForNumber").value;
+
+  // Validate the number (simple validation for 10 digits)
+  if (
+    !rechargeNumber ||
+    rechargeNumber.length !== 10 ||
+    !/^\d+$/.test(rechargeNumber)
+  ) {
+    showToast("Please enter a valid 10-digit mobile number", "error");
+    return;
+  }
+
+  // Store the number in localStorage to be used across pages
+  localStorage.setItem("rechargeForNumber", rechargeNumber);
+
+  // Navigate to plans page
+  window.location.href = "/pages/customer/plans/plans.html?source=dashboard";
 }
 
 function startLiveChat() {
