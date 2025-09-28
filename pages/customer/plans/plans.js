@@ -27,7 +27,9 @@ let categoryList,
   postpaidTab,
   planSearch,
   activationAnimation,
-  doneButton;
+  doneButton,
+  rechargeNumberDisplay,
+  changeNumberModal;
 
 // API URLs
 const PLANS_API_URL = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans";
@@ -801,6 +803,8 @@ function initializeDOMElements() {
   planSearch = document.getElementById("plan-search");
   activationAnimation = document.getElementById("activation-animation");
   doneButton = document.getElementById("done-button");
+  rechargeNumberDisplay = document.getElementById("rechargeNumberDisplay");
+  changeNumberModal = document.getElementById("change-number-modal");
 
   // Setup event listeners
   if (planModal) {
@@ -900,6 +904,90 @@ function initializeDOMElements() {
   setupSearchListener(document.getElementById("mobile-search-input"));
 }
 
+// Initialize recharge number display
+function initializeRechargeNumber() {
+  console.log("Initializing recharge number display");
+  if (rechargeNumberDisplay) {
+    // Get recharge number from localStorage or use logged in user's number
+    const rechargeForNumber = localStorage.getItem("rechargeForNumber");
+    const loggedInUser = localStorage.getItem("loggedInUser");
+    let phoneNumber = "";
+    let isPersonalRecharge = true;
+
+    if (rechargeForNumber) {
+      phoneNumber = rechargeForNumber;
+      isPersonalRecharge = false;
+      console.log("Using rechargeForNumber:", phoneNumber);
+    } else if (loggedInUser) {
+      const user = JSON.parse(loggedInUser);
+      phoneNumber = user.phone || "";
+      console.log("Using logged in user's number:", phoneNumber);
+    }
+
+    // Always ensure we have a number to display
+    if (!phoneNumber && loggedInUser) {
+      const user = JSON.parse(loggedInUser);
+      phoneNumber = user.phone || "";
+      console.log("Fallback to logged in user's number:", phoneNumber);
+    }
+
+    // Display the phone number
+    rechargeNumberDisplay.textContent = phoneNumber || "Not set";
+    console.log("Set display text to:", phoneNumber || "Not set");
+
+    // Update UI to show if this is personal or another number recharge
+    const rechargeNumberCard = document.getElementById("rechargeNumberCard");
+    if (rechargeNumberCard) {
+      if (isPersonalRecharge) {
+        rechargeNumberCard.querySelector("p.text-sm").textContent =
+          "Recharging for myself";
+      } else {
+        rechargeNumberCard.querySelector("p.text-sm").textContent =
+          "Recharging for another number";
+      }
+    }
+  } else {
+    console.warn("rechargeNumberDisplay element not found");
+  }
+}
+
+// Show change number modal
+function showChangeNumberModal() {
+  if (changeNumberModal) {
+    const currentNumber = localStorage.getItem("rechargeForNumber") || "";
+    document.getElementById("changeNumberInput").value = currentNumber;
+    changeNumberModal.classList.remove("hidden");
+  }
+}
+
+// Close change number modal
+function closeChangeNumberModal() {
+  if (changeNumberModal) {
+    changeNumberModal.classList.add("hidden");
+  }
+}
+
+// Update recharge number
+function updateRechargeNumber() {
+  const numberInput = document.getElementById("changeNumberInput");
+  const newNumber = numberInput.value.trim();
+
+  // Validate phone number (10 digits)
+  if (!/^\d{10}$/.test(newNumber)) {
+    alert("Please enter a valid 10-digit mobile number");
+    return;
+  }
+
+  // Update localStorage and display
+  localStorage.setItem("rechargeForNumber", newNumber);
+  if (rechargeNumberDisplay) {
+    rechargeNumberDisplay.textContent = newNumber;
+  }
+
+  // Close modal
+  closeChangeNumberModal();
+}
+
 // Main initialization function
 async function initializeApp() {
   try {
@@ -914,6 +1002,10 @@ async function initializeApp() {
 
     // Fetch data and initialize page
     await fetchData();
+
+    // Initialize recharge number display after DOM elements are set
+    initializeRechargeNumber();
+
     document.dispatchEvent(new Event("navloaded"));
 
     console.log("App initialized successfully");
@@ -924,7 +1016,9 @@ async function initializeApp() {
 
 // Wait for DOM to be ready, then initialize
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initializeApp);
+  document.addEventListener("DOMContentLoaded", function () {
+    initializeApp();
+  });
 } else {
   initializeApp();
 }

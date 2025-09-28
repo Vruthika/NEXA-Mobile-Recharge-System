@@ -95,6 +95,29 @@
         <div class="flex flex-col lg:flex-row gap-8">
           <!-- Sidebar -->
           <aside class="w-full lg:w-1/4">
+            <!-- Recharge Number Display -->
+            <div
+              id="rechargeNumberCard"
+              class="bg-card-light dark:bg-card-dark p-4 rounded-xl border border-border-light dark:border-border-dark mb-6"
+            >
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Recharging for
+                  </p>
+                  <p id="rechargeNumberDisplay" class="font-bold text-lg"></p>
+                </div>
+                <button
+                  id="changeRechargeNumber"
+                  class="text-primary hover:text-primary-dark text-sm flex items-center"
+                  onclick="showChangeNumberModal()"
+                >
+                  <span class="material-icons text-sm mr-1">edit</span>
+                  Change
+                </button>
+              </div>
+            </div>
+
             <h2 class="text-xl font-semibold mb-4">Plan Category</h2>
             <div class="space-y-2" id="category-list">
               <!-- Categories will be loaded dynamically -->
@@ -219,6 +242,54 @@
                 Buy Now
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Change Number Modal -->
+    <div id="change-number-modal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black bg-opacity-50 modal-overlay"></div>
+      <div
+        class="relative z-10 flex items-center justify-center min-h-screen p-4"
+      >
+        <div
+          class="bg-card-light dark:bg-card-dark rounded-2xl shadow-xl max-w-md w-full p-6 animate-fadeIn"
+        >
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold">Change Recharge Number</h3>
+            <button
+              onclick="closeChangeNumberModal()"
+              class="text-gray-500 hover:text-gray-700"
+            >
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+
+          <div class="mb-6">
+            <label class="block text-sm font-medium mb-2">Mobile Number</label>
+            <input
+              type="text"
+              id="changeNumberInput"
+              class="w-full px-4 py-3 rounded-xl border border-border-light dark:border-border-dark focus:ring-2 focus:ring-primary focus:border-transparent"
+              placeholder="Enter 10-digit mobile number"
+              maxlength="10"
+            />
+          </div>
+
+          <div class="flex justify-end space-x-3">
+            <button
+              onclick="closeChangeNumberModal()"
+              class="px-4 py-2 border border-border-light dark:border-border-dark rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              Cancel
+            </button>
+            <button
+              onclick="updateRechargeNumber()"
+              class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-purple-700"
+            >
+              Update
+            </button>
           </div>
         </div>
       </div>
