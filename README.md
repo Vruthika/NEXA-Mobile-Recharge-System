@@ -95,6 +95,20 @@ NEXA-Mobile-Recharge-System/
 
 ---
 
+## 📡 API Endpoints
+
+The application currently interacts with mock services. Replace these with your production API as needed.
+
+```javascript
+const API = {
+  customers: "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Customers",
+  plans: "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans",
+  transactions: "https://68ca32f2430c4476c3488311.mockapi.io/Transactions",
+};
+```
+
+---
+
 ## 🏃‍♂️ Quick Start
 
 1. **Clone the repository**
