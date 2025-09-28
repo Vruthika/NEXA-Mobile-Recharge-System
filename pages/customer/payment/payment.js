@@ -136,6 +136,7 @@ function updatePlanDetails(plan) {
   const totalAmount = document.getElementById("total-amount");
   const cardPayAmount = document.getElementById("card-pay-amount");
   const netbankingPayAmount = document.getElementById("netbanking-pay-amount");
+  const rechargeNumber = document.getElementById("recharge-number");
 
   // Ensure all elements exist before updating
   if (
@@ -160,6 +161,22 @@ function updatePlanDetails(plan) {
   totalAmount.textContent = formattedPrice;
   cardPayAmount.textContent = formattedPrice;
   netbankingPayAmount.textContent = formattedPrice;
+
+  // Display the recharge number if element exists
+  if (rechargeNumber) {
+    const rechargeForNumber = localStorage.getItem("rechargeForNumber");
+    const loggedInUser = localStorage.getItem("loggedInUser");
+    let displayNumber = "";
+
+    if (rechargeForNumber) {
+      displayNumber = rechargeForNumber;
+    } else if (loggedInUser) {
+      const user = JSON.parse(loggedInUser);
+      displayNumber = user.phone || "Your number";
+    }
+
+    rechargeNumber.textContent = displayNumber;
+  }
 
   planData = plan;
   console.log("Plan details updated successfully");
@@ -338,17 +355,24 @@ document.addEventListener("DOMContentLoaded", function () {
       const isBillPayment = urlParams.get("type") === "bill";
 
       // Create transaction data with customer details
+      // Get the recharge number from localStorage if it exists, otherwise use customer's phone
+      const rechargeForNumber = localStorage.getItem("rechargeForNumber");
+      const phoneToUse = rechargeForNumber || customerData.phone;
+
       const transactionData = {
         transaction_id: getNextTransactionId(),
-        userId: customerData.id,
+        userId: phoneToUse, // Use the phone number as the userId so it appears in that number's history
+        customerId: phoneToUse, // Add customerId field for the phone number
+        phoneNumber: phoneToUse, // Add phoneNumber field for compatibility with history.js
         name: customerData.name,
-        phone: customerData.phone,
+        phone: phoneToUse, // Use the recharge number instead of customer's phone
         planId: selectedPlan.id,
         plan: selectedPlan.name,
         type: isBillPayment ? "Bill Payment" : "Recharge",
         status: "Success",
         date: formatDate(new Date()), // Format as YYYY-MM-DD
         amount: selectedPlan.price,
+        rechargedBy: customerData.id, // Track who made the recharge
       };
 
       console.log("Creating transaction:", transactionData);
