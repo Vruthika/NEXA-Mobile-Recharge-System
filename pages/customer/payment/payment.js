@@ -367,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function () {
         phone: phoneToUse, // Use the recharge number instead of customer's phone
         planId: selectedPlan.id,
         plan: selectedPlan.name,
-        type: isBillPayment ? "Bill Payment" : "Prepaid",
+        type: isBillPayment ? "Postpaid" : "Prepaid",
         status: "Success",
         date: formatDate(new Date()), // Format as YYYY-MM-DD
         amount: selectedPlan.price,
