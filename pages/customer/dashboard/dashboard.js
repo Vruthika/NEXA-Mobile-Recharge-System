@@ -319,7 +319,7 @@ async function initializeDataUsage() {
     // Prepaid plans
     dailyDataUsage.totalGB = currentActivePlan.limit
       ? parseFloat(currentActivePlan.limit)
-      : 2.5;
+      : 3;
   }
 
   console.log("Plan Limit:", currentActivePlan.limit);
