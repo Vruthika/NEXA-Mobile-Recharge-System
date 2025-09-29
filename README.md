@@ -130,7 +130,13 @@ const API = {
    open pages/admin/dashboard/dashboard.html
    ```
 
-3. Start recharging mobiles and managing plans! 🎉
+3. **Login Credentials for Admin**
+
+   Email ID : admin@gmail.com
+
+   Password : admin@123
+
+4. Start recharging mobiles and managing plans! 🎉
 
 ---
 
