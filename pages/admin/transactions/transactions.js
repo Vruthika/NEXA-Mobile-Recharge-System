@@ -19,7 +19,6 @@ function highlightActiveLink() {
     const href = link.getAttribute("href");
 
     if (currentPath.endsWith(href.replace("../", ""))) {
-      // Active link: purple base, dark purple on hover
       link.classList.add(
         "bg-purple-600",
         "text-white",
@@ -27,7 +26,6 @@ function highlightActiveLink() {
         "hover:bg-purple-700"
       );
     } else {
-      // Inactive links: plain style, no hover background
       link.classList.remove(
         "bg-purple-600",
         "text-white",
@@ -44,7 +42,7 @@ const transactionsURL =
 
 let totalTransactions = [];
 let filteredTransactions = [];
-let allPlans = []; // Store all plans globally
+let allPlans = [];
 
 let transactionCurrentPage = 1;
 const transactionRowsPerPage = 10;
@@ -54,9 +52,7 @@ async function fetchTransactions() {
     const res = await fetch(transactionsURL);
     const trans = await res.json();
     totalTransactions = [...trans];
-    filteredTransactions = [...trans]; // Initialize filtered array
-
-    // Render tables after data fetch
+    filteredTransactions = [...trans];
     renderTransactions();
   } catch (e) {
     console.error("Error fetching transactions:", e);
@@ -64,87 +60,66 @@ async function fetchTransactions() {
 }
 fetchTransactions();
 
-// Fetch Plans and populate the dropdown
 async function fetchPlans() {
   try {
     const res = await fetch(
       "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans"
     );
     const plans = await res.json();
-    allPlans = plans; // Store all plans globally
-
-    populatePlanDropdown(plans); // Initial population with all plans
+    allPlans = plans;
+    populatePlanDropdown(plans);
   } catch (error) {
     console.error("Error fetching plans:", error);
   }
 }
 
-// Function to populate plan dropdown
 function populatePlanDropdown(plans) {
   const filterPlan = document.getElementById("filterPlan");
   if (filterPlan) {
-    // Store current selection
     const currentSelection = filterPlan.value;
-
-    // Reset dropdown
     filterPlan.innerHTML = `<option value="All">All</option>`;
-
-    // Populate from filtered plans
     plans.forEach((plan) => {
       const option = document.createElement("option");
       option.value = plan.name;
       option.textContent = plan.name;
       filterPlan.appendChild(option);
     });
-
-    // Restore selection if it still exists in filtered plans
     const optionExists = [...filterPlan.options].some(
       (option) => option.value === currentSelection
     );
     if (optionExists) {
       filterPlan.value = currentSelection;
     } else {
-      filterPlan.value = "All"; // Reset to "All" if current selection is no longer available
+      filterPlan.value = "All";
     }
   }
 }
 
-// Function to filter plans based on type
 function updatePlanDropdown() {
   const selectedType = document.getElementById("filterType").value;
-
   let filteredPlans;
   if (selectedType === "All") {
-    filteredPlans = allPlans; // Show all plans
+    filteredPlans = allPlans;
   } else {
-    // Filter plans by type (assuming plans have a 'type' property)
     filteredPlans = allPlans.filter((plan) => plan.type === selectedType);
   }
-
   populatePlanDropdown(filteredPlans);
 }
 
-// Parse date from different formats
 function parseDate(dateString) {
   if (!dateString) return null;
-
-  // Try parsing as ISO date first
   let date = new Date(dateString);
   if (!isNaN(date.getTime())) {
     return date;
   }
-
-  // Try parsing common formats like DD/MM/YYYY, MM/DD/YYYY, etc.
   const dateFormats = [
-    /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/, // DD/MM/YYYY or MM/DD/YYYY
-    /^(\d{4})-(\d{1,2})-(\d{1,2})$/, // YYYY-MM-DD
-    /^(\d{1,2})-(\d{1,2})-(\d{4})$/, // DD-MM-YYYY or MM-DD-YYYY
+    /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/,
+    /^(\d{4})-(\d{1,2})-(\d{1,2})$/,
+    /^(\d{1,2})-(\d{1,2})-(\d{4})$/,
   ];
-
   for (let format of dateFormats) {
     const match = dateString.match(format);
     if (match) {
-      // Assume DD/MM/YYYY format for slash-separated dates
       if (format === dateFormats[0]) {
         date = new Date(match[3], match[2] - 1, match[1]);
       } else if (format === dateFormats[1]) {
@@ -152,17 +127,14 @@ function parseDate(dateString) {
       } else {
         date = new Date(match[3], match[1] - 1, match[2]);
       }
-
       if (!isNaN(date.getTime())) {
         return date;
       }
     }
   }
-
   return null;
 }
 
-// Clear date filters
 function clearDateFilters() {
   document.getElementById("dateFrom").value = "";
   document.getElementById("dateTo").value = "";
@@ -185,29 +157,22 @@ function applyFilters() {
     const statusMatch =
       statusFilter === "All" || transaction.status === statusFilter;
     const planMatch = planFilter === "All" || transaction.plan === planFilter;
-
-    // Safe search matching with null/undefined checks
     const searchMatch =
       searchInput === "" ||
       (transaction.name &&
         transaction.name.toLowerCase().includes(searchInput)) ||
       (transaction.phone && transaction.phone.toString().includes(searchInput));
 
-    // Date range filtering
     let dateMatch = true;
     if (dateFrom || dateTo) {
       const transactionDate = parseDate(
         transaction.date || transaction.createdAt || transaction.timestamp
       );
-
       if (transactionDate) {
         const fromDate = dateFrom ? new Date(dateFrom) : null;
         const toDate = dateTo ? new Date(dateTo) : null;
-
-        // Set time to start/end of day for proper comparison
         if (fromDate) fromDate.setHours(0, 0, 0, 0);
         if (toDate) toDate.setHours(23, 59, 59, 999);
-
         if (fromDate && transactionDate < fromDate) {
           dateMatch = false;
         }
@@ -215,11 +180,9 @@ function applyFilters() {
           dateMatch = false;
         }
       } else if (dateFrom || dateTo) {
-        // If date filters are applied but transaction has no valid date, exclude it
         dateMatch = false;
       }
     }
-
     return typeMatch && statusMatch && searchMatch && planMatch && dateMatch;
   });
 
@@ -227,7 +190,6 @@ function applyFilters() {
   renderTransactions();
 }
 
-// Initialize event listeners after DOM is loaded
 function initializeFilters() {
   const typeFilter = document.getElementById("filterType");
   const statusFilter = document.getElementById("filterStatus");
@@ -239,45 +201,147 @@ function initializeFilters() {
 
   if (typeFilter) {
     typeFilter.addEventListener("change", () => {
-      updatePlanDropdown(); // Update plan dropdown first
-      applyFilters(); // Then apply filters
+      updatePlanDropdown();
+      applyFilters();
     });
   }
-
   if (statusFilter) {
     statusFilter.addEventListener("change", applyFilters);
   }
-
   if (planFilter) {
     planFilter.addEventListener("change", applyFilters);
   }
-
   if (searchInput) {
     searchInput.addEventListener("input", applyFilters);
   }
-
   if (dateFrom) {
     dateFrom.addEventListener("change", applyFilters);
   }
-
   if (dateTo) {
     dateTo.addEventListener("change", applyFilters);
   }
-
   if (clearDateBtn) {
     clearDateBtn.addEventListener("click", clearDateFilters);
   }
 }
 
-// Wait for DOM to be fully loaded
-document.addEventListener("DOMContentLoaded", () => {
-  fetchPlans();
-  initializeFilters();
-});
+function openTransactionModal(index) {
+  const transaction = filteredTransactions[index];
+  const modal = document.getElementById("transactionModal");
+  const modalContent = document.getElementById("modalContent");
 
-// Total Transactions + Pagination
+  if (!modal || !modalContent) {
+    console.error("Modal elements not found");
+    return;
+  }
+
+  let displayDate = "N/A";
+  if (transaction.date || transaction.createdAt || transaction.timestamp) {
+    const date = parseDate(
+      transaction.date || transaction.createdAt || transaction.timestamp
+    );
+    if (date) {
+      displayDate = date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    }
+  }
+
+  modalContent.innerHTML = `
+    <div class="space-y-6">
+      <div class="text-center border-b pb-4">
+        <h2 class="text-2xl font-bold text-purple-600">Transaction Invoice</h2>
+        <p class="text-sm text-gray-500 mt-1">Transaction ID: ${
+          transaction.transaction_id || "N/A"
+        }</p>
+      </div>
+      <div class="flex justify-center">
+        <span class="px-4 py-2 rounded-full text-sm font-semibold ${
+          transaction.status === "Success"
+            ? "bg-green-100 text-green-800"
+            : "bg-red-100 text-red-800"
+        }">
+          ${transaction.status || "N/A"}
+        </span>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">Customer Information</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm text-gray-600">Name</p>
+            <p class="font-semibold text-gray-800">${
+              transaction.name || "N/A"
+            }</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Phone Number</p>
+            <p class="font-semibold text-gray-800">${
+              transaction.phone || "N/A"
+            }</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">Plan Details</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm text-gray-600">Connection Type</p>
+            <p class="font-semibold text-gray-800">${
+              transaction.type || "N/A"
+            }</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Recharged Plan</p>
+            <p class="font-semibold text-gray-800">${
+              transaction.plan || "N/A"
+            }</p>
+          </div>
+          ${
+            transaction.amount
+              ? `
+          <div>
+            <p class="text-sm text-gray-600">Amount</p>
+            <p class="font-semibold text-gray-800">₹${transaction.amount}</p>
+          </div>
+          `
+              : ""
+          }
+          <div>
+            <p class="text-sm text-gray-600">Transaction Date</p>
+            <p class="font-semibold text-gray-800">${displayDate}</p>
+          </div>
+        </div>
+      </div>
+      ${
+        transaction.description
+          ? `
+      <div class="bg-gray-50 p-4 rounded-lg">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">Description</h3>
+        <p class="text-gray-700">${transaction.description}</p>
+      </div>
+      `
+          : ""
+      }
+      
+    </div>
+  `;
+
+  modal.classList.remove("hidden");
+}
+
+function closeTransactionModal() {
+  const modal = document.getElementById("transactionModal");
+  if (modal) {
+    modal.classList.add("hidden");
+  }
+}
+
 function renderTransactions() {
   let tbody = document.getElementById("transactionTable");
+  if (!tbody) return;
+
   tbody.innerHTML = "";
 
   let start = (transactionCurrentPage - 1) * transactionRowsPerPage;
@@ -285,7 +349,6 @@ function renderTransactions() {
   let paginated = filteredTransactions.slice(start, end);
 
   paginated.forEach((t, index) => {
-    // Format date for display
     let displayDate = "N/A";
     if (t.date || t.createdAt || t.timestamp) {
       const date = parseDate(t.date || t.createdAt || t.timestamp);
@@ -296,13 +359,25 @@ function renderTransactions() {
 
     tbody.innerHTML += `
       <tr class="text-center border">
-        <td class="p-3 border">${start + index + 1}</td>
-        <td class="p-3 border">${t.name || "N/A"}</td>
-        <td class="p-3 border">${t.phone || "N/A"}</td>
-        <td class="p-3 border">${t.type || "N/A"}</td>
-        <td class="p-3 border">${t.plan || "N/A"}</td>
-        <td class="p-3 border">${t.status || "N/A"}</td>
-        <td class="p-3 border">${displayDate}</td>
+        <td class="p-2 border text-xs lg:text-sm">${start + index + 1}</td>
+        <td class="p-2 border text-xs lg:text-sm truncate">${
+          t.name || "N/A"
+        }</td>
+        <td class="p-2 border text-xs lg:text-sm">${t.phone || "N/A"}</td>
+        <td class="p-2 border text-xs lg:text-sm">${t.type || "N/A"}</td>
+        <td class="p-2 border text-xs lg:text-sm truncate">${
+          t.plan || "N/A"
+        }</td>
+        <td class="p-2 border text-xs lg:text-sm">${t.status || "N/A"}</td>
+        <td class="p-2 border text-xs lg:text-sm">${displayDate}</td>
+        <td class="p-2 border">
+          <button 
+            onclick="openTransactionModal(${start + index})" 
+            class="bg-purple-600 text-white px-2 py-1 rounded text-xs lg:text-sm hover:bg-purple-700 transition"
+          >
+            View
+          </button>
+        </td>
       </tr>`;
   });
 
@@ -311,6 +386,8 @@ function renderTransactions() {
 
 function renderTransactionPagination() {
   let pagination = document.getElementById("transactionPagination");
+  if (!pagination) return;
+
   pagination.innerHTML = "";
 
   let totalPages = Math.ceil(
@@ -318,7 +395,6 @@ function renderTransactionPagination() {
   );
   if (totalPages === 0) return;
 
-  // Prev Button
   let prevBtn = document.createElement("button");
   prevBtn.innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
@@ -341,7 +417,6 @@ function renderTransactionPagination() {
   });
   pagination.appendChild(prevBtn);
 
-  // Page Numbers
   for (let i = 1; i <= totalPages; i++) {
     let button = document.createElement("button");
     button.innerText = i;
@@ -358,7 +433,6 @@ function renderTransactionPagination() {
     pagination.appendChild(button);
   }
 
-  // Next Button
   let nextBtn = document.createElement("button");
   nextBtn.innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
@@ -381,3 +455,29 @@ function renderTransactionPagination() {
   });
   pagination.appendChild(nextBtn);
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  fetchPlans();
+  initializeFilters();
+
+  const closeModalBtn = document.getElementById("closeModal");
+  const modal = document.getElementById("transactionModal");
+
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener("click", closeTransactionModal);
+  }
+
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        closeTransactionModal();
+      }
+    });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeTransactionModal();
+    }
+  });
+});

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Transactions</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="./transactions.js"></script>
   </head>
   <body class="bg-gray-100">
     <!-- Mobile Menu Button -->
@@ -40,6 +39,32 @@
       id="sidebar"
       class="fixed left-0 w-64 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300"
     ></div>
+
+    <!-- Transaction Details Modal -->
+    <div
+      id="transactionModal"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+      >
+        <div
+          class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center"
+        >
+          <h3 class="text-xl font-bold text-gray-800">Transaction Details</h3>
+          <button
+            id="closeModal"
+            class="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div id="modalContent" class="p-6">
+          <!-- Content will be dynamically inserted -->
+        </div>
+      </div>
+    </div>
 
     <!-- Main Content -->
     <main class="pt-16 lg:ml-64 p-4 lg:p-6 space-y-5">
@@ -155,43 +180,50 @@
 
         <!-- Table -->
         <div class="overflow-x-auto">
-          <table class="border-collapse border border-gray-400 min-w-full">
+          <table
+            class="border-collapse border border-gray-400 w-full table-fixed"
+          >
             <thead>
               <tr class="bg-gray-200 text-center">
                 <th
-                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                  class="border border-gray-300 px-1 lg:px-2 py-2 text-xs lg:text-sm w-12 lg:w-16"
                 >
                   S.No
                 </th>
                 <th
-                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                  class="border border-gray-300 px-1 lg:px-2 py-2 text-xs lg:text-sm w-20 lg:w-32"
                 >
                   Name
                 </th>
                 <th
-                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                  class="border border-gray-300 px-1 lg:px-2 py-2 text-xs lg:text-sm w-24 lg:w-32"
                 >
                   Phone Number
                 </th>
                 <th
-                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                  class="border border-gray-300 px-1 lg:px-2 py-2 text-xs lg:text-sm w-16 lg:w-24"
                 >
                   Type
                 </th>
                 <th
-                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                  class="border border-gray-300 px-1 lg:px-2 py-2 text-xs lg:text-sm w-24 lg:w-36"
                 >
                   Recharged Plan
                 </th>
                 <th
-                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                  class="border border-gray-300 px-1 lg:px-2 py-2 text-xs lg:text-sm w-16 lg:w-24"
                 >
                   Status
                 </th>
                 <th
-                  class="border border-gray-300 px-2 lg:px-4 py-2 text-xs lg:text-sm"
+                  class="border border-gray-300 px-1 lg:px-2 py-2 text-xs lg:text-sm w-20 lg:w-28"
                 >
                   Date
+                </th>
+                <th
+                  class="border border-gray-300 px-1 lg:px-2 py-2 text-xs lg:text-sm w-16 lg:w-24"
+                >
+                  Action
                 </th>
               </tr>
             </thead>
