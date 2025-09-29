@@ -361,8 +361,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const transactionData = {
         transaction_id: getNextTransactionId(),
-        userId: phoneToUse, // Use the phone number as the userId so it appears in that number's history
-        customerId: phoneToUse, // Add customerId field for the phone number
+        userId: customerData.id, // Use the phone number as the userId so it appears in that number's history
         phoneNumber: phoneToUse, // Add phoneNumber field for compatibility with history.js
         name: customerData.name,
         phone: phoneToUse, // Use the recharge number instead of customer's phone
