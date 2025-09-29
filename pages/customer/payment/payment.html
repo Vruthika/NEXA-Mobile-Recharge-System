@@ -19,15 +19,15 @@
         theme: {
           extend: {
             colors: {
-              primary: "#6D28D9",
-              "background-light": "#F3F4F6",
-              "background-dark": "#1F2937",
+              primary: "#6D28D9", // Violet
+              "background-light": "#F3F4F6", // Light Gray
+              "background-dark": "#1F2937", // Dark Gray
               "card-light": "#FFFFFF",
               "card-dark": "#374151",
               "text-light": "#111827",
               "text-dark": "#F9FAFB",
-              "accent-light": "#E9D5FF",
-              "accent-dark": "#4C1D95",
+              "accent-light": "#E9D5FF", // Light Lavender
+              "accent-dark": "#4C1D95", // Darker Violet
               "border-light": "#E5E7EB",
               "border-dark": "#4B5563",
             },
@@ -86,6 +86,7 @@
         }
       }
 
+      /* Success Animation */
       .success-animation {
         display: none;
         position: fixed;
@@ -211,6 +212,7 @@
         box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
       }
 
+      /* Remove scrollbars */
       html {
         overflow-y: hidden;
       }
@@ -225,6 +227,7 @@
         overflow-y: auto;
       }
 
+      /* Custom scrollbar for webkit browsers */
       .container::-webkit-scrollbar {
         width: 0px;
         background: transparent;
@@ -234,6 +237,7 @@
   <body
     class="min-h-screen bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark overflow-x-hidden"
   >
+    <!-- Full Width Header -->
     <!-- <div id="navbar"></div> -->
 
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -589,46 +593,6 @@
       </main>
     </div>
 
-    <!-- Login Required Modal -->
-    <div
-      id="login-modal"
-      class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 backdrop-blur-sm"
-    >
-      <div
-        class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md mx-4 transform transition-all shadow-2xl"
-      >
-        <div class="text-center">
-          <div
-            class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4"
-          >
-            <span class="material-icons text-red-600 dark:text-red-400 text-3xl"
-              >lock</span
-            >
-          </div>
-          <h3 class="text-2xl font-bold mb-3 text-gray-900 dark:text-white">
-            Login Required
-          </h3>
-          <p class="text-gray-600 dark:text-gray-400 mb-6">
-            You must be logged in to make a payment. Please login to continue.
-          </p>
-          <div class="flex gap-3">
-            <button
-              id="cancel-login"
-              class="flex-1 px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
-            >
-              Cancel
-            </button>
-            <button
-              id="go-to-login"
-              class="flex-1 px-6 py-3 bg-gradient-to-r from-primary to-purple-600 hover:from-purple-700 hover:to-purple-800 text-white font-semibold rounded-xl transition-all transform hover:scale-105"
-            >
-              Go to Login
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Success Animation -->
     <div id="success-animation" class="success-animation">
       <div class="checkmark-circle">
@@ -649,5 +613,7 @@
 
     <!-- Footer -->
     <div id="footer"></div>
+
+    <script src="./payment.js"></script>
   </body>
 </html>

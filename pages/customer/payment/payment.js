@@ -27,29 +27,18 @@ function getUrlParameter(name) {
     : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
-// Function to show login modal
-function showLoginModal() {
-  const modal = document.getElementById("login-modal");
-  if (modal) {
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-  }
-}
-
-// Function to hide login modal
-function hideLoginModal() {
-  const modal = document.getElementById("login-modal");
-  if (modal) {
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
-  }
-}
-
 // Function to check if user is logged in
 function checkUserAuthentication() {
   const loggedInUser = localStorage.getItem("loggedInUser");
   if (!loggedInUser) {
-    showLoginModal();
+    alert(
+      "You must be logged in to make a payment. Redirecting to login page..."
+    );
+    // Store the current payment page URL to redirect back after login
+    const currentUrl = window.location.href;
+    localStorage.setItem("redirectAfterLogin", currentUrl);
+    // Redirect to login page
+    window.location.href = "/pages/auth/login/login.html";
     return null;
   }
   return JSON.parse(loggedInUser);
@@ -92,6 +81,7 @@ async function fetchPlanData() {
 
     if (!planId) {
       console.warn("No planId found in URL, using fallback");
+      // Fallback to default values
       updatePlanDetails({
         name: "Premium Monthly",
         category: "Popular Plans",
@@ -121,9 +111,11 @@ async function fetchPlanData() {
       throw new Error("Plan not found");
     }
 
+    // Update UI with plan data
     updatePlanDetails(selectedPlan);
   } catch (error) {
     console.error("Error fetching plan data:", error);
+    // Fallback to default values
     updatePlanDetails({
       name: "Premium Monthly",
       category: "Popular Plans",
@@ -146,6 +138,7 @@ function updatePlanDetails(plan) {
   const netbankingPayAmount = document.getElementById("netbanking-pay-amount");
   const rechargeNumber = document.getElementById("recharge-number");
 
+  // Ensure all elements exist before updating
   if (
     !planName ||
     !planCategory ||
@@ -169,6 +162,7 @@ function updatePlanDetails(plan) {
   cardPayAmount.textContent = formattedPrice;
   netbankingPayAmount.textContent = formattedPrice;
 
+  // Display the recharge number if element exists
   if (rechargeNumber) {
     const rechargeForNumber = localStorage.getItem("rechargeForNumber");
     const loggedInUser = localStorage.getItem("loggedInUser");
@@ -192,33 +186,15 @@ function updatePlanDetails(plan) {
 document.addEventListener("DOMContentLoaded", function () {
   console.log("DOM loaded, initializing payment page...");
 
-  // Setup login modal handlers
-  const loginModal = document.getElementById("login-modal");
-  const goToLoginBtn = document.getElementById("go-to-login");
-  const cancelLoginBtn = document.getElementById("cancel-login");
-
-  if (goToLoginBtn) {
-    goToLoginBtn.addEventListener("click", function () {
-      const currentUrl = window.location.href;
-      localStorage.setItem("redirectAfterLogin", currentUrl);
-      window.location.href = "/pages/auth/login/login.html";
-    });
-  }
-
-  if (cancelLoginBtn) {
-    cancelLoginBtn.addEventListener("click", function () {
-      hideLoginModal();
-      window.location.href = "/pages/customer/landing/landing.html";
-    });
-  }
-
   // Check if user is logged in
   const loggedInUser = checkUserAuthentication();
   if (!loggedInUser) {
-    return;
+    return; // Exit if user is not logged in
   }
 
+  // Wait a bit for all elements to be properly rendered
   setTimeout(() => {
+    // Fetch plan data on page load
     fetchPlanData();
   }, 100);
 
@@ -276,11 +252,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Continue after successful payment
   continueButton.addEventListener("click", function () {
+    // Check if this was a bill payment
     const lastTransaction = JSON.parse(
       localStorage.getItem("lastTransaction") || "{}"
     );
 
     if (lastTransaction.isBillPayment) {
+      // Store flag to show bill payment success alert on dashboard
       localStorage.setItem("showBillPaymentSuccess", "true");
     }
 
@@ -297,9 +275,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function showForm(formToShow) {
+    // Hide all forms and instruction
     cardPaymentForm.classList.remove("active");
     netBankingForm.classList.remove("active");
     selectMethodInstruction.style.display = "none";
+
+    // Show selected form
     formToShow.classList.add("active");
   }
 
@@ -314,26 +295,8 @@ document.addEventListener("DOMContentLoaded", function () {
       return false;
     }
 
-    // Validate expiry date format
     if (!expiryDate || !expiryDate.match(/^(0[1-9]|1[0-2])\/([0-9]{2})$/)) {
       alert("Please enter a valid expiry date (MM/YY)");
-      return false;
-    }
-
-    // Validate expiry date is not in the past
-    const [month, year] = expiryDate.split("/");
-    const expiryMonth = parseInt(month, 10);
-    const expiryYear = parseInt("20" + year, 10);
-
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth() + 1;
-    const currentYear = currentDate.getFullYear();
-
-    if (
-      expiryYear < currentYear ||
-      (expiryYear === currentYear && expiryMonth < currentMonth)
-    ) {
-      alert("Card has expired. Please enter a valid expiry date");
       return false;
     }
 
@@ -365,11 +328,13 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   async function processPayment(button) {
+    // Check user authentication again before processing
     const loggedInUser = checkUserAuthentication();
     if (!loggedInUser) {
       return;
     }
 
+    // Show loading state
     const originalHTML = button.innerHTML;
     button.innerHTML =
       '<span class="material-icons animate-spin mr-2">hourglass_empty</span>Processing...';
@@ -382,48 +347,40 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     try {
+      // Fetch customer data from API to get the most up-to-date information
       const customerData = await fetchCustomerData(loggedInUser.id);
 
+      // Check if this is a bill payment or recharge
       const urlParams = new URLSearchParams(window.location.search);
       const isBillPayment = urlParams.get("type") === "bill";
 
+      // Create transaction data with customer details
+      // Get the recharge number from localStorage if it exists, otherwise use customer's phone
       const rechargeForNumber = localStorage.getItem("rechargeForNumber");
       const phoneToUse = rechargeForNumber || customerData.phone;
 
-      // Check if recharging own number vs another number
-      const isOwnNumber =
-        !rechargeForNumber || rechargeForNumber === customerData.phone;
-
-      // Determine transaction type
-      let transactionType;
-      if (isBillPayment) {
-        transactionType = "Bill Payment";
-      } else if (isOwnNumber) {
-        transactionType = "Prepaid";
-      } else {
-        transactionType = "Recharge";
-      }
-
       const transactionData = {
         transaction_id: getNextTransactionId(),
-        userId: phoneToUse,
-        customerId: phoneToUse,
-        phoneNumber: phoneToUse,
+        userId: phoneToUse, // Use the phone number as the userId so it appears in that number's history
+        customerId: phoneToUse, // Add customerId field for the phone number
+        phoneNumber: phoneToUse, // Add phoneNumber field for compatibility with history.js
         name: customerData.name,
-        phone: phoneToUse,
+        phone: phoneToUse, // Use the recharge number instead of customer's phone
         planId: selectedPlan.id,
         plan: selectedPlan.name,
-        type: transactionType,
+        type: isBillPayment ? "Bill Payment" : "Recharge",
         status: "Success",
-        date: formatDate(new Date()),
+        date: formatDate(new Date()), // Format as YYYY-MM-DD
         amount: selectedPlan.price,
-        rechargedBy: customerData.id,
+        rechargedBy: customerData.id, // Track who made the recharge
       };
 
       console.log("Creating transaction:", transactionData);
 
+      // Simulate payment processing and create transaction
       setTimeout(async function () {
         try {
+          // Create transaction record
           const response = await fetch(
             "https://68ca32f2430c4476c3488311.mockapi.io/Transactions",
             {
@@ -442,12 +399,14 @@ document.addEventListener("DOMContentLoaded", function () {
               createdTransaction
             );
 
+            // Store transaction details with payment type info
             createdTransaction.isBillPayment = isBillPayment;
             localStorage.setItem(
               "lastTransaction",
               JSON.stringify(createdTransaction)
             );
 
+            // Show success animation
             successAnimation.classList.add("active");
           } else {
             throw new Error("Failed to create transaction");
@@ -460,6 +419,7 @@ document.addEventListener("DOMContentLoaded", function () {
           successAnimation.classList.add("active");
         }
 
+        // Reset button state
         button.innerHTML = originalHTML;
         button.disabled = false;
       }, 2500);
@@ -467,6 +427,7 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("Error fetching customer data:", error);
       alert("Error processing payment. Please try again.");
 
+      // Reset button state
       button.innerHTML = originalHTML;
       button.disabled = false;
     }
