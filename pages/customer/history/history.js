@@ -987,11 +987,7 @@ function downloadInvoice(transactionId, transactionData = null) {
     doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
     doc.text(`Name: ${customer?.name || "Unknown Customer"}`, 25, 125);
-    doc.text(
-      `Phone: ${customer?.phone || customer?.phoneNumber || "N/A"}`,
-      25,
-      132
-    );
+    doc.text(`Recharged Phone Number: ${transaction?.phoneNumber}`, 25, 132);
 
     // Plan details section with styling
     doc.setFillColor(59, 130, 246);
