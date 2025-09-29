@@ -182,6 +182,131 @@ function updatePlanDetails(plan) {
   console.log("Plan details updated successfully");
 }
 
+// Enhanced card validation with comprehensive expiry date validation
+function validateCardDetails(cardNumber, cardName, expiryDate, cvv) {
+  if (!cardNumber || cardNumber.replace(/\s/g, "").length !== 16) {
+    alert("Please enter a valid 16-digit card number");
+    return false;
+  }
+
+  if (!cardName || cardName.trim().length < 2) {
+    alert("Please enter the name on your card");
+    return false;
+  }
+
+  // Enhanced expiry date validation
+  if (!expiryDate || !expiryDate.match(/^(0[1-9]|1[0-2])\/([0-9]{2})$/)) {
+    alert("Please enter a valid expiry date (MM/YY)");
+    return false;
+  }
+
+  // Extract month and year from expiry date
+  const [monthStr, yearStr] = expiryDate.split("/");
+  const month = parseInt(monthStr, 10);
+  const year = parseInt(yearStr, 10);
+
+  // Convert two-digit year to four-digit year (assuming 20xx)
+  const fullYear = 2000 + year;
+
+  // Get current date
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1; // JavaScript months are 0-11
+
+  // Validate month range
+  if (month < 1 || month > 12) {
+    alert("Please enter a valid month (01-12)");
+    return false;
+  }
+
+  // Validate year is not in the past
+  if (fullYear < currentYear) {
+    alert("Card has expired. Please check the expiry year.");
+    return false;
+  }
+
+  // Validate that if year is current year, month must be in the future
+  if (fullYear === currentYear && month < currentMonth) {
+    alert("Card has expired. Please check the expiry month and year.");
+    return false;
+  }
+
+  if (!cvv || cvv.length !== 3) {
+    alert("Please enter a valid 3-digit CVV");
+    return false;
+  }
+
+  return true;
+}
+
+// Utility function to get current month and year in MM/YY format
+function getCurrentMonthYear() {
+  const currentDate = new Date();
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+  const year = String(currentDate.getFullYear()).slice(-2);
+  return `${month}/${year}`;
+}
+
+// Real-time validation with visual feedback
+function validateExpiryDateRealTime(expiryDate) {
+  const expiryInput = document.getElementById("expiry-date");
+
+  if (!expiryDate || !expiryDate.match(/^(0[1-9]|1[0-2])\/([0-9]{2})$/)) {
+    expiryInput.style.borderColor = ""; // Reset to default
+    return;
+  }
+
+  const [monthStr, yearStr] = expiryDate.split("/");
+  const month = parseInt(monthStr, 10);
+  const year = parseInt(yearStr, 10);
+  const fullYear = 2000 + year;
+
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+
+  let isValid = true;
+
+  // Validate month range
+  if (month < 1 || month > 12) {
+    isValid = false;
+  }
+  // Validate year is not in the past
+  else if (fullYear < currentYear) {
+    isValid = false;
+  }
+  // Validate that if year is current year, month must be in the future
+  else if (fullYear === currentYear && month < currentMonth) {
+    isValid = false;
+  }
+
+  // Visual feedback
+  if (isValid) {
+    expiryInput.style.borderColor = "#10b981"; // Green for valid
+  } else {
+    expiryInput.style.borderColor = "#ef4444"; // Red for invalid
+  }
+}
+
+function validateNetBankingDetails(bank, accountNumber, ifscCode) {
+  if (!bank) {
+    alert("Please select your bank");
+    return false;
+  }
+
+  if (!accountNumber || accountNumber.length < 8) {
+    alert("Please enter a valid account number");
+    return false;
+  }
+
+  if (!ifscCode || ifscCode.length < 8) {
+    alert("Please enter a valid IFSC code");
+    return false;
+  }
+
+  return true;
+}
+
 // Payment functionality
 document.addEventListener("DOMContentLoaded", function () {
   console.log("DOM loaded, initializing payment page...");
@@ -282,49 +407,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Show selected form
     formToShow.classList.add("active");
-  }
-
-  function validateCardDetails(cardNumber, cardName, expiryDate, cvv) {
-    if (!cardNumber || cardNumber.replace(/\s/g, "").length !== 16) {
-      alert("Please enter a valid 16-digit card number");
-      return false;
-    }
-
-    if (!cardName || cardName.trim().length < 2) {
-      alert("Please enter the name on your card");
-      return false;
-    }
-
-    if (!expiryDate || !expiryDate.match(/^(0[1-9]|1[0-2])\/([0-9]{2})$/)) {
-      alert("Please enter a valid expiry date (MM/YY)");
-      return false;
-    }
-
-    if (!cvv || cvv.length !== 3) {
-      alert("Please enter a valid 3-digit CVV");
-      return false;
-    }
-
-    return true;
-  }
-
-  function validateNetBankingDetails(bank, accountNumber, ifscCode) {
-    if (!bank) {
-      alert("Please select your bank");
-      return false;
-    }
-
-    if (!accountNumber || accountNumber.length < 8) {
-      alert("Please enter a valid account number");
-      return false;
-    }
-
-    if (!ifscCode || ifscCode.length < 8) {
-      alert("Please enter a valid IFSC code");
-      return false;
-    }
-
-    return true;
   }
 
   async function processPayment(button) {
@@ -444,15 +526,29 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Format expiry date
+  // Format expiry date with real-time validation
   const expiryDateInput = document.getElementById("expiry-date");
   if (expiryDateInput) {
+    // Set placeholder to current month/year
+    expiryDateInput.placeholder = getCurrentMonthYear();
+
     expiryDateInput.addEventListener("input", function (e) {
       let value = e.target.value.replace(/\D/g, "");
+
+      // Format as MM/YY
       if (value.length > 2) {
         value = value.substring(0, 2) + "/" + value.substring(2, 4);
       }
+
       e.target.value = value;
+
+      // Real-time validation feedback
+      validateExpiryDateRealTime(value);
+    });
+
+    // Also validate on blur for final check
+    expiryDateInput.addEventListener("blur", function (e) {
+      validateExpiryDateRealTime(e.target.value);
     });
   }
 
@@ -461,6 +557,22 @@ document.addEventListener("DOMContentLoaded", function () {
   if (cvvInput) {
     cvvInput.addEventListener("input", function (e) {
       e.target.value = e.target.value.replace(/[^0-9]/g, "");
+    });
+  }
+
+  // Only allow numbers for account number
+  const accountNumberInput = document.getElementById("account-number");
+  if (accountNumberInput) {
+    accountNumberInput.addEventListener("input", function (e) {
+      e.target.value = e.target.value.replace(/[^0-9]/g, "");
+    });
+  }
+
+  // Format IFSC code to uppercase
+  const ifscCodeInput = document.getElementById("ifsc-code");
+  if (ifscCodeInput) {
+    ifscCodeInput.addEventListener("input", function (e) {
+      e.target.value = e.target.value.toUpperCase();
     });
   }
 });
