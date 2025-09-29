@@ -364,7 +364,7 @@ document.addEventListener("DOMContentLoaded", function () {
         userId: customerData.id, // Use the phone number as the userId so it appears in that number's history
         phoneNumber: phoneToUse, // Add phoneNumber field for compatibility with history.js
         name: customerData.name,
-        phone: customerData.phone, // Use the recharge number instead of customer's phone
+        phone: customerData.phone, // Logged-in user's number
         planId: selectedPlan.id,
         plan: selectedPlan.name,
         type: isBillPayment ? "Postpaid" : "Prepaid",
