@@ -1,6 +1,14 @@
 // Global variables
 let loggedInUser = null;
 let currentCustomer = null;
+let userTransactions = [];
+let availablePlans = [];
+let currentActivePlan = null;
+
+// API URLs
+const API_TRANSACTIONS =
+  "https://68ca32f2430c4476c3488311.mockapi.io/Transactions";
+const API_PLANS = "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Plans";
 
 // Toast notification function
 function showToast(message, type = "success") {
@@ -95,8 +103,154 @@ async function loadCustomerData() {
     // Populate the form fields
     document.getElementById("customerName").value = currentCustomer.name;
     document.getElementById("customerPhone").value = currentCustomer.phone;
-    document.getElementById("customerPlan").value =
-      currentCustomer.plan || "No active plan";
+
+    // Fetch active plan instead of using the static value
+    fetchActivePlan();
+  } catch (error) {
+    console.error("Error loading customer data:", error);
+    showToast("Failed to load customer data", "error");
+    showLoadingState(false);
+  }
+}
+
+// Fetch transactions for the current user
+async function fetchTransactions() {
+  try {
+    const response = await fetch(API_TRANSACTIONS);
+    const allTransactions = await response.json();
+
+    if (currentCustomer) {
+      // Filter transactions by phone number and only successful ones
+      userTransactions = allTransactions
+        .filter(
+          (transaction) =>
+            transaction.phone === currentCustomer.phone &&
+            transaction.status === "Success"
+        )
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+  } catch (error) {
+    console.error("Error fetching transactions:", error);
+    userTransactions = [];
+  }
+}
+
+// Fetch available plans
+async function fetchPlans() {
+  try {
+    const response = await fetch(API_PLANS);
+    availablePlans = await response.json();
+  } catch (error) {
+    console.error("Error fetching plans:", error);
+    availablePlans = [];
+  }
+}
+
+// Find the active plan based on transactions and plan validity
+function findActivePlan() {
+  if (userTransactions.length === 0) {
+    currentActivePlan = null;
+    return;
+  }
+
+  const now = new Date();
+  now.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
+
+  for (let transaction of userTransactions) {
+    const transactionDate = new Date(transaction.date);
+    transactionDate.setHours(0, 0, 0, 0); // Reset time to start of day
+
+    const plan = availablePlans.find((p) => p.id === transaction.planId);
+
+    if (plan) {
+      // For postpaid plans, validity is always 30 days (monthly)
+      const validity =
+        plan.type === "Postpaid"
+          ? 30
+          : parseInt(plan.validity.replace(/\D/g, "")) || 30;
+
+      const daysDifference = Math.floor(
+        (now - transactionDate) / (1000 * 60 * 60 * 24)
+      );
+
+      // Plan is active if (current date - recharge date) < validity days
+      if (daysDifference < validity) {
+        const expiryDate = new Date(transactionDate);
+        expiryDate.setDate(expiryDate.getDate() + validity);
+
+        currentActivePlan = {
+          ...plan,
+          transactionDate: transactionDate,
+          expiryDate: expiryDate,
+          transaction: transaction,
+          daysUsed: daysDifference,
+          daysRemaining: validity - daysDifference,
+          isPrepaid: plan.type === "Prepaid",
+          isPostpaid: plan.type === "Postpaid",
+        };
+        return; // Found active plan, exit the loop
+      }
+    }
+  }
+
+  // If we get here, no active plan was found
+  currentActivePlan = null;
+}
+
+// Fetch and display the active plan
+async function fetchActivePlan() {
+  try {
+    await fetchPlans();
+    await fetchTransactions();
+    findActivePlan();
+    updatePlanInfo();
+  } catch (error) {
+    console.error("Error fetching active plan:", error);
+    currentActivePlan = null;
+    updatePlanInfo();
+  }
+}
+
+// Update the plan information in the UI
+function updatePlanInfo() {
+  const planField = document.getElementById("customerPlan");
+
+  if (currentActivePlan) {
+    planField.value = `${currentActivePlan.name} (${currentActivePlan.type})`;
+  } else {
+    planField.value = "No active plan";
+  }
+
+  showLoadingState(false);
+}
+
+// Load customer data from API
+async function loadCustomerData() {
+  try {
+    showLoadingState(true);
+
+    const response = await fetch(
+      "https://68c7990d5d8d9f5147324d39.mockapi.io/v1/Customers"
+    );
+    const customers = await response.json();
+
+    // Find the logged in customer using the phone from loggedInUser
+    const userPhone = loggedInUser ? loggedInUser.phone : null;
+    currentCustomer = customers.find(
+      (customer) => customer.phone === userPhone
+    );
+
+    if (!currentCustomer) {
+      showToast("Customer data not found", "error");
+      return;
+    }
+
+    // Populate the form fields
+    document.getElementById("customerName").value = currentCustomer.name;
+    document.getElementById("customerPhone").value = currentCustomer.phone;
+
+    // Fetch active plan instead of using the static value
+    fetchActivePlan();
 
     // Update status badge
     const statusBadge = document.getElementById("statusBadge");
