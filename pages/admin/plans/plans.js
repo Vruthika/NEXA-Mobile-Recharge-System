@@ -163,6 +163,9 @@ function renderPlan() {
               <td class="p-3 border">${start + index + 1}</td>
               <td class="p-3 border">${p.name}</td>
               <td class="p-3 border">Rs.${p.price}</td>
+              <td class="p-3 border">${p.limit} GB ${
+      p.type === "Prepaid" ? "/day" : "/month"
+    }</td>
               <td class="p-3 border">${p.category}</td>
               <td class="p-3 border">${p.type}</td>
               
@@ -343,6 +346,7 @@ function checkForDuplicatePlan(planData) {
       plan.validity.toLowerCase().trim() ===
       planData.validity.toLowerCase().trim();
     const priceMatch = parseFloat(plan.price) === parseFloat(planData.price);
+    const limitMatch = parseFloat(plan.limit) === parseFloat(planData.limit); // Add limit check
     const descriptionMatch =
       (plan.description || "").toLowerCase().trim() ===
       (planData.description || "").toLowerCase().trim();
@@ -371,6 +375,7 @@ function checkForDuplicatePlan(planData) {
       typeMatch &&
       validityMatch &&
       priceMatch &&
+      limitMatch && // Include limit in duplicate check
       descriptionMatch &&
       benefitsMatch
     );
@@ -421,6 +426,12 @@ function showDuplicateAlert(existingPlan) {
             <span class="font-medium">Validity:</span>
             <span>${existingPlan.validity}</span>
           </div>
+          <div class="flex justify-between">
+            <span class="font-medium">Data Limit:</span>
+            <span>${existingPlan.limit} GB ${
+    existingPlan.type === "Prepaid" ? "per day" : "per month"
+  }</span>
+          </div>
         </div>
       </div>
       
@@ -428,7 +439,9 @@ function showDuplicateAlert(existingPlan) {
         <button onclick="closeModal()" class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
           OK, Got it
         </button>
-        <button onclick="closeModal(); viewPlan(${existingPlan.id});" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+        <button onclick="closeModal(); viewPlan(${
+          existingPlan.id
+        });" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
           View Existing Plan
         </button>
       </div>
@@ -494,6 +507,17 @@ function showAddPlanModal() {
                   <label class="block text-sm font-medium text-gray-700 mb-1">Price *</label>
                   <input type="number" id="planPrice" name="planPrice" required min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500">
                 </div>
+
+                <!-- Add Limit Field -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Data Limit (GB) *
+                    <span id="limitDescription" class="text-xs text-gray-500 font-normal">
+                      (per day for Prepaid, per month for Postpaid)
+                    </span>
+                  </label>
+                  <input type="number" id="planLimit" name="planLimit" required min="0" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="e.g., 1.5">
+                </div>
               </div>
               
               <div>
@@ -515,6 +539,21 @@ function showAddPlanModal() {
         `;
 
   showModal(modalContent);
+
+  // Add event listener to update limit description based on type selection
+  const planTypeSelect = document.getElementById("planType");
+  const limitDescription = document.getElementById("limitDescription");
+
+  planTypeSelect.addEventListener("change", function () {
+    if (this.value === "Prepaid") {
+      limitDescription.textContent = "(per day for Prepaid)";
+    } else if (this.value === "Postpaid") {
+      limitDescription.textContent = "(per month for Postpaid)";
+    } else {
+      limitDescription.textContent =
+        "(per day for Prepaid, per month for Postpaid)";
+    }
+  });
 
   // Handle form submission
   document
@@ -540,6 +579,7 @@ async function handleAddPlan(e) {
     category: formData.get("planCategory"),
     validity: formData.get("planValidity"),
     price: parseFloat(formData.get("planPrice")),
+    limit: parseFloat(formData.get("planLimit")), // Add limit field
     description: formData.get("planDescription") || "",
     benefits: benefitsArray,
   };
@@ -587,6 +627,11 @@ async function handleAddPlan(e) {
 function viewPlan(planId) {
   const plan = totalPlans.find((p) => p.id === planId);
   if (!plan) return;
+
+  const limitText =
+    plan.type === "Prepaid"
+      ? `${plan.limit} GB per day`
+      : `${plan.limit} GB per month`;
 
   const modalContent = `
           <div class="p-6">
@@ -641,6 +686,11 @@ function viewPlan(planId) {
                   <p class="text-lg font-semibold text-gray-900">${
                     plan.validity || "N/A"
                   }</p>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-lg">
+                  <h3 class="text-sm font-medium text-gray-500 mb-1">Data Limit</h3>
+                  <p class="text-lg font-semibold text-gray-900">${limitText}</p>
                 </div>
               </div>
               
@@ -758,6 +808,19 @@ function editPlan(planId) {
                     plan.price
                   }" required min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500">
                 </div>
+
+                <!-- Limit Field (Readonly) -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Data Limit (GB)
+                    <span class="text-xs text-gray-500 font-normal">
+                      ${plan.type === "Prepaid" ? "(per day)" : "(per month)"}
+                    </span>
+                  </label>
+                  <input type="number" value="${
+                    plan.limit
+                  }" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500">
+                </div>
               </div>
               
               <div>
@@ -787,7 +850,6 @@ function editPlan(planId) {
     .getElementById("editPlanForm")
     .addEventListener("submit", handleEditPlan);
 }
-
 async function handleEditPlan(e) {
   e.preventDefault();
 
